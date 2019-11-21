@@ -1,0 +1,101 @@
+h3{
+    text-align: center;
+}
+footer{
+    text-align: center;
+    background-color: #eeeeee;
+    color: #999999;
+    font-size: 12px;
+}
+button{
+    position: relative;
+    margin-left: 14px;
+    margin-right: 14px;
+    padding: 5px 12px 5px 12px;
+}
+canvas{
+    margin: 0;
+    padding: 0;
+    border: 1px solid grey;
+}
+.canvas_part{
+    position: relative;
+    text-align: center;
+}
+.input_part{
+    position: relative;
+    display: inline-block;
+}
+.input_canvas{
+    position: relative;
+    width: 256px;
+}
+.output_part{
+    position: relative;
+    display: inline-block;
+}
+.output_canvas{
+    position: relative;
+    display: inline-block;
+    width: 256px;
+    height: 256px;
+}
+.list_part{
+    position: relative;
+    display: inline-block;
+    margin-left: 20px;
+}
+.icon_part{
+    text-align: center;
+}
+.single_part{
+    display: inline-block;
+    vertical-align: middle;
+}
+.single_icon_1{
+    width: 376px;
+    height: 80px;
+    cursor: pointer;
+}
+.single_icon_2{
+    width: 156px;
+    height: 75px;
+    cursor: pointer;
+}
+.control_part{
+    text-align: center;
+}
+.evaluation_part{
+    text-align: right;
+}
+.evaluation{
+    cursor: pointer;
+}
+.evaluation_icon{
+    width: 31.5px;
+    height: 29.5px;
+}
+.selected{
+    border:1px solid darkgrey;
+}
+#input_canvas_1{
+    z-index: 1;
+}
+#input_canvas_2{
+    position: absolute;
+    z-index: 2;
+}
+#input_canvas_3 {
+    position: absolute;
+    z-index: 3;
+}
+#icon_list{
+    width: 124px;
+    height: 244px;
+    vertical-align: baseline;
+}
+#scut{
+    position: relative;
+    width: 191px;
+    height: 60px;
+}
