@@ -6,6 +6,7 @@
 * 5. 矩形，起止点
 * 6. 撤回，
 * 7. 跟踪鼠标变化
+* 注： 线条宽度像素：15/10/6px
 */
 
 window.onload = function () {
@@ -17,7 +18,8 @@ window.onload = function () {
 }
 
 var DrawCanvas = new function () {
-
+    this.start_point = null;
+    this.end_point = null;
 }
 
 // 检查浏览器的支持
