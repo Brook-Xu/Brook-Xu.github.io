@@ -19,29 +19,65 @@ window.onload = function () {
         document.body.innerHTML = "当前浏览器不支持canvas画布功能。请使用其他浏览器打开。推荐使用chrome浏览器。";
         return ;
     }
-    // 记录绘制历史
-    var history = [];
     // 初始化绘制工具
     var draw = new Draw();
     draw.init();
-
 }
 
 // 封装绘制类
 function Draw () {
+    this.is_down = false;
     this.input_canvas_1 = document.getElementById('input_canvas_1');
     this.input_canvas_2 = document.getElementById('input_canvas_2');
     this.input_canvas_3 = document.getElementById('input_canvas_3');
     this.ctx_1 = this.input_canvas_1.getContext('2d');
     this.ctx_2 = this.input_canvas_2.getContext('2d');
     this.ctx_3 = this.input_canvas_3.getContext('2d');
-    
-    this.start_point = null;
-    this.end_point = null;
+    this.linear_start_point = null;
+    this.linear_end_point = null;
     this.lineWidth = 0;
+    this.curve_start_point = null;
+    this.curve_end_point = null;
+    this.curve_quadratic_point = null;
+    this.rect_x = null;
+    this.rect_y = null;
+    this.rect_end_x = null;
+    this.rect_end_y = null;
+    this.polygon_point_list = [];
+    this.history = [];
+    /* 
+        history数组元素说明:
+        {
+
+        }
+    */
 
     this.init = function () {
         // 初始化
+    }
+
+    this.drawLine = function () {
+        // 作直线
+    }
+
+    this.drawCurve = function () {
+        // 作曲线
+    }
+
+    this.drawRect = function () {
+        // 作矩形
+    }
+
+    this.drawPolygon = function () {
+        // 作多边形
+    }
+
+    this.upload = function () {
+        // 上传图片
+    }
+
+    this.undo = function () {
+        // 撤回
     }
 }
 
