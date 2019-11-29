@@ -56,20 +56,70 @@ function Draw () {
         // 初始化
     }
 
-    this.drawLine = function () {
+    this.drawLine = function (ctx, ctx_width, start_point_x, start_point_y, end_point_x, end_point_y) {
         // 作直线
+        var ctx_color = "#0000ff";
+        ctx.beginPath();
+        ctx.moveTo(start_point_x, start_point_y);
+        ctx.lineTo(end_point_x, end_point_y);
+        ctx.lineWidth = ctx_width;
+        ctx.strokeStyle = ctx_color;
+        ctx.stroke();
+        // ctx.closePath();
     }
 
-    this.drawCurve = function () {
+    this.drawCurve = function (ctx, ctx_width, start_point_x, start_point_y, end_point_x, end_point_y, cpx, cpy) {
         // 作曲线
+        var ctx_color = "#0000ff";
+        ctx.beginPath();
+        ctx.moveTo(start_point_x, start_point_y);
+        ctx.quadraticCurveTo(cpx, cpy, end_point_x, end_point_y);
+        ctx.lineWidth = ctx_width;
+        ctx.strokeStyle = ctx_color;
+        ctx.stroke();
+        // ctx.closePath();
     }
 
-    this.drawRect = function () {
+    this.drawRect = function (ctx, ctx_color, start_point_x, start_point_y, end_point_x, end_point_y) {
         // 作矩形
+        var rect_width = Math.abs(end_point_x - start_point_x);
+        var rect_height = Math.abs(end_point_y - start_point_y);
+        ctx.beginPath();
+        ctx.fillStyle = ctx_color;
+        ctx.fillRect(start_point_x, start_point_y, rect_width, rect_height);
+        // ctx.closePath();
     }
 
-    this.drawPolygon = function () {
+    this.drawPolygon = function (ctx, ctx_color, polygon_point_list) {
         // 作多边形
+        if (polygon_point_list.length < 3) {
+            console.log("polygon_point_list error");
+            return ;
+        }
+        const point_1_x = polygon_point_list[0].x;
+        const point_1_y = polygon_point_list[0].y;
+        var point_2_x;
+        var point_2_y;
+        var point_3_x;
+        var point_3_y
+        for (var i = 1; i < polygon_point_list.length - 1; i++) {
+            point_2_x = polygon_point_list[i].x;
+            point_2_y = polygon_point_list[i].y;
+            point_3_x = polygon_point_list[i+1].x;
+            point_3_y = polygon_point_list[i+1].y;
+            this.drawTriangle(ctx, ctx_color, point_1_x, point_1_y, point_2_x, point_2_y, point_3_x, point_3_y);
+        }
+    }
+
+    this.drawTriangle = function (ctx, ctx_color, point_1_x, point_1_y, point_2_x, point_2_y, point_3_x, point_3_y) {
+        // 作三角形
+        ctx.beginPath();
+        ctx.moveTo(point_1_x, point_1_y);
+        ctx.lineTo(point_2_x, point_2_y);
+        ctx.lineTo(point_3_x, point_3_y);
+        ctx.closePath();
+        ctx.fillStyle = ctx_color;
+        ctx.fill();
     }
 
     this.upload = function () {
