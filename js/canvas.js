@@ -47,9 +47,39 @@ function Draw () {
     this.history = [];
     /* 
         history数组元素说明:
-        {
-
-        }
+        [
+            {
+                drawType: "line",
+                lineWidth: 6 | 10 | 15,
+                start_point_x: null,
+                start_point_y: null,
+                end_point_x: null,
+                end_point_y: null,
+            },
+            {
+                drawType: "curve",
+                lineWidth: 6 | 10 |15,
+                start_point_x: null,
+                start_point_y: null,
+                end_point_x: null,
+                end_point_y: null,
+                cpx: null,
+                cpy: null,
+            },
+            {
+                drawType: "rectangle",
+                fillColor: "",
+                start_point_x: null,
+                start_point_y: null,
+                end_point_x: null,
+                end_point_y: null,
+            },
+            {
+                drawType: "polygon",
+                fillColor: "",
+                polygon_point_list: [],
+            }
+        ]
     */
 
     this.init = function () {
