@@ -208,3 +208,10 @@ function checkBrowser () {
         return true;
     }
 }
+
+// 提交评分
+function uploadEvaluation () {
+    if (evaluation === null) {
+        return ;
+    }
+}

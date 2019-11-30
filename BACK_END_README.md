@@ -1,4 +1,6 @@
 # 接口
+`http://lll702.wicp.vip`
+
 
 ## 上传图片
 ### 请求
@@ -21,3 +23,18 @@ filename: 图片名
 ### 响应
 成功：返回图片，`Content-Type = image/png`  
 失败：404
+
+## 图片评分
+### 请求
+`POST /score`
+```
+FormData 
+{
+    filename : 图片名
+    score    : 分数
+}
+```
+
+### 响应
+成功：200  
+失败：500 
