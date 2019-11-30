@@ -3,7 +3,7 @@
 * 2. 获取画笔
 * 3. 直线，起止点
 * 4. 曲线，三点式
-* 5. 矩形，起止点
+* 5. 矩形，对角线起止点
 * 6. 多边形，三角形拼接
 * 7. 撤回/清空
 * 8. 跟踪鼠标变化
@@ -19,6 +19,10 @@ window.onload = function () {
         document.body.innerHTML = "当前浏览器不支持canvas画布功能。请使用其他浏览器打开。推荐使用chrome浏览器。";
         return ;
     }
+    // 初始化绘制工具
+    var draw = new Draw();
+    draw.init();
+    // 绘图图例切换
     $("img.single_icon_1").click(function (e) {
         $("img.single_icon_1").removeClass("selected");
         e.target.className += " selected";
@@ -27,9 +31,19 @@ window.onload = function () {
         $("img.single_icon_2").removeClass("selected");
         e.target.className += " selected";
     });
-    // 初始化绘制工具
-    var draw = new Draw();
-    draw.init();
+    // 初始化评价星级
+    var evaluation = null;
+    // 修改评价星级
+    $('.evaluation_icon').mouseover(function (e) {
+        var index = parseInt(e.target.id.charAt(11));
+        for (var i = 1; i < index + 1; i++) {
+            document.getElementById("evaluation_" + i).src = "images/star_full.png";
+        }
+        for (var j = index+1; j < 6; j++) {
+            document.getElementById("evaluation_" + i).src = "images/star_blank.png";
+        }
+        evaluation = index;
+    });
 }
 
 // 封装绘制类
