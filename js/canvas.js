@@ -1,5 +1,5 @@
 /* 
-* 1. 获取画布
+* 1. 获取画布(3为实时跟踪画笔， 2为道路绘制， 1为区域绘制)
 * 2. 获取画笔
 * 3. 直线，起止点
 * 4. 曲线，三点式
@@ -19,6 +19,14 @@ window.onload = function () {
         document.body.innerHTML = "当前浏览器不支持canvas画布功能。请使用其他浏览器打开。推荐使用chrome浏览器。";
         return ;
     }
+    $("img.single_icon_1").click(function (e) {
+        $("img.single_icon_1").removeClass("selected");
+        e.target.className += " selected";
+    });
+    $("img.single_icon_2").click(function (e) {
+        $("img.single_icon_2").removeClass("selected");
+        e.target.className += " selected";
+    });
     // 初始化绘制工具
     var draw = new Draw();
     draw.init();
@@ -158,6 +166,23 @@ function Draw () {
 
     this.undo = function () {
         // 撤回
+    }
+
+    this.trace = function (history) {
+        //跟踪重绘canvas画布
+        for (var i = 0; i < history.length; i++) {
+            var type = history[i].drawType;
+            switch (type) {
+                case "line": this.drawLine(this.ctx_2, history[i].lineWidth, history[i].start_point_x, history[i].start_point_y, history[i].end_point_x, history[i].end_point_y);
+                break;
+                case "curve": this.drawCurve(this.ctx_2, history[i].lineWidth, history[i].start_point_x, history[i].start_point_y, history[i].end_point_x, history[i].end_point_y, history[i].cpx, history[i].cpy);
+                break;
+                case "rectangle": this.drawRect(this.ctx_1, history[i].fillColor, history[i].start_point_x, history[i].start_point_y, history[i].end_point_x, history[i].end_point_y);
+                break;
+                case "polygon": this.drawPolygon(this.ctx_1, history[i].fillColor, history[i].polygon_point_list);
+                break;
+            }
+        }
     }
 }
 
