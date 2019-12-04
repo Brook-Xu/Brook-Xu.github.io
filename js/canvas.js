@@ -22,6 +22,7 @@ window.onload = function () {
     // 初始化绘制工具
     var draw = new Draw();
     draw.init();
+    // 画笔功能切换
     document.getElementById("linear").addEventListener("click", function () {draw.state_change(1)});
     document.getElementById("curve").addEventListener("click", function () {draw.state_change(2)});
     document.getElementById("rectangle").addEventListener("click", function () {draw.state_change(3)});
@@ -53,6 +54,8 @@ window.onload = function () {
             evaluation = index;
         }
     });
+    // 提交评价星级
+    $('.evaluation_icon').click(uploadEvaluation);
     // 初始化页面当前输出文件名称
     var filename = null;
 }
@@ -130,6 +133,7 @@ function Draw () {
 
     this.init = function () {
         // 初始化
+
     }
 
     this.drawLine = function (ctx, ctx_width, ctx_color, start_point_x, start_point_y, end_point_x, end_point_y) {
@@ -204,12 +208,14 @@ function Draw () {
 
     this.undo = function () {
         // 撤回
+        this.ctx_1.clearRect(0, 0, 256, 256);
+        this.ctx_2.clearRect(0, 0, 256, 256);
         this.draw_history.pop();
         this.trace(this.draw_history);
     }
 
     this.trace = function (draw_history) {
-        //跟踪重绘canvas画布
+        //按照记录重绘canvas画布
         for (var i = 0; i < draw_history.length; i++) {
             var type = draw_history[i].drawType;
             switch (type) {
