@@ -74,9 +74,9 @@ function Draw () {
     this.rect_end_x = null;
     this.rect_end_y = null;
     this.polygon_point_list = [];
-    this.history = [];
+    this.draw_history = [];
     /* 
-        history数组元素说明:
+        draw_history数组元素说明:
         [
             {
                 drawType: "line",
@@ -109,6 +109,15 @@ function Draw () {
                 fillColor: "",
                 polygon_point_list: [],
             }
+        ]
+    */
+    this.img_history = [];
+    /*
+        img_history数组元素说明：
+        [
+            {
+                src: "",
+            },
         ]
     */
 
@@ -188,22 +197,22 @@ function Draw () {
 
     this.undo = function () {
         // 撤回
-        this.history.pop();
-        this.trace(this.history);
+        this.draw_history.pop();
+        this.trace(this.draw_history);
     }
 
-    this.trace = function (history) {
+    this.trace = function (draw_history) {
         //跟踪重绘canvas画布
-        for (var i = 0; i < history.length; i++) {
-            var type = history[i].drawType;
+        for (var i = 0; i < draw_history.length; i++) {
+            var type = draw_history[i].drawType;
             switch (type) {
-                case "line": this.drawLine(this.ctx_2, history[i].lineWidth, "#0000ff", history[i].start_point_x, history[i].start_point_y, history[i].end_point_x, history[i].end_point_y);
+                case "line": this.drawLine(this.ctx_2, draw_history[i].lineWidth, "#0000ff", draw_history[i].start_point_x, draw_history[i].start_point_y, draw_history[i].end_point_x, draw_history[i].end_point_y);
                 break;
-                case "curve": this.drawCurve(this.ctx_2, history[i].lineWidth, "#0000ff", history[i].start_point_x, history[i].start_point_y, history[i].end_point_x, history[i].end_point_y, history[i].cpx, history[i].cpy);
+                case "curve": this.drawCurve(this.ctx_2, draw_history[i].lineWidth, "#0000ff", draw_history[i].start_point_x, draw_history[i].start_point_y, draw_history[i].end_point_x, draw_history[i].end_point_y, draw_history[i].cpx, draw_history[i].cpy);
                 break;
-                case "rectangle": this.drawRect(this.ctx_1, history[i].fillColor, history[i].start_point_x, history[i].start_point_y, history[i].end_point_x, history[i].end_point_y);
+                case "rectangle": this.drawRect(this.ctx_1, draw_history[i].fillColor, draw_history[i].start_point_x, draw_history[i].start_point_y, draw_history[i].end_point_x, draw_history[i].end_point_y);
                 break;
-                case "polygon": this.drawPolygon(this.ctx_1, history[i].fillColor, history[i].polygon_point_list);
+                case "polygon": this.drawPolygon(this.ctx_1, draw_history[i].fillColor, draw_history[i].polygon_point_list);
                 break;
             }
         }
