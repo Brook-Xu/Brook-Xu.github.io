@@ -22,10 +22,10 @@ window.onload = function () {
     // 初始化绘制工具
     var draw = new Draw();
     draw.init();
-    document.getElementById("linear").addEventListener("click", draw.state_to_line);
-    document.getElementById("curve").addEventListener("click", draw.state_to_curve);
-    document.getElementById("rectangle").addEventListener("click", draw.state_to_rect);
-    document.getElementById("polygon").addEventListener("click", draw.state_to_polygon);
+    document.getElementById("linear").addEventListener("click", function () {draw.state_change(1)});
+    document.getElementById("curve").addEventListener("click", function () {draw.state_change(2)});
+    document.getElementById("rectangle").addEventListener("click", function () {draw.state_change(3)});
+    document.getElementById("polygon").addEventListener("click", function () {draw.state_change(4)});
     // 绘图图例切换
     $("img.single_icon_1").click(function (e) {
         $("img.single_icon_1").removeClass("selected");
@@ -209,24 +209,8 @@ function Draw () {
         }
     }
 
-    this.state_to_line = function () {
-        this.draw_state = 1;
-        console.log(this.draw_state);
-    }
-
-    this.state_to_curve = function () {
-        this.draw_state = 2;
-        console.log(this.draw_state);
-    }
-
-    this.state_to_rect = function () {
-        this.draw_state = 3;
-        console.log(this.draw_state);
-    }
-
-    this.state_to_polygon = function () {
-        this.draw_state = 4;
-        console.log(this.draw_state);
+    this.state_change = function (state) {
+        this.draw_state = state;
     }
 }
 
