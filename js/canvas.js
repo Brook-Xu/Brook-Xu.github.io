@@ -53,6 +53,8 @@ window.onload = function () {
             evaluation = index;
         }
     });
+    // 初始化页面当前输出文件名称
+    var filename = null;
 }
 
 // 封装绘制类
@@ -241,7 +243,25 @@ function checkBrowser () {
 
 // 提交评分
 function uploadEvaluation () {
-    if (evaluation === null) {
+    if (evaluation_allowed === true && evaluation !== null && filename !== null) {
+        var formData = new FormData();
+        formData.append("filename", filename);
+        formData.append("score", evaluation);
+        $.ajax({
+            type: "post",
+            url: "/score",
+            data: formData,
+            success: function (data) {
+                if (data === 200) {
+                    alert("评价提交成功。感谢您的评价！");
+                    evaluation_allowed = false;
+                }else if (data === 500) {
+                    alert("评价提交失败，请重试。");
+                }
+            }
+        });
+    }else {
+        alert("当前不可进行评分。");
         return ;
     }
 }
