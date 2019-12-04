@@ -22,14 +22,20 @@ window.onload = function () {
     // 初始化绘制工具
     var draw = new Draw();
     draw.init();
+    document.getElementById("linear").addEventListener("click", draw.state_to_line);
+    document.getElementById("curve").addEventListener("click", draw.state_to_curve);
+    document.getElementById("rectangle").addEventListener("click", draw.state_to_rect);
+    document.getElementById("polygon").addEventListener("click", draw.state_to_polygon);
     // 绘图图例切换
     $("img.single_icon_1").click(function (e) {
         $("img.single_icon_1").removeClass("selected");
         e.target.className += " selected";
+        draw.lineWidth = parseInt(e.target.id.slice(5));
     });
     $("img.single_icon_2").click(function (e) {
         $("img.single_icon_2").removeClass("selected");
         e.target.className += " selected";
+        draw.color = e.target.id.slice(5);
     });
     // 初始化评价星级
     var evaluation = null;
@@ -48,6 +54,7 @@ window.onload = function () {
 
 // 封装绘制类
 function Draw () {
+    this.draw_state = null;
     this.is_down = false;
     this.input_canvas_1 = document.getElementById('input_canvas_1');
     this.input_canvas_2 = document.getElementById('input_canvas_2');
@@ -58,6 +65,7 @@ function Draw () {
     this.linear_start_point = null;
     this.linear_end_point = null;
     this.lineWidth = 0;
+    this.color = "";
     this.curve_start_point = null;
     this.curve_end_point = null;
     this.curve_quadratic_point = null;
@@ -108,9 +116,9 @@ function Draw () {
         // 初始化
     }
 
-    this.drawLine = function (ctx, ctx_width, start_point_x, start_point_y, end_point_x, end_point_y) {
+    this.drawLine = function (ctx, ctx_width, ctx_color, start_point_x, start_point_y, end_point_x, end_point_y) {
         // 作直线
-        var ctx_color = "#0000ff";
+        // ctx_color = "#0000ff";
         ctx.beginPath();
         ctx.moveTo(start_point_x, start_point_y);
         ctx.lineTo(end_point_x, end_point_y);
@@ -120,9 +128,9 @@ function Draw () {
         // ctx.closePath();
     }
 
-    this.drawCurve = function (ctx, ctx_width, start_point_x, start_point_y, end_point_x, end_point_y, cpx, cpy) {
+    this.drawCurve = function (ctx, ctx_width, ctx_color, start_point_x, start_point_y, end_point_x, end_point_y, cpx, cpy) {
         // 作曲线
-        var ctx_color = "#0000ff";
+        // ctx_color = "#0000ff";
         ctx.beginPath();
         ctx.moveTo(start_point_x, start_point_y);
         ctx.quadraticCurveTo(cpx, cpy, end_point_x, end_point_y);
@@ -180,6 +188,8 @@ function Draw () {
 
     this.undo = function () {
         // 撤回
+        this.history.pop();
+        this.trace(this.history);
     }
 
     this.trace = function (history) {
@@ -187,9 +197,9 @@ function Draw () {
         for (var i = 0; i < history.length; i++) {
             var type = history[i].drawType;
             switch (type) {
-                case "line": this.drawLine(this.ctx_2, history[i].lineWidth, history[i].start_point_x, history[i].start_point_y, history[i].end_point_x, history[i].end_point_y);
+                case "line": this.drawLine(this.ctx_2, history[i].lineWidth, "#0000ff", history[i].start_point_x, history[i].start_point_y, history[i].end_point_x, history[i].end_point_y);
                 break;
-                case "curve": this.drawCurve(this.ctx_2, history[i].lineWidth, history[i].start_point_x, history[i].start_point_y, history[i].end_point_x, history[i].end_point_y, history[i].cpx, history[i].cpy);
+                case "curve": this.drawCurve(this.ctx_2, history[i].lineWidth, "#0000ff", history[i].start_point_x, history[i].start_point_y, history[i].end_point_x, history[i].end_point_y, history[i].cpx, history[i].cpy);
                 break;
                 case "rectangle": this.drawRect(this.ctx_1, history[i].fillColor, history[i].start_point_x, history[i].start_point_y, history[i].end_point_x, history[i].end_point_y);
                 break;
@@ -197,6 +207,26 @@ function Draw () {
                 break;
             }
         }
+    }
+
+    this.state_to_line = function () {
+        this.draw_state = 1;
+        console.log(this.draw_state);
+    }
+
+    this.state_to_curve = function () {
+        this.draw_state = 2;
+        console.log(this.draw_state);
+    }
+
+    this.state_to_rect = function () {
+        this.draw_state = 3;
+        console.log(this.draw_state);
+    }
+
+    this.state_to_polygon = function () {
+        this.draw_state = 4;
+        console.log(this.draw_state);
     }
 }
 
