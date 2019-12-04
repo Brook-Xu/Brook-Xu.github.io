@@ -64,9 +64,11 @@ function Draw () {
     this.input_canvas_1 = document.getElementById('input_canvas_1');
     this.input_canvas_2 = document.getElementById('input_canvas_2');
     this.input_canvas_3 = document.getElementById('input_canvas_3');
+    this.output_canvas = document.getElementById('output_canvas');
     this.ctx_1 = this.input_canvas_1.getContext('2d');
     this.ctx_2 = this.input_canvas_2.getContext('2d');
     this.ctx_3 = this.input_canvas_3.getContext('2d');
+    this.ctx_4 = this.output_canvas.getContext('2d');
     this.linear_start_point = null;
     this.linear_end_point = null;
     this.lineWidth = 0;
