@@ -39,6 +39,7 @@ window.onload = function () {
     });
     // 初始化评价星级
     var evaluation = null;
+    var evaluation_allowed = false;
     // 修改评价星级
     $('.evaluation_icon').mouseover(function (e) {
         var index = parseInt(e.target.id.charAt(11));
@@ -46,9 +47,11 @@ window.onload = function () {
             document.getElementById("evaluation_" + i).src = "images/star_full.png";
         }
         for (var j = index+1; j < 6; j++) {
-            document.getElementById("evaluation_" + i).src = "images/star_blank.png";
+            document.getElementById("evaluation_" + j).src = "images/star_blank.png";
         }
-        evaluation = index;
+        if (evaluation_allowed) {
+            evaluation = index;
+        }
     });
 }
 
@@ -219,6 +222,10 @@ function Draw () {
     }
 
     this.state_change = function (state) {
+        if (state !== 1 && state !== 2 && state !== 3 && state !== 4) {
+            console.log("error");
+            return ;
+        }
         this.draw_state = state;
     }
 }
