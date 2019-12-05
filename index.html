@@ -1,93 +1,107 @@
-<!--
-  Copyright (c) 2018 ml5
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="uft-8">
+        <meta http-equiv="Content-Type" content="text/html">
 
-  This software is released under the MIT License.
-  https://opensource.org/licenses/MIT
--->
-<html>
-<link rel="shortcut icon" type="image/png" href="images/favicon.png" />
+        <title>SCUT-College of Architecture-Machine Learning</title>
 
-<link href="https://fonts.googleapis.com/css?family=Dosis" rel="stylesheet">
+        <link rel="shortcut icon" type="image/png" href="images/star.png" />
 
-<head>
-    <meta charset="UTF-8">
-    <title>example of Unit + Program</title>
+        <link rel="stylesheet" href="http://cdn.bootcss.com/bootstrap/3.3.0/css/bootstrap.min.css">
+        <link rel="stylesheet" href="css/style.css">
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.0/p5.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.0/addons/p5.dom.min.js"></script>
-    <script src="https://unpkg.com/ml5@0.1.1/dist/ml5.min.js" type="text/javascript"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <link rel="stylesheet" href="style.css">
-</head>
-
-<!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-122084660-1"></script>
-<script>
-    window.dataLayer = window.dataLayer || [];
-
-    function gtag() {
-        dataLayer.push(arguments);
-    }
-    gtag('js', new Date());
-
-    gtag('config', 'UA-122084660-1');
-</script>
-
-<body>
-    <div>
-        <img src="images/medium.jpg" onclick="document.location.href = 'https://medium.com/@sfjchaillou'"
-            style="position: absolute;right:50px;top:50px; width:120px; height:auto;z-index:0;cursor: pointer;">
-    </div>
-    <div>
-        <img src="images/sc.svg" onclick="document.location.href = 'http://stanislaschaillou.com'"
-            style="position: absolute;left:50px;top:50px;width:120px; height:auto;z-index:0;cursor: pointer;">
-    </div>
-
-    <div id="screen">
-        <button class="btn" id="startBtn">START</button>
-    </div>
-
-    <!-- MODEL 1 -->
-    <div>
-        <p id="status">Loading Model... Please wait...</p>
-        <div id="app">
-            <div id="input"></div>
-            <img id="output" src="images/blank.png">
+        <script src="http://cdn.bootcss.com/jquery/3.2.1/jquery.min.js" crossorigin="anonymous"></script>
+        <script src="http://cdn.bootcss.com/bootstrap/3.3.0/js/bootstrap.min.js" crossorigin="anonymous"></script>
+        <script src="js/canvas.js"></script>
+    </head>
+    <body>
+        <div>
+            <a href="https://www.scut.edu.cn"><img src="images/scut.png" id="scut"></a>
+            <p style="float: right;">推荐使用Chrome浏览器打开。</p>
         </div>
-        <center>
-            <!-- <p>Colors</p> -->
-            <center>
-                <div style="font-family:Dosis;font-size: 10px;opacity: 0.7"><i>Performance depending on screen
-                        resolution/browser version — Chrome Advised.</i></div>
-            </center>
-            <center>
-                <img style="height:auto; width:400px" src="images/legend.PNG">
-            </center>
-            &nbsp;
-            <div id="colors">
-                <div class="colors" id="color_void">
-                    <p>Void</p>
+        <hr>
+        <div>
+            <div class="container">
+                <div class="canvas_part">
+                    <div class="input_part">
+                        <h3>INPUT</h3>
+                        <div class="input_canvas">
+                            <canvas width="256" height="256" id="input_canvas_3">当前浏览器不支持canvas画布功能。请使用其他浏览器打开。推荐使用chrome浏览器。</canvas>
+                            <canvas width="256" height="256" id="input_canvas_2">当前浏览器不支持canvas画布功能。请使用其他浏览器打开。推荐使用chrome浏览器。</canvas>
+                            <canvas width="256" height="256" id="input_canvas_1">当前浏览器不支持canvas画布功能。请使用其他浏览器打开。推荐使用chrome浏览器。</canvas>
+                        </div>
+                    </div>
+                    <div class="output_part">
+                        <h3>OUTPUT</h3>
+                        <div class="output_canvas">
+                            <canvas width="256" height="256" id="output_canvas">当前浏览器不支持canvas画布功能。请使用其他浏览器打开。推荐使用chrome浏览器。</canvas>
+                        </div>
+                    </div>
+                    <div class="list_part">
+                        <img src="images/list.png" id="icon_list">
+                    </div>
                 </div>
-                <div class="colors" id="color_0">
-                    <p>Floor</p>
-                </div>
-                <div class="colors" id="color_1">
-                    <p>Entr.</p>
-                </div>
-                <div class="colors" id="color_2">
-                    <p>Window</p>
+                <br>
+                <br>
+                <div class="icon_part">
+                    <div class="single_part">
+                        <img src="images/road_list1.png" class="single_icon_1 selected" id="road_15"><br>
+                        <img src="images/road_list2.png" class="single_icon_1" id="road_10"><br>
+                        <img src="images/road_list3.png" class="single_icon_1" id="road_6">
+                    </div>
+                    <div class="single_part">
+                        <button id="linear">直线</button><br><br>
+                        <button id="curve">曲线</button>
+                    </div>
+                    <div class="single_part">
+                        <img src="images/void.png" class="single_icon_2 selected" id="void_white"><br>
+                        <img src="images/site.png" class="single_icon_2" id="void_black">
+                    </div>
+                    <div class="single_part">
+                        <button id="rectangle">长方形</button><br><br>
+                        <button id="polygon">多边形</button>
+                    </div>
+                </div><br>
+                <div class="control_part">
+                    <button id="cancel">Cancel</button>
+                    <button id="clear">Clear</button>
+                    <button id="transfer">Transfer</button>
+                    <button id="help" data-toggle="modal" data-target="#myModal">Help</button>
+                </div><br>
+                <div class="evaluation_part">
+                    <h4>效果评价</h4>
+                    <div class="evaluation">
+                        <img src="images/star_full.png" class="evaluation_icon" id="evaluation_1">
+                        <img src="images/star_full.png" class="evaluation_icon" id="evaluation_2">
+                        <img src="images/star_full.png" class="evaluation_icon" id="evaluation_3">
+                        <img src="images/star_full.png" class="evaluation_icon" id="evaluation_4">
+                        <img src="images/star_full.png" class="evaluation_icon" id="evaluation_5">
+                    </div>
                 </div>
             </div>
-        </center>
-        <div id="buttons">
-            <button class="btn" id="cancelBtn">Cancel</button>
-            <button class="btn" id="clearBtn">Clear</button>
-            <button class="btn" id="transferBtn">Transfer</button>
-            <button class="btn" id="randomBtn">Random</button>
         </div>
-    </div>
-
-    <script src="sketch.js"></script>
-</body>
-
+        <br>
+        <footer>
+            @2019 provided by XuBo<br>
+            mail: 1308425295@qq.com<br>
+            phone: 17802007943
+        </footer>
+        <!-- 模态框（Modal） -->
+        <div class="modal fade" id="myModal" tabindex="-1" role="help" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title" id="myModalLabel">使用说明</h4>
+                    </div>
+                    <div class="modal-body">页面使用具体说明</div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary">关闭</button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal -->
+        </div>
+    </body>
+    <script></script>
 </html>

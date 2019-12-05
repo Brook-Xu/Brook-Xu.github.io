@@ -116,6 +116,7 @@ class Draw {
             ]
         */
         this.curve_state = 1;
+        this.polygon_state = 0;
         this.init = function () {
             // 初始化
             var _this = this;
@@ -170,7 +171,7 @@ class Draw {
                     _this.rect_y = e.layerY;
                     _this.is_down = true;
                 } else if (_this.draw_state === 4) {
-
+                    return ;
                 } else {
                     console.log("error");
                     return ;
@@ -292,7 +293,7 @@ class Draw {
                         end_point_y: _this.rect_end_y,
                     });
                 } else if (_this.draw_state === 4) {
-
+                    return ;
                 } else {
                     console.log("error");
                     return;
