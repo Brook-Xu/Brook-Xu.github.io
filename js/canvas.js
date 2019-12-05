@@ -239,7 +239,7 @@ class Draw {
                 } else if (_this.draw_state === 2) {
 
                 } else if (_this.draw_state === 3) {
-
+                    return ;
                 } else if (_this.draw_state === 4) {
 
                 } else {
@@ -254,7 +254,7 @@ class Draw {
                 } else if (_this.draw_state === 2) {
 
                 } else if (_this.draw_state === 3) {
-
+                    return ;
                 } else if (_this.draw_state === 4) {
 
                 } else {
@@ -291,10 +291,12 @@ class Draw {
             ctx.stroke();
             // ctx.closePath();
         };
-        this.drawRect = function (ctx, ctx_color, start_point_x, start_point_y, end_point_x, end_point_y) {
+        this.drawRect = function (ctx, ctx_color, point_1_x, point_1_y, point_2_x, point_2_y) {
             // 作矩形
-            var rect_width = Math.abs(end_point_x - start_point_x);
-            var rect_height = Math.abs(end_point_y - start_point_y);
+            var rect_width = Math.abs(point_2_x - point_1_x);
+            var rect_height = Math.abs(point_2_y - point_1_y);
+            var start_point_x = point_1_x < point_2_x ? point_1_x : point_2_x;
+            var start_point_y = point_1_y < point_2_y ? point_1_y : point_2_y;
             ctx.beginPath();
             ctx.fillStyle = ctx_color;
             ctx.fillRect(start_point_x, start_point_y, rect_width, rect_height);
