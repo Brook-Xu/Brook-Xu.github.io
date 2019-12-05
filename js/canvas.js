@@ -1,15 +1,5 @@
 /* 
-* 1. 获取画布(3为实时跟踪画笔， 2为道路绘制， 1为区域绘制)
-* 2. 获取画笔
-* 3. 直线，起止点
-* 4. 曲线，三点式
-* 5. 矩形，对角线起止点
-* 6. 多边形，三角形拼接
-* 7. 撤回/清空
-* 8. 跟踪鼠标变化
-* 9. 评价
-* 10. 帮助
-* 注： 线条宽度像素：15/10/6px
+*
 */
 
 window.onload = function () {
@@ -25,6 +15,8 @@ window.onload = function () {
     // 初始化评价星级
     var evaluation = null;
     var evaluation_allowed = false;
+    // 初始化当前页面文件名
+    var filename = null;
     // 修改评价星级
     $('.evaluation_icon').mouseover(function (e) {
         var index = parseInt(e.target.id.charAt(11));
@@ -39,9 +31,8 @@ window.onload = function () {
         }
     });
     // 提交评价星级
-    $('.evaluation_icon').click(uploadEvaluation);
+    $('.evaluation_icon').click(function () {});
     // 初始化页面当前输出文件名称
-    var filename = null;
 }
 
 // 封装绘制类
@@ -111,7 +102,8 @@ class Draw {
             img_history数组元素说明：
             [
                 {
-                    src: "",
+                    src_1: "",
+                    src_2: ""
                 },
             ]
         */
@@ -444,6 +436,39 @@ class Draw {
         };
         this.upload = function () {
             // 上传图片
+            for (var i = 0; i < this.draw_history.length; i++) {
+                if (this.draw_history[i].drawType === "rectangle") {
+                    this.drawRect(this.ctx_3, this.draw_history[i].fillColor, this.draw_history[i].start_point_x, this.draw_history[i].start_point_y, this.draw_history[i].end_point_x, this.draw_history[i].end_point_y);
+                }else if (this.draw_history[i].drawType === "polygon") {
+                    this.drawPolygon(this.ctx_3, this.draw_history[i].fillColor, this.draw_history[i].polygon_point_list);
+                }else {
+                    continue;
+                }
+            }
+            for (var j = 0; j < this.draw_history.length; j++) {
+                if (this.draw_history[j].drawType === "line") {
+                    this.drawLine(this.ctx_2, this.draw_history[j].lineWidth, "#0000ff", this.draw_history[j].start_point_x, this.draw_history[j].start_point_y, this.draw_history[j].end_point_x, this.draw_history[j].end_point_y);
+                }else if (this.draw_history[j].drawType === "curve") {
+                    this.drawCurve(this.ctx_2, this.draw_history[j].lineWidth, "#0000ff", this.draw_history[j].start_point_x, this.draw_history[j].start_point_y, this.draw_history[j].end_point_x, this.draw_history[j].end_point_y, this.draw_history[j].cpx, this.draw_history[j].cpy);
+                }else {
+                    continue;
+                }
+            }
+            this.input_canvas_3.toBlob(function (blobObj) {
+                console.log(blobObj);
+                var form = new FormData();
+                form.append("file", blobObj);
+                $.ajax({
+                    url: "/upload",
+                    type: "post",
+                    processData: false,
+                    contentType: false,
+                    data: form,
+                    success: function (data) {
+
+                    }
+                })
+            });
         };
         this.undo = function () {
             // 撤回
