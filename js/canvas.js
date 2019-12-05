@@ -448,9 +448,9 @@ class Draw {
             }
             for (var j = 0; j < this.draw_history.length; j++) {
                 if (this.draw_history[j].drawType === "line") {
-                    this.drawLine(this.ctx_2, this.draw_history[j].lineWidth, "#0000ff", this.draw_history[j].start_point_x, this.draw_history[j].start_point_y, this.draw_history[j].end_point_x, this.draw_history[j].end_point_y);
+                    this.drawLine(this.ctx_3, this.draw_history[j].lineWidth, "#0000ff", this.draw_history[j].start_point_x, this.draw_history[j].start_point_y, this.draw_history[j].end_point_x, this.draw_history[j].end_point_y);
                 }else if (this.draw_history[j].drawType === "curve") {
-                    this.drawCurve(this.ctx_2, this.draw_history[j].lineWidth, "#0000ff", this.draw_history[j].start_point_x, this.draw_history[j].start_point_y, this.draw_history[j].end_point_x, this.draw_history[j].end_point_y, this.draw_history[j].cpx, this.draw_history[j].cpy);
+                    this.drawCurve(this.ctx_3, this.draw_history[j].lineWidth, "#0000ff", this.draw_history[j].start_point_x, this.draw_history[j].start_point_y, this.draw_history[j].end_point_x, this.draw_history[j].end_point_y, this.draw_history[j].cpx, this.draw_history[j].cpy);
                 }else {
                     continue;
                 }
