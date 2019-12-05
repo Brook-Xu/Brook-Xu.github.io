@@ -134,42 +134,90 @@ class Draw {
                 e.target.className += " selected";
                 _this.color = e.target.id.slice(5);
             });
+            // 初始化画笔状态为直线
             _this.draw_state = 1;
+            // 添加鼠标事件监听
             _this.input_canvas_3.addEventListener("mousedown", function (e) {
                 e.preventDefault();
-                if (_this.draw_state === 1) {}
-                if (_this.draw_state === 2) {}
-                if (_this.draw_state === 3) {}
-                if (_this.draw_state === 4) {}
+                if (_this.draw_state === 1) {
+
+                } else if (_this.draw_state === 2) {
+
+                } else if (_this.draw_state === 3) {
+
+                } else if (_this.draw_state === 4) {
+
+                } else {
+                    console.log("error");
+                    return ;
+                }
             });
             _this.input_canvas_3.addEventListener("mousemove", function () {
                 e.preventDefault();
-                if (_this.draw_state === 1) {}
-                if (_this.draw_state === 2) {}
-                if (_this.draw_state === 3) {}
-                if (_this.draw_state === 4) {}
+                if (_this.draw_state === 1) {
+
+                } else if (_this.draw_state === 2) {
+
+                } else if (_this.draw_state === 3) {
+
+                } else if (_this.draw_state === 4) {
+
+                } else {
+                    console.log("error");
+                    return;
+                }
             });
             _this.input_canvas_3.addEventListener("mouseup", function () {
                 e.preventDefault();
-                if (_this.draw_state === 1) {}
-                if (_this.draw_state === 2) {}
-                if (_this.draw_state === 3) {}
-                if (_this.draw_state === 4) {}
+                if (_this.draw_state === 1) {
+
+                } else if (_this.draw_state === 2) {
+
+                } else if (_this.draw_state === 3) {
+
+                } else if (_this.draw_state === 4) {
+
+                } else {
+                    console.log("error");
+                    return;
+                }
             });
             _this.input_canvas_3.addEventListener("click", function () {
                 e.preventDefault();
-                if (_this.draw_state === 1) {}
-                if (_this.draw_state === 2) {}
-                if (_this.draw_state === 3) {}
-                if (_this.draw_state === 4) {}
+                if (_this.draw_state === 1) {
+
+                } else if (_this.draw_state === 2) {
+
+                } else if (_this.draw_state === 3) {
+
+                } else if (_this.draw_state === 4) {
+
+                } else {
+                    console.log("error");
+                    return;
+                }
             });
             _this.input_canvas_3.addEventListener("dbclick", function () {
                 e.preventDefault();
-                if (_this.draw_state === 1) {}
-                if (_this.draw_state === 2) {}
-                if (_this.draw_state === 3) {}
-                if (_this.draw_state === 4) {}
-            })
+                if (_this.draw_state === 1) {
+
+                } else if (_this.draw_state === 2) {
+
+                } else if (_this.draw_state === 3) {
+
+                } else if (_this.draw_state === 4) {
+
+                } else {
+                    console.log("error");
+                    return;
+                }
+            });
+            // 绑定撤回button
+            document.getElementById("cancel").addEventListener("click", _this.undo);
+            // 绑定清空button
+            document.getElementById("clear").addEventListener("click", _this.clearAll);
+            // 绑定提交button
+            document.getElementById("transfer").addEventListener("click", _this.upload);
         };
         this.drawLine = function (ctx, ctx_width, ctx_color, start_point_x, start_point_y, end_point_x, end_point_y) {
             // 作直线
@@ -239,6 +287,7 @@ class Draw {
             // 撤回
             this.ctx_1.clearRect(0, 0, 256, 256);
             this.ctx_2.clearRect(0, 0, 256, 256);
+            this.ctx_3.clearRect(0, 0, 256, 256);
             this.draw_history.pop();
             this.trace(this.draw_history);
         };
@@ -261,6 +310,14 @@ class Draw {
                         break;
                 }
             }
+        };
+        this.clearAll = function () {
+            this.ctx_1.clearRect(0, 0, 256, 256);
+            this.ctx_2.clearRect(0, 0, 256, 256);
+            this.ctx_3.clearRect(0, 0, 256, 256);
+            this.ctx_4.clearRect(0, 0, 256, 256);
+            this.draw_history = [];
+            this.img_history = [];
         };
         this.state_change = function (state) {
             if (state !== 1 && state !== 2 && state !== 3 && state !== 4) {
