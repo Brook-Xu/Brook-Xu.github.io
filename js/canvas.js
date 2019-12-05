@@ -105,6 +105,7 @@ class Draw {
                     src_2: ""
                 },
             ]
+            设想另一种撤回方案，将每一步的canvas状态使用toDataURL转为src存在img_history数组中，撤回时直接将对应image绘制在canvas上
         */
         this.curve_state = 0;
         this.polygon_state = 0;
