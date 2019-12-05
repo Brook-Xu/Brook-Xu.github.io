@@ -60,7 +60,7 @@ class Draw {
         this.linear_start_point = null; // {x: null, y: null}
         this.linear_end_point = null; // {x: null, y: null}
         this.lineWidth = 0;
-        this.color = "";
+        this.fillColor = "";
         this.curve_start_point = null; // {x: null, y: null}
         this.curve_end_point = null; // {x: null, y: null}
         this.curve_quadratic_point = null; // {x: null, y: null}
@@ -68,7 +68,7 @@ class Draw {
         this.rect_y = null;
         this.rect_end_x = null;
         this.rect_end_y = null;
-        this.polygon_point_list = [];
+        this.polygon_point_list = []; // [{x: null, y: null},{x: null, y: null}]
         this.draw_history = [];
         /*
             draw_history数组元素说明:
@@ -115,7 +115,7 @@ class Draw {
                 },
             ]
         */
-        this.curve_state = 1;
+        this.curve_state = 0;
         this.polygon_state = 0;
         this.init = function () {
             // 初始化
@@ -134,14 +134,14 @@ class Draw {
             $("img.single_icon_2").click(function (e) {
                 $("img.single_icon_2").removeClass("selected");
                 e.target.className += " selected";
-                _this.color = e.target.id.slice(5);
+                _this.fillColor = e.target.id.slice(5);
             });
             // 初始化画笔状态为直线
             _this.draw_state = 1;
             // 初始化画笔宽度为15px
             _this.lineWidth = 15;
             //初始化画笔填充颜色为白色
-            _this.color = "white";
+            _this.fillColor = "white";
             // 添加鼠标事件监听
             _this.input_canvas_3.addEventListener("mousedown", function (e) {
                 e.preventDefault();
@@ -152,13 +152,13 @@ class Draw {
                     };
                     _this.is_down = true;
                 } else if (_this.draw_state === 2) {
-                    if (_this.curve_state === 1) {
+                    if (_this.curve_state === 0) {
                         _this.curve_start_point = {
                             x: e.layerX,
                             y: e.layerY
                         }
                         _this.is_down = true;
-                    }else if (_this.curve_state === 2) {
+                    }else if (_this.curve_state === 1) {
                         _this.is_down = true;
                         _this.ctx_3.clearRect(0, 0, 256, 256);
                         _this.drawCurve(_this.ctx_3, _this.lineWidth, "#0000ff", _this.curve_start_point.x, _this.curve_start_point.y, _this.curve_end_point.x, _this.curve_end_point.y, e.layerX, e.layerY);
@@ -185,12 +185,12 @@ class Draw {
                         _this.drawLine(_this.ctx_3, _this.lineWidth, "#0000ff", _this.linear_start_point.x, _this.linear_start_point.y, e.layerX, e.layerY);
                     }
                 } else if (_this.draw_state === 2) {
-                    if (_this.curve_state === 1) {
+                    if (_this.curve_state === 0) {
                         _this.ctx_3.clearRect(0, 0, 256, 256);
                         if (_this.is_down === true) {
                             _this.drawLine(_this.ctx_3, _this.lineWidth, "#0000ff", _this.curve_start_point.x, _this.curve_start_point.y, e.layerX, e.layerY);
                         }
-                    } else if (_this.curve_state === 2) {
+                    } else if (_this.curve_state === 1) {
                         if (_this.is_down === true) {
                             _this.ctx_3.clearRect(0, 0, 256, 256);
                             _this.drawCurve(_this.ctx_3, _this.lineWidth, "#0000ff", _this.curve_start_point.x, _this.curve_start_point.y, _this.curve_end_point.x, _this.curve_end_point.y, e.layerX, e.layerY);
@@ -202,10 +202,27 @@ class Draw {
                 } else if (_this.draw_state === 3) {
                     _this.ctx_3.clearRect(0, 0, 256, 256);
                     if (_this.is_down === true) {
-                        _this.drawRect(_this.ctx_3, _this.color, _this.rect_x, _this.rect_y, e.layerX, e.layerY);
+                        _this.drawRect(_this.ctx_3, _this.fillColor, _this.rect_x, _this.rect_y, e.layerX, e.layerY);
                     }
                 } else if (_this.draw_state === 4) {
-
+                    if (_this.polygon_state === 0) {
+                        return ;
+                    }else if (_this.polygon_state === 1) {
+                        _this.ctx_3.clearRect(0, 0, 256, 256);
+                        if (_this.polygon_point_list.length === 1) {
+                            _this.drawLine(_this.ctx_3, 1, _this.fillColor, _this.polygon_point_list[0].x, _this.polygon_point_list[0].y, e.layerX, e.layerY);
+                        }else if (_this.polygon_point_list.length > 1) {
+                            _this.polygon_point_list.push({
+                                x: e.layerX,
+                                y: e.layerY
+                            });
+                            _this.drawPolygon(_this.ctx_3, _this.fillColor, _this.polygon_point_list);
+                            _this.polygon_point_list.pop();
+                        }else {
+                            console.log("error");
+                            return ;
+                        }
+                    }
                 } else {
                     console.log("error");
                     return;
@@ -234,7 +251,7 @@ class Draw {
                         end_point_y: _this.linear_end_point.y,
                     });
                 } else if (_this.draw_state === 2) {
-                    if (_this.curve_state === 1) {
+                    if (_this.curve_state === 0) {
                         _this.ctx_3.clearRect(0, 0, 256, 256);
                         if (_this.is_down === false) {
                             console.log("error");
@@ -246,8 +263,8 @@ class Draw {
                         }
                         _this.drawLine(_this.ctx_3, _this.lineWidth, "#0000ff", _this.curve_start_point.x, _this.curve_start_point.y, _this.curve_end_point.x, _this.curve_end_point.y);
                         _this.is_down = false;
-                        _this.curve_state = 2;
-                    } else if (_this.curve_state === 2) {
+                        _this.curve_state = 1;
+                    } else if (_this.curve_state === 1) {
                         _this.ctx_3.clearRect(0, 0, 256, 256);
                         if (_this.is_down === false) {
                             console.log("error");
@@ -269,7 +286,7 @@ class Draw {
                             cpx: _this.curve_quadratic_point.x,
                             cpy: _this.curve_quadratic_point.y,
                         });
-                        _this.curve_state = 1;
+                        _this.curve_state = 0;
                     } else {
                         console.log("error");
                         return;
@@ -282,11 +299,11 @@ class Draw {
                     }
                     _this.rect_end_x = e.layerX;
                     _this.rect_end_y = e.layerY;
-                    _this.drawRect(_this.ctx_1, _this.color, _this.rect_x, _this.rect_y, _this.rect_end_x, _this.rect_end_y);
+                    _this.drawRect(_this.ctx_1, _this.fillColor, _this.rect_x, _this.rect_y, _this.rect_end_x, _this.rect_end_y);
                     _this.is_down = false;
                     _this.draw_history.push({
                         drawType: "rectangle",
-                        fillColor: _this.color,
+                        fillColor: _this.fillColor,
                         start_point_x: _this.rect_x,
                         start_point_y: _this.rect_y,
                         end_point_x: _this.rect_end_x,
@@ -302,7 +319,21 @@ class Draw {
             _this.input_canvas_3.addEventListener("click", function (e) {
                 e.preventDefault();
                 if (_this.draw_state === 4) {
-                    
+                    if (_this.polygon_state === 0) {
+                        _this.polygon_state = 1;
+                        _this.polygon_point_list.push({
+                            x: e.layerX,
+                            y: e.layerY
+                        });
+                    }else if (_this.polygon_state === 1) {
+                        _this.polygon_point_list.push({
+                            x: e.layerX,
+                            y: e.layerY
+                        });
+                    }else {
+                        console.log("error");
+                        return ;
+                    }
                 } else if (_this.draw_state === 3) {
                     return ;
                 } else if (_this.draw_state === 2) {
@@ -314,10 +345,22 @@ class Draw {
                     return;
                 }
             });
-            _this.input_canvas_3.addEventListener("dbclick", function (e) {
+            _this.input_canvas_3.addEventListener("mouseleave", function (e) {
                 e.preventDefault();
                 if (_this.draw_state === 4) {
-                    
+                    if (_this.polygon_state === 1) {
+                        _this.ctx_3.clearRect(0, 0, 256, 256);
+                        _this.drawPolygon(_this.ctx_1, _this.fillColor, _this.polygon_point_list);
+                        _this.draw_history.push({
+                            drawType: "polygon",
+                            fillColor: _this.fillColor,
+                            polygon_point_list: _this.polygon_point_list
+                        });
+                        _this.polygon_point_list = [];
+                        _this.polygon_state = 0;
+                    }else {
+                        return;
+                    }
                 } else if (_this.draw_state === 3) {
                     return ;
                 } else if (_this.draw_state === 2) {
