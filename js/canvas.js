@@ -469,6 +469,7 @@ class Draw {
                             alert("上传成功。");
                             window.filename = data.msg;
                             window.evaluation_allowed = true;
+                            _this.ctx_3.clearRect(0, 0, 256, 256);
                             $.ajax({
                                 url: "/show/"+window.filename,
                                 type: "get",
