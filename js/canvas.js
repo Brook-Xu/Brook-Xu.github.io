@@ -13,10 +13,10 @@ window.onload = function () {
     var draw = new Draw();
     draw.init();
     // 初始化评价星级
-    var evaluation = null;
-    var evaluation_allowed = false;
+    window.evaluation = null;
+    window.evaluation_allowed = false;
     // 初始化当前页面文件名
-    var filename = null;
+    window.filename = null;
     // 修改评价星级
     $('.evaluation_icon').mouseover(function (e) {
         var index = parseInt(e.target.id.charAt(11));
@@ -26,13 +26,12 @@ window.onload = function () {
         for (var j = index+1; j < 6; j++) {
             document.getElementById("evaluation_" + j).src = "images/star_blank.png";
         }
-        if (evaluation_allowed) {
-            evaluation = index;
+        if (window.evaluation_allowed) {
+            window.evaluation = index;
         }
     });
     // 提交评价星级
-    $('.evaluation_icon').click(function () {});
-    // 初始化页面当前输出文件名称
+    $('.evaluation_icon').click(uploadEvaluation);
 }
 
 // 封装绘制类
@@ -455,7 +454,6 @@ class Draw {
                 }
             }
             this.input_canvas_3.toBlob(function (blobObj) {
-                console.log(blobObj);
                 var form = new FormData();
                 form.append("file", blobObj);
                 $.ajax({
@@ -465,7 +463,15 @@ class Draw {
                     contentType: false,
                     data: form,
                     success: function (data) {
-
+                        if (data.status === 200) {
+                            alert("上传成功。");
+                            window.filename = data.msg;
+                            window.evaluation_allowed = true;
+                        }else if (data.status === -100) {
+                            alert("图片上传失败。");
+                        }else if (data.status === -999) {
+                            alert("系统错误。");
+                        }
                     }
                 })
             });
@@ -527,10 +533,10 @@ function checkBrowser () {
 
 // 提交评分
 function uploadEvaluation () {
-    if (evaluation_allowed === true && evaluation !== null && filename !== null) {
+    if (window.evaluation_allowed === true && window.evaluation !== null && window.filename !== null) {
         var formData = new FormData();
-        formData.append("filename", filename);
-        formData.append("score", evaluation);
+        formData.append("filename", window.filename);
+        formData.append("score", window.evaluation);
         $.ajax({
             type: "post",
             url: "/score",
@@ -538,7 +544,7 @@ function uploadEvaluation () {
             success: function (data) {
                 if (data === 200) {
                     alert("评价提交成功。感谢您的评价！");
-                    evaluation_allowed = false;
+                    window.evaluation_allowed = false;
                 }else if (data === 500) {
                     alert("评价提交失败，请重试。");
                 }
