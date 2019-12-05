@@ -436,6 +436,7 @@ class Draw {
         };
         this.upload = function () {
             // 上传图片
+            var _this = this;
             for (var i = 0; i < this.draw_history.length; i++) {
                 if (this.draw_history[i].drawType === "rectangle") {
                     this.drawRect(this.ctx_3, this.draw_history[i].fillColor, this.draw_history[i].start_point_x, this.draw_history[i].start_point_y, this.draw_history[i].end_point_x, this.draw_history[i].end_point_y);
@@ -468,6 +469,18 @@ class Draw {
                             alert("上传成功。");
                             window.filename = data.msg;
                             window.evaluation_allowed = true;
+                            $.ajax({
+                                url: "/show/"+window.filename,
+                                type: "get",
+                                success: function (data) {
+                                    if (data.contentType === "image/png") {
+                                        _this.ctx_4.drawImage(data, 0, 0, 256, 256);
+                                    }else if (data === 404) {
+                                        alert("图片获取失败。");
+                                        return ;
+                                    }
+                                }
+                            });
                         }else if (data.status === -100) {
                             alert("图片上传失败。");
                         }else if (data.status === -999) {
@@ -525,7 +538,7 @@ class Draw {
 
 // 检查浏览器的支持
 function checkBrowser () {
-    if (!FileReader) {
+    if (!FileReader || !FormData) {
         return false;
     }else {
         return true;
