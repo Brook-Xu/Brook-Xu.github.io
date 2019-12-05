@@ -61,9 +61,9 @@ class Draw {
         this.linear_end_point = null; // {x: null, y: null}
         this.lineWidth = 0;
         this.color = "";
-        this.curve_start_point = null;
-        this.curve_end_point = null;
-        this.curve_quadratic_point = null;
+        this.curve_start_point = null; // {x: null, y: null}
+        this.curve_end_point = null; // {x: null, y: null}
+        this.curve_quadratic_point = null; // {x: null, y: null}
         this.rect_x = null;
         this.rect_y = null;
         this.rect_end_x = null;
@@ -115,6 +115,7 @@ class Draw {
                 },
             ]
         */
+        this.curve_state = 1;
         this.init = function () {
             // 初始化
             var _this = this;
@@ -150,7 +151,20 @@ class Draw {
                     };
                     _this.is_down = true;
                 } else if (_this.draw_state === 2) {
-
+                    if (_this.curve_state === 1) {
+                        _this.curve_start_point = {
+                            x: e.layerX,
+                            y: e.layerY
+                        }
+                        _this.is_down = true;
+                    }else if (_this.curve_state === 2) {
+                        _this.is_down = true;
+                        _this.ctx_3.clearRect(0, 0, 256, 256);
+                        _this.drawCurve(_this.ctx_3, _this.lineWidth, "#0000ff", _this.curve_start_point.x, _this.curve_start_point.y, _this.curve_end_point.x, _this.curve_end_point.y, e.layerX, e.layerY);
+                    }else {
+                        console.log("error");
+                        return ;
+                    }
                 } else if (_this.draw_state === 3) {
                     _this.rect_x = e.layerX;
                     _this.rect_y = e.layerY;
@@ -170,7 +184,20 @@ class Draw {
                         _this.drawLine(_this.ctx_3, _this.lineWidth, "#0000ff", _this.linear_start_point.x, _this.linear_start_point.y, e.layerX, e.layerY);
                     }
                 } else if (_this.draw_state === 2) {
-                    _
+                    if (_this.curve_state === 1) {
+                        _this.ctx_3.clearRect(0, 0, 256, 256);
+                        if (_this.is_down === true) {
+                            _this.drawLine(_this.ctx_3, _this.lineWidth, "#0000ff", _this.curve_start_point.x, _this.curve_start_point.y, e.layerX, e.layerY);
+                        }
+                    } else if (_this.curve_state === 2) {
+                        if (_this.is_down === true) {
+                            _this.ctx_3.clearRect(0, 0, 256, 256);
+                            _this.drawCurve(_this.ctx_3, _this.lineWidth, "#0000ff", _this.curve_start_point.x, _this.curve_start_point.y, _this.curve_end_point.x, _this.curve_end_point.y, e.layerX, e.layerY);
+                        }
+                    } else {
+                        console.log("error");
+                        return;
+                    }
                 } else if (_this.draw_state === 3) {
                     _this.ctx_3.clearRect(0, 0, 256, 256);
                     if (_this.is_down === true) {
@@ -206,7 +233,46 @@ class Draw {
                         end_point_y: _this.linear_end_point.y,
                     });
                 } else if (_this.draw_state === 2) {
-
+                    if (_this.curve_state === 1) {
+                        _this.ctx_3.clearRect(0, 0, 256, 256);
+                        if (_this.is_down === false) {
+                            console.log("error");
+                            return ;
+                        }
+                        _this.curve_end_point ={
+                            x: e.layerX,
+                            y: e.layerY
+                        }
+                        _this.drawLine(_this.ctx_3, _this.lineWidth, "#0000ff", _this.curve_start_point.x, _this.curve_start_point.y, _this.curve_end_point.x, _this.curve_end_point.y);
+                        _this.is_down = false;
+                        _this.curve_state = 2;
+                    } else if (_this.curve_state === 2) {
+                        _this.ctx_3.clearRect(0, 0, 256, 256);
+                        if (_this.is_down === false) {
+                            console.log("error");
+                            return;
+                        }
+                        _this.curve_quadratic_point = {
+                            x: e.layerX,
+                            y: e.layerY
+                        };
+                        _this.drawCurve(_this.ctx_2, _this.lineWidth, "#0000ff", _this.curve_start_point.x, _this.curve_start_point.y, _this.curve_end_point.x, _this.curve_end_point.y, _this.curve_quadratic_point.x, _this.curve_quadratic_point.y);
+                        _this.is_down = false;
+                        _this.draw_history.push({
+                            drawType: "curve",
+                            lineWidth: _this.lineWidth,
+                            start_point_x: _this.curve_start_point.x,
+                            start_point_y: _this.curve_start_point.y,
+                            end_point_x: _this.curve_end_point.x,
+                            end_point_y: _this.curve_end_point.y,
+                            cpx: _this.curve_quadratic_point.x,
+                            cpy: _this.curve_quadratic_point.y,
+                        });
+                        _this.curve_state = 1;
+                    } else {
+                        console.log("error");
+                        return;
+                    }
                 } else if (_this.draw_state === 3) {
                     _this.ctx_3.clearRect(0, 0, 256, 256);
                     if (_this.is_down === false) {
@@ -234,14 +300,14 @@ class Draw {
             });
             _this.input_canvas_3.addEventListener("click", function (e) {
                 e.preventDefault();
-                if (_this.draw_state === 1) {
-                    return ;
-                } else if (_this.draw_state === 2) {
-
+                if (_this.draw_state === 4) {
+                    
                 } else if (_this.draw_state === 3) {
                     return ;
-                } else if (_this.draw_state === 4) {
-
+                } else if (_this.draw_state === 2) {
+                    return ;
+                } else if (_this.draw_state === 1) {
+                    return;
                 } else {
                     console.log("error");
                     return;
@@ -249,14 +315,14 @@ class Draw {
             });
             _this.input_canvas_3.addEventListener("dbclick", function (e) {
                 e.preventDefault();
-                if (_this.draw_state === 1) {
-                    return ;
-                } else if (_this.draw_state === 2) {
-
+                if (_this.draw_state === 4) {
+                    
                 } else if (_this.draw_state === 3) {
                     return ;
-                } else if (_this.draw_state === 4) {
-
+                } else if (_this.draw_state === 2) {
+                    return ;
+                } else if (_this.draw_state === 1) {
+                    return;
                 } else {
                     console.log("error");
                     return;
