@@ -137,8 +137,39 @@ class Draw {
             _this.draw_state = 1;
             _this.input_canvas_3.addEventListener("mousedown", function (e) {
                 e.preventDefault();
-                _this.is_down = true;
+                if (_this.draw_state === 1) {}
+                if (_this.draw_state === 2) {}
+                if (_this.draw_state === 3) {}
+                if (_this.draw_state === 4) {}
             });
+            _this.input_canvas_3.addEventListener("mousemove", function () {
+                e.preventDefault();
+                if (_this.draw_state === 1) {}
+                if (_this.draw_state === 2) {}
+                if (_this.draw_state === 3) {}
+                if (_this.draw_state === 4) {}
+            });
+            _this.input_canvas_3.addEventListener("mouseup", function () {
+                e.preventDefault();
+                if (_this.draw_state === 1) {}
+                if (_this.draw_state === 2) {}
+                if (_this.draw_state === 3) {}
+                if (_this.draw_state === 4) {}
+            });
+            _this.input_canvas_3.addEventListener("click", function () {
+                e.preventDefault();
+                if (_this.draw_state === 1) {}
+                if (_this.draw_state === 2) {}
+                if (_this.draw_state === 3) {}
+                if (_this.draw_state === 4) {}
+            });
+            _this.input_canvas_3.addEventListener("dbclick", function () {
+                e.preventDefault();
+                if (_this.draw_state === 1) {}
+                if (_this.draw_state === 2) {}
+                if (_this.draw_state === 3) {}
+                if (_this.draw_state === 4) {}
+            })
         };
         this.drawLine = function (ctx, ctx_width, ctx_color, start_point_x, start_point_y, end_point_x, end_point_y) {
             // 作直线
