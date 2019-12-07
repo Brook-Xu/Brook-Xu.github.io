@@ -93,13 +93,13 @@ img.QRcode{
     vertical-align: middle;
 }
 .single_icon_1{
-    width: auto;
-    height: auto;
+    width: 115px;
+    height: 21px;
     cursor: pointer;
 }
 .single_icon_2{
-    width: auto;
-    height: auto;
+    width: 73px;
+    height: 30px;
     cursor: pointer;
 }
 .control_part{
@@ -128,4 +128,10 @@ img.QRcode{
 #input_canvas_3 {
     position: absolute;
     z-index: 3;
+}
+#list{
+    position: relative;
+    margin-left: auto;
+    margin-right: auto;
+    width: 90%;
 }
