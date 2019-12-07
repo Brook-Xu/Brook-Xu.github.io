@@ -474,12 +474,16 @@ class Draw {
                                 url: "/show/"+window.filename,
                                 type: "get",
                                 success: function (data) {
-                                    if (data.contentType === "image/png") {
+                                    var img = new Image();
+                                    img.src = data;
+                                    img.onload = function () {
                                         _this.ctx_4.drawImage(data, 0, 0, 256, 256);
-                                    }else if (data === 404) {
-                                        alert("图片获取失败。");
-                                        return ;
                                     }
+                                },
+                                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                    alert("图片获取失败。");
+                                    console.log(textStatus);
+                                    return ;
                                 }
                             });
                         }else if (data.status === -100) {
