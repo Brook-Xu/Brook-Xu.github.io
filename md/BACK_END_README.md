@@ -31,6 +31,7 @@ filename: 图片名
 FormData 
 {
     filename : 图片名
+    person: "专业人士" | "非专业人士"
     score    : 分数
 }
 ```
