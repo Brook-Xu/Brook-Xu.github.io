@@ -475,9 +475,9 @@ class Draw {
                                 type: "get",
                                 success: function (data) {
                                     var img = new Image();
-                                    img.src = data;
+                                    img.src = "/show/" + window.filename;
                                     img.onload = function () {
-                                        _this.ctx_4.drawImage(data, 0, 0, 256, 256);
+                                        _this.ctx_4.drawImage(img, 0, 0, 256, 256);
                                     }
                                 },
                                 error: function (XMLHttpRequest, textStatus, errorThrown) {
@@ -560,13 +560,15 @@ function uploadEvaluation () {
             type: "post",
             url: "/score",
             data: formData,
+            processData: false,
+            contentType: false,
             success: function (data) {
-                if (data === 200) {
-                    alert("评价提交成功。感谢您的评价！");
-                    window.evaluation_allowed = false;
-                }else if (data === 500) {
-                    alert("评价提交失败，请重试。");
-                }
+                alert("评价提交成功。感谢您的评价！");
+                window.evaluation_allowed = false;
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                alert("评分失败，请重新评价。");
+                console.log(textStatus);
             }
         });
     }else {
