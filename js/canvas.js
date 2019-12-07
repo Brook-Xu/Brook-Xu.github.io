@@ -457,7 +457,7 @@ class Draw {
             }
             this.input_canvas_3.toBlob(function (blobObj) {
                 var form = new FormData();
-                form.append("file", blobObj);
+                form.append("img", blobObj);
                 $.ajax({
                     url: "/upload",
                     type: "post",
