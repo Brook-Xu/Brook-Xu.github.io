@@ -22,15 +22,50 @@
         </div>
         <div>
             <div class="container">
-                <div class="canvas_part">
-                    <div class="input_part">
-                        <h3>INPUT</h3>
-                        <div class="input_canvas">
-                            <canvas width="256" height="256" id="input_canvas_3">当前浏览器不支持canvas画布功能。请使用其他浏览器打开。推荐使用chrome浏览器。</canvas>
-                            <canvas width="256" height="256" id="input_canvas_2">当前浏览器不支持canvas画布功能。请使用其他浏览器打开。推荐使用chrome浏览器。</canvas>
-                            <canvas width="256" height="256" id="input_canvas_1">当前浏览器不支持canvas画布功能。请使用其他浏览器打开。推荐使用chrome浏览器。</canvas>
+                <div class="row">
+                    <div class="col-xs-offset-1 col-sm-offset-1 col-md-offset-1 col-lg-offset-1 col-xs-4 col-sm-4 col-md-4 col-lg-4 input_part content_center">
+                        <div class="limit_width">
+                            <div class="">
+                                <h3><b>INPUT</b></h3>
+                                <label class="light_font">(场地条件)</label>
+                            </div>
+                            <div class="input_canvas">
+                                <canvas width="256" height="256" id="input_canvas_3">当前浏览器不支持canvas画布功能。请使用其他浏览器打开。推荐使用chrome浏览器。</canvas>
+                                <canvas width="256" height="256" id="input_canvas_2">当前浏览器不支持canvas画布功能。请使用其他浏览器打开。推荐使用chrome浏览器。</canvas>
+                                <canvas width="256" height="256" id="input_canvas_1">当前浏览器不支持canvas画布功能。请使用其他浏览器打开。推荐使用chrome浏览器。</canvas>
+                            </div>
+                            <div>
+                                <div>
+                                    <h4><b>绘制道路</b></h4>
+                                    <div class="single_part">
+                                        <button id="linear">直线</button><br><br>
+                                        <button id="curve">曲线</button>
+                                    </div>
+                                    <div class="single_part">
+                                        <img src="images/road_list1.png" class="single_icon_1 selected" id="road_15"><br>
+                                        <img src="images/road_list2.png" class="single_icon_1" id="road_10"><br>
+                                        <img src="images/road_list3.png" class="single_icon_1" id="road_6">
+                                    </div>
+                                </div>
+                                <div>
+                                    <h4><b>绘制形状</b></h4>
+                                </div>
+                                <div>
+                                    <button id="cancel">撤回</button>
+                                    <button id="clear">清除</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
+                    <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">
+                        <button id="transfer">智能生成</button>
+                        <img src="images/onprocess.gif">
+                    </div>
+                    <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                        <div class="limit_width"></div>
+                    </div>
+                </div>
+                <div class="canvas_part">
                     <div class="output_part">
                         <h3>OUTPUT</h3>
                         <div class="output_canvas">
@@ -42,24 +77,11 @@
                 <br>
                 <div class="icon_part">
                     <div class="single_part">
-                        <img src="images/road_list1.png" class="single_icon_1 selected" id="road_15"><br>
-                        <img src="images/road_list2.png" class="single_icon_1" id="road_10"><br>
-                        <img src="images/road_list3.png" class="single_icon_1" id="road_6">
-                    </div>
-                    <div class="single_part">
-                        <button id="linear">直线</button><br><br>
-                        <button id="curve">曲线</button>
-                    </div>
-                    <div class="single_part">
                         <button id="rectangle">长方形</button><br><br>
                         <button id="polygon">多边形</button>
                     </div>
                 </div><br>
-                <div class="control_part">
-                    <button id="cancel">Cancel</button>
-                    <button id="clear">Clear</button>
-                    <button id="transfer">Transfer</button>
-                </div><br>
+                <div class="control_part"></div><br>
                 <div class="evaluation_part">
                     <h4>效果评价</h4>
                     <div class="evaluation">
@@ -69,6 +91,9 @@
                         <img src="images/star_full.png" class="evaluation_icon" id="evaluation_4">
                         <img src="images/star_full.png" class="evaluation_icon" id="evaluation_5">
                     </div>
+                    <br>
+                    <button id="professional">专业人士</button>
+                    <button id="non_professional">非专业人士</button>
                 </div>
             </div>
         </div>

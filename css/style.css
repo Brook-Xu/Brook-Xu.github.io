@@ -28,13 +28,22 @@ img.QRcode{
 .title{
     text-align: center;
 }
+.light_font{
+    font-weight: 100;
+}
+.content_center{
+    text-align: center;
+}
+.limit_width{
+    position: relative;
+    width: 256px;
+}
 .canvas_part{
     position: relative;
     text-align: center;
 }
 .input_part{
     position: relative;
-    display: inline-block;
 }
 .input_canvas{
     position: relative;
@@ -76,14 +85,14 @@ img.QRcode{
     text-align: center;
 }
 .evaluation_part{
-    text-align: right;
+    text-align: center;
 }
 .evaluation{
     cursor: pointer;
 }
 .evaluation_icon{
-    width: 31.5px;
-    height: 29.5px;
+    width: 36px;
+    height: 36px;
 }
 .selected{
     border:1px solid darkgrey;
