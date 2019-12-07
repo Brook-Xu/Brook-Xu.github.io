@@ -16,3 +16,11 @@ Entrance：255,255,0（黄）
 画布大小：
 256*256像素
 
+评价蓝色rgb:111, 183, 188
+
+邮箱：
+Liuyubo@scut.edu.cn
+Dengqm@scut.edu.cn
+
+requirements.png说明：
+黄色加粗 红色正常 蓝色light

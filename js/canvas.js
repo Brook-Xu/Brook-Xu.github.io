@@ -123,17 +123,19 @@ class Draw {
                 e.target.className += " selected";
                 _this.lineWidth = parseInt(e.target.id.slice(5));
             });
+/*
             $("img.single_icon_2").click(function (e) {
                 $("img.single_icon_2").removeClass("selected");
                 e.target.className += " selected";
                 _this.fillColor = e.target.id.slice(5);
             });
+*/
             // 初始化画笔状态为直线
             _this.draw_state = 1;
             // 初始化画笔宽度为15px
             _this.lineWidth = 15;
-            //初始化画笔填充颜色为白色
-            _this.fillColor = "white";
+            //初始化画笔填充颜色为黑色
+            _this.fillColor = "black";
             // 添加鼠标事件监听
             _this.input_canvas_3.addEventListener("mousedown", function (e) {
                 e.preventDefault();
