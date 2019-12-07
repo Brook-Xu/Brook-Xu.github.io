@@ -49,6 +49,10 @@
                                 </div>
                                 <div>
                                     <h4><b>绘制形状</b></h4>
+                                    <div class="single_part">
+                                        <button id="rectangle">长方形</button>
+                                        <button id="polygon">多边形</button>
+                                    </div>
                                 </div>
                                 <div>
                                     <button id="cancel">撤回</button>
@@ -61,39 +65,34 @@
                         <button id="transfer">智能生成</button>
                         <img src="images/onprocess.gif">
                     </div>
-                    <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
-                        <div class="limit_width"></div>
-                    </div>
-                </div>
-                <div class="canvas_part">
-                    <div class="output_part">
-                        <h3>OUTPUT</h3>
-                        <div class="output_canvas">
-                            <canvas width="256" height="256" id="output_canvas">当前浏览器不支持canvas画布功能。请使用其他浏览器打开。推荐使用chrome浏览器。</canvas>
+                    <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 output_part content_center">
+                        <div class="limit_width">
+                            <div class="">
+                                <h3><b>OUTPUT</b></h3>
+                                <label class="light_font">(校园布局)</label>
+                            </div>
+                            <div class="output_canvas">
+                                <canvas width="256" height="256" id="output_canvas">当前浏览器不支持canvas画布功能。请使用其他浏览器打开。推荐使用chrome浏览器。</canvas>
+                            </div>
+                            <div>
+                                <h4><b>图例</b></h4>
+                                <img src="images/list.png">
+                                <div class="evaluation_part">
+                                    <h4>效果评价</h4>
+                                    <div class="evaluation">
+                                        <img src="images/star_full.png" class="evaluation_icon" id="evaluation_1">
+                                        <img src="images/star_full.png" class="evaluation_icon" id="evaluation_2">
+                                        <img src="images/star_full.png" class="evaluation_icon" id="evaluation_3">
+                                        <img src="images/star_full.png" class="evaluation_icon" id="evaluation_4">
+                                        <img src="images/star_full.png" class="evaluation_icon" id="evaluation_5">
+                                    </div>
+                                    <br>
+                                    <button id="professional">专业人士</button>
+                                    <button id="non_professional">非专业人士</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <br>
-                <br>
-                <div class="icon_part">
-                    <div class="single_part">
-                        <button id="rectangle">长方形</button><br><br>
-                        <button id="polygon">多边形</button>
-                    </div>
-                </div><br>
-                <div class="control_part"></div><br>
-                <div class="evaluation_part">
-                    <h4>效果评价</h4>
-                    <div class="evaluation">
-                        <img src="images/star_full.png" class="evaluation_icon" id="evaluation_1">
-                        <img src="images/star_full.png" class="evaluation_icon" id="evaluation_2">
-                        <img src="images/star_full.png" class="evaluation_icon" id="evaluation_3">
-                        <img src="images/star_full.png" class="evaluation_icon" id="evaluation_4">
-                        <img src="images/star_full.png" class="evaluation_icon" id="evaluation_5">
-                    </div>
-                    <br>
-                    <button id="professional">专业人士</button>
-                    <button id="non_professional">非专业人士</button>
                 </div>
             </div>
         </div>

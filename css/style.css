@@ -51,7 +51,6 @@ img.QRcode{
 }
 .output_part{
     position: relative;
-    display: inline-block;
 }
 .output_canvas{
     position: relative;
@@ -95,7 +94,7 @@ img.QRcode{
     height: 36px;
 }
 .selected{
-    border:1px solid darkgrey;
+    border:1px solid lightgrey;
 }
 #input_canvas_1{
     z-index: 1;
