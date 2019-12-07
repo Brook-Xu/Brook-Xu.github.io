@@ -15,6 +15,8 @@ window.onload = function () {
     // 初始化评价星级
     window.evaluation = null;
     window.evaluation_allowed = false;
+    // 初始化评价者身份
+    window.is_professional = true;
     // 初始化当前页面文件名
     window.filename = null;
     // 修改评价星级
@@ -29,6 +31,12 @@ window.onload = function () {
         if (window.evaluation_allowed) {
             window.evaluation = index;
         }
+    });
+    //修改评价者身份
+    $(".wide_button").click(function (e) {
+        $(".wide_button").removeClass("chosen");
+        e.target.className += " chosen";
+        window.is_professional = e.target.id === "professional" ? true : false;
     });
     // 提交评价星级
     $('.evaluation_icon').click(uploadEvaluation);
@@ -113,10 +121,38 @@ class Draw {
             // 初始化
             var _this = this;
             // 画笔功能切换
-            document.getElementById("linear").addEventListener("click", function () {_this.state_change(1)});
-            document.getElementById("curve").addEventListener("click", function () {_this.state_change(2)});
-            document.getElementById("rectangle").addEventListener("click", function () {_this.state_change(3)});
-            document.getElementById("polygon").addEventListener("click", function () {_this.state_change(4)});
+            document.getElementById("linear").addEventListener("click", function () {
+                // $("#linear").removeClass("chosen");
+                $("#curve").removeClass("chosen");
+                $("#rectangle").removeClass("selected");
+                $("#polygon").removeClass("selected");
+                $("#linear").addClass("chosen");
+                _this.state_change(1);
+            });
+            document.getElementById("curve").addEventListener("click", function () {
+                $("#linear").removeClass("chosen");
+                // $("#curve").removeClass("chosen");
+                $("#rectangle").removeClass("selected");
+                $("#polygon").removeClass("selected");
+                $("#curve").addClass("chosen");
+                _this.state_change(2);
+            });
+            document.getElementById("rectangle").addEventListener("click", function () {
+                $("#linear").removeClass("chosen");
+                $("#curve").removeClass("chosen");
+                // $("#rectangle").removeClass("selected");
+                $("#polygon").removeClass("selected");
+                $("#rectangle").addClass("selected");
+                _this.state_change(3);
+            });
+            document.getElementById("polygon").addEventListener("click", function () {
+                $("#linear").removeClass("chosen");
+                $("#curve").removeClass("chosen");
+                $("#rectangle").removeClass("selected");
+                // $("#polygon").removeClass("selected");
+                $("#polygon").addClass("selected");
+                _this.state_change(4);
+            });
             // 绘图图例切换
             $("img.single_icon_1").click(function (e) {
                 $("img.single_icon_1").removeClass("selected");
@@ -439,6 +475,7 @@ class Draw {
         this.upload = function () {
             // 上传图片
             var _this = this;
+            $("#transfer_icon").show();
             for (var i = 0; i < this.draw_history.length; i++) {
                 if (this.draw_history[i].drawType === "rectangle") {
                     this.drawRect(this.ctx_3, this.draw_history[i].fillColor, this.draw_history[i].start_point_x, this.draw_history[i].start_point_y, this.draw_history[i].end_point_x, this.draw_history[i].end_point_y);
@@ -480,17 +517,21 @@ class Draw {
                                     img.src = "/show/" + window.filename;
                                     img.onload = function () {
                                         _this.ctx_4.drawImage(img, 0, 0, 256, 256);
+                                        $("#transfer_icon").hide();
                                     }
                                 },
                                 error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                    $("#transfer_icon").hide();
                                     alert("图片获取失败。");
                                     console.log(textStatus);
                                     return ;
                                 }
                             });
                         }else if (data.status === -100) {
+                            $("#transfer_icon").hide();
                             alert("图片上传失败。");
                         }else if (data.status === -999) {
+                            $("#transfer_icon").hide();
                             alert("系统错误。");
                         }
                     }
@@ -558,6 +599,7 @@ function uploadEvaluation () {
         var formData = new FormData();
         formData.append("filename", window.filename);
         formData.append("score", window.evaluation);
+        formData.append("person", window.is_professional ? "professional" : "unprofessional");
         $.ajax({
             type: "post",
             url: "/score",

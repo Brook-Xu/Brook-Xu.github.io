@@ -39,7 +39,7 @@
                                     <div class="col-xs-7 col-sm-7 col-md-7 col-lg-7 content_center">
                                         <h5><b>绘制道路</b></h5>
                                         <div class="single_part">
-                                            <button id="linear">直线</button>
+                                            <button class="chosen" id="linear">直线</button>
                                             <button id="curve">曲线</button>
                                         </div>
                                         <div class="single_part">
@@ -51,23 +51,23 @@
                                     <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 content_center">
                                         <h5><b>绘制形状</b></h5>
                                         <div class="single_part">
-                                            <img src="images/rectangle.png" class="single_icon_2 selected" style="margin-top: 12px; margin-bottom: 12px;" id="rectangle">
+                                            <img src="images/rectangle.png" class="single_icon_2" style="margin-top: 12px; margin-bottom: 12px;" id="rectangle">
                                             <img src="images/polygon.png" class="single_icon_2" style="margin-top: 5px;" id="polygon">
                                         </div>
                                     </div>
                                 </div>
                                 <div>
                                     <br>
-                                    <button id="cancel">撤回</button>
-                                    <button id="clear">清除</button>
+                                    <button style="padding-left: 24px; padding-right: 24px;" id="cancel">撤回</button>
+                                    <button style="padding-left: 24px; padding-right: 24px;" id="clear">清除</button>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 content_center">
                         <div class="process">
-                            <button id="transfer">智能生成</button>
-                            <img src="images/onprocess.gif" class="transfer">
+                            <button style="padding-left: 15px; padding-right: 15px;" id="transfer">智能生成</button>
+                            <img src="images/onprocess.gif" class="transfer" id="transfer_icon">
                         </div>
                     </div>
                     <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 output_part content_center">
@@ -92,8 +92,8 @@
                                         <img src="images/star_full.png" class="evaluation_icon" id="evaluation_5">
                                     </div>
                                     <br>
-                                    <button id="professional">专业人士</button>
-                                    <button id="non_professional">非专业人士</button>
+                                    <button class="wide_button chosen" id="professional">专业人士</button>
+                                    <button class="wide_button" id="non_professional">非专业人士</button>
                                 </div>
                             </div>
                         </div>
