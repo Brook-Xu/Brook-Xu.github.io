@@ -9,10 +9,10 @@ footer{
 }
 button{
     position: relative;
-    margin-left: 14px;
-    margin-right: 14px;
     margin-bottom: 10px;
-    padding: 5px 12px 5px 12px;
+    color: white;
+    background-color: darkgrey;
+    border-radius: 8px;
 }
 canvas{
     margin: 0;
@@ -40,8 +40,6 @@ img.QRcode{
 }
 .limit_width{
     position: relative;
-    margin-left: auto;
-    margin-right: auto;
     width: 258px;
 }
 .surround{
@@ -54,7 +52,7 @@ img.QRcode{
     margin-top: 164px;
     margin-left: auto;
     margin-right: auto;
-    width: 100%;
+    width: 100px;
 }
 .transfer{
     width: 100%;
@@ -89,8 +87,7 @@ img.QRcode{
     text-align: center;
 }
 .single_part{
-    display: inline-block;
-    vertical-align: middle;
+    position: relative;
 }
 .single_icon_1{
     width: 115px;
@@ -112,8 +109,8 @@ img.QRcode{
     cursor: pointer;
 }
 .evaluation_icon{
-    width: 36px;
-    height: 36px;
+    width: 30px;
+    height: 30px;
 }
 .selected{
     border:1px solid lightgrey;
