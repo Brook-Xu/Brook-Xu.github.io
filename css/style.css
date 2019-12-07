@@ -51,8 +51,12 @@ img.QRcode{
 }
 .process{
     position: relative;
+    margin-top: 164px;
     margin-left: auto;
     margin-right: auto;
+    width: 100%;
+}
+.transfer{
     width: 100%;
 }
 .canvas_part{
@@ -124,14 +128,4 @@ img.QRcode{
 #input_canvas_3 {
     position: absolute;
     z-index: 3;
-}
-#icon_list{
-    width: 124px;
-    height: 244px;
-    vertical-align: baseline;
-}
-#scut{
-    position: relative;
-    width: 191px;
-    height: 60px;
 }
