@@ -25,7 +25,7 @@
                 <div class="row">
                     <div class="col-xs-offset-1 col-sm-offset-1 col-md-offset-1 col-lg-offset-1 col-xs-4 col-sm-4 col-md-4 col-lg-4 input_part content_center">
                         <div class="limit_width">
-                            <div class="">
+                            <div class="surround">
                                 <h3><b>INPUT</b></h3>
                                 <label class="light_font">(场地条件)</label>
                             </div>
@@ -34,11 +34,11 @@
                                 <canvas width="256" height="256" id="input_canvas_2">当前浏览器不支持canvas画布功能。请使用其他浏览器打开。推荐使用chrome浏览器。</canvas>
                                 <canvas width="256" height="256" id="input_canvas_1">当前浏览器不支持canvas画布功能。请使用其他浏览器打开。推荐使用chrome浏览器。</canvas>
                             </div>
-                            <div>
+                            <div class="surround">
                                 <div>
                                     <h4><b>绘制道路</b></h4>
                                     <div class="single_part">
-                                        <button id="linear">直线</button><br><br>
+                                        <button id="linear">直线</button>
                                         <button id="curve">曲线</button>
                                     </div>
                                     <div class="single_part">
@@ -50,8 +50,8 @@
                                 <div>
                                     <h4><b>绘制形状</b></h4>
                                     <div class="single_part">
-                                        <button id="rectangle">长方形</button>
-                                        <button id="polygon">多边形</button>
+                                        <img src="images/rectangle.png" id="rectangle">
+                                        <img src="images/polygon.png" id="polygon">
                                     </div>
                                 </div>
                                 <div>
@@ -61,20 +61,20 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">
+                    <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 content_center">
                         <button id="transfer">智能生成</button>
                         <img src="images/onprocess.gif">
                     </div>
                     <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 output_part content_center">
                         <div class="limit_width">
-                            <div class="">
+                            <div class="surround">
                                 <h3><b>OUTPUT</b></h3>
                                 <label class="light_font">(校园布局)</label>
                             </div>
                             <div class="output_canvas">
                                 <canvas width="256" height="256" id="output_canvas">当前浏览器不支持canvas画布功能。请使用其他浏览器打开。推荐使用chrome浏览器。</canvas>
                             </div>
-                            <div>
+                            <div class="surround">
                                 <h4><b>图例</b></h4>
                                 <img src="images/list.png">
                                 <div class="evaluation_part">

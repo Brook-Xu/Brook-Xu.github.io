@@ -1,5 +1,6 @@
 h3{
     text-align: center;
+    margin-top: 10px;
 }
 footer{
     text-align: center;
@@ -10,12 +11,13 @@ button{
     position: relative;
     margin-left: 14px;
     margin-right: 14px;
+    margin-bottom: 10px;
     padding: 5px 12px 5px 12px;
 }
 canvas{
     margin: 0;
     padding: 0;
-    border: 1px solid grey;
+    border: 1px solid black;
 }
 img.logo{
     width: 140px;
@@ -30,13 +32,17 @@ img.QRcode{
 }
 .light_font{
     font-weight: 100;
+    color: darkgrey;
 }
 .content_center{
     text-align: center;
 }
 .limit_width{
     position: relative;
-    width: 256px;
+    width: 258px;
+}
+.surround{
+    border: 1px solid black;
 }
 .canvas_part{
     position: relative;
@@ -71,13 +77,13 @@ img.QRcode{
     vertical-align: middle;
 }
 .single_icon_1{
-    width: 376px;
-    height: 80px;
+    width: auto;
+    height: auto;
     cursor: pointer;
 }
 .single_icon_2{
-    width: 156px;
-    height: 75px;
+    width: auto;
+    height: auto;
     cursor: pointer;
 }
 .control_part{
