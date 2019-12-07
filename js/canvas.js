@@ -564,7 +564,6 @@ function uploadEvaluation () {
             contentType: false,
             success: function (data) {
                 alert("评价提交成功。感谢您的评价！");
-                window.evaluation_allowed = false;
             },
             error: function (XMLHttpRequest, textStatus, errorThrown) {
                 alert("评分失败，请重新评价。");
