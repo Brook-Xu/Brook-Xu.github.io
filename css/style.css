@@ -18,6 +18,9 @@ canvas{
     padding: 0;
     border: 1px solid grey;
 }
+.title{
+    text-align: center;
+}
 .canvas_part{
     position: relative;
     text-align: center;
