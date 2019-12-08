@@ -95,21 +95,23 @@ img.QRcode{
 }
 .single_icon_1{
     width: 115px;
-    height: 21px;
+    height: 14.5px;
     cursor: pointer;
 }
 .single_icon_2{
     width: 73px;
-    height: 30px;
+    height: 24.5px;
     cursor: pointer;
 }
 .control_part{
     text-align: center;
 }
 .evaluation_part{
+    margin-top: 24px;
     text-align: center;
 }
 .evaluation{
+    margin-bottom: 8px;
     cursor: pointer;
 }
 .evaluation_icon{
