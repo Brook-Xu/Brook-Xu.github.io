@@ -1,5 +1,5 @@
 /* 
-*
+* 此为最初版本canvas.js存在诸多问题，但大致结构不变
 */
 
 window.onload = function () {

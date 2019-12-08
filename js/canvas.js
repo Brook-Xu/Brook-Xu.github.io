@@ -460,6 +460,9 @@ class Draw {
                 point_3_x = polygon_point_list[i + 1].x;
                 point_3_y = polygon_point_list[i + 1].y;
                 this.drawTriangle(ctx, ctx_color, point_1_x, point_1_y, point_2_x, point_2_y, point_3_x, point_3_y);
+                // 修复白线bug
+                this.drawLine(ctx, 1, ctx_color, point_1_x, point_1_y, point_2_x, point_2_y);
+                this.drawLine(ctx, 1, ctx_color, point_1_x, point_1_y, point_3_x, point_3_y);
             }
         };
         this.drawTriangle = function (ctx, ctx_color, point_1_x, point_1_y, point_2_x, point_2_y, point_3_x, point_3_y) {
