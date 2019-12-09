@@ -20,6 +20,7 @@ button{
     background-color: lightgrey;
     border: 1px solid lightgrey;
     border-radius: 8px;
+    outline: none;
 }
 canvas{
     margin: 0;
