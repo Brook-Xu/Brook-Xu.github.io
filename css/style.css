@@ -14,13 +14,18 @@ button{
     position: relative;
     margin-bottom: 10px;
     color: white;
-    background-color: darkgrey;
+    background-color: lightgrey;
+    border: 1px solid lightgrey;
     border-radius: 8px;
 }
 canvas{
     margin: 0;
     padding: 0;
     border: 1px solid black;
+}
+address{
+    margin-bottom: 8px;
+    font-size: 12px;
 }
 img.logo{
     width: 140px;
@@ -35,7 +40,7 @@ img.QRcode{
 }
 .light_font{
     font-weight: 100;
-    color: darkgrey;
+    color: rgb(100, 100, 100);
     margin-bottom: 0;
 }
 .content_center{
@@ -122,7 +127,7 @@ img.QRcode{
     border:1px solid lightgrey;
 }
 .chosen{
-    background-color: rgb(111, 183, 188);
+    background-color: rgb(0, 176, 240);
 }
 .wide_button{
     padding-left: 12px;
