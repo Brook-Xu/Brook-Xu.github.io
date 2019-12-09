@@ -479,6 +479,9 @@ class Draw {
             // 上传图片
             var _this = this;
             $("#transfer_icon").show();
+            this.ctx_3.fillStyle = "white";
+            this.ctx_3.fillRect(0, 0, 256, 256);
+            this.ctx_3.fillStyle = this.fillColor;
             for (var i = 0; i < this.draw_history.length; i++) {
                 if (this.draw_history[i].drawType === "rectangle") {
                     this.drawRect(this.ctx_3, this.draw_history[i].fillColor, this.draw_history[i].start_point_x, this.draw_history[i].start_point_y, this.draw_history[i].end_point_x, this.draw_history[i].end_point_y);
