@@ -16,7 +16,7 @@ window.onload = function () {
     window.evaluation = null;
     window.evaluation_allowed = false;
     // 初始化评价者身份
-    window.is_professional = true;
+    window.is_professional = 0;
     // 初始化当前页面文件名
     window.filename = null;
     // 修改评价星级
@@ -36,7 +36,7 @@ window.onload = function () {
     $(".wide_button").click(function (e) {
         $(".wide_button").removeClass("chosen");
         e.target.className += " chosen";
-        window.is_professional = e.target.id === "professional" ? true : false;
+        window.is_professional = e.target.id === "professional" ? 1 : 2;
     });
     // 提交评价星级
     $('.evaluation_icon').click(uploadEvaluation);
@@ -602,10 +602,14 @@ function checkBrowser () {
 // 提交评分
 function uploadEvaluation () {
     if (window.evaluation_allowed === true && window.evaluation !== null && window.filename !== null) {
+        if (window.is_professional === 0) {
+            alert("请选择评价者身份。");
+            return ;
+        }
         var formData = new FormData();
         formData.append("filename", window.filename);
         formData.append("score", window.evaluation);
-        formData.append("person", window.is_professional ? "professional" : "unprofessional");
+        formData.append("person", window.is_professional === 1 ? "professional" : "unprofessional");
         $.ajax({
             type: "post",
             url: "/score",
