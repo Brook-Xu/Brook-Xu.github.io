@@ -5,6 +5,9 @@ h3{
     text-align: center;
     margin-top: 10px;
 }
+h5{
+    margin-bottom: 13px;
+}
 footer{
     text-align: center;
     color: darkgrey;
@@ -97,15 +100,16 @@ img.QRcode{
 }
 .single_part{
     position: relative;
+    display: inline-block;
 }
 .single_icon_1{
-    width: 115px;
-    height: 14.5px;
+    width: 105px;
+    height: 32px;
     cursor: pointer;
 }
 .single_icon_2{
-    width: 73px;
-    height: 24.5px;
+    width: 90px;
+    height: 26px;
     cursor: pointer;
 }
 .control_part{
