@@ -40,6 +40,12 @@ window.onload = function () {
     });
     // 提交评价星级
     $('.evaluation_icon').click(uploadEvaluation);
+    $('.click_change_bgc').mousedown(function (e) {
+        e.target.style.backgroundColor = "#00b0f0";
+    });
+    $('.click_change_bgc').mouseup(function (e) {
+        e.target.style.backgroundColor = "lightgrey";
+    });
 }
 
 // 封装绘制类
