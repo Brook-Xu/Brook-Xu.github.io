@@ -105,11 +105,13 @@ img.QRcode{
 .single_icon_1{
     width: 105px;
     height: 32px;
+    border-radius: 8px;
     cursor: pointer;
 }
 .single_icon_2{
     width: 90px;
     height: 26px;
+    border-radius: 10px;
     cursor: pointer;
 }
 .control_part{
