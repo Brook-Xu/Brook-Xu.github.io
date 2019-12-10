@@ -585,6 +585,10 @@ class Draw {
             this.ctx_4.clearRect(0, 0, 256, 256);
             this.draw_history = [];
             this.img_history = [];
+            window.is_professional = 0;
+            window.evaluation = 0;
+            $(".evaluation_icon").attr("src", "images/star_blank.png");
+            $(".wide_button").removeClass("chosen");
         };
         this.state_change = function (state) {
             if (state !== 1 && state !== 2 && state !== 3 && state !== 4) {
