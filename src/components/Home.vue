@@ -14,9 +14,20 @@
           <h4>File Requirements:</h4>
           <ul>
             <li>Only CSV files are supported</li>
-            <li>First column: date (YYYY-MM-DD format)</li>
-            <li>Second column: value (numeric)</li>
-            <li>First row should contain headers: "date" and "value"</li>
+            <li>First column: date (various formats supported)</li>
+            <li>Second column: numeric value</li>
+            <li>Column names are automatically detected</li>
+          </ul>
+          <h5>Supported Date Formats:</h5>
+          <ul>
+            <li>YYYY-MM-DD, MM/DD/YYYY, MM-DD-YYYY</li>
+            <li>YYYY/MM/DD, MM/DD/YY</li>
+            <li>YYYY-MM-DD HH:MM:SS</li>
+          </ul>
+          <h5>Supported Column Names:</h5>
+          <ul>
+            <li>Date: date, time, timestamp, day, month, year, 日期, 时间, etc.</li>
+            <li>Value: value, price, amount, quantity, count, number, 数值, 价格, etc.</li>
           </ul>
         </div>
       </div>
@@ -103,16 +114,59 @@ export default {
         throw new Error('CSV file is empty or invalid');
       }
 
-      // 检查列名
+      // 智能检测列名
       const firstRow = data[0];
-      if (!firstRow.hasOwnProperty('date') || !firstRow.hasOwnProperty('value')) {
-        throw new Error('CSV file must have "date" and "value" columns');
+      const columnNames = Object.keys(firstRow);
+      
+      if (columnNames.length < 2) {
+        throw new Error('CSV file must have at least 2 columns');
+      }
+
+      // 查找日期列（第一列或包含日期关键词的列）
+      let dateColumn = null;
+      let valueColumn = null;
+
+      // 优先检查第一列是否为日期
+      const firstColumnName = columnNames[0];
+      const firstColumnValue = firstRow[firstColumnName];
+      if (this.isDateColumn(firstColumnValue)) {
+        dateColumn = firstColumnName;
+        valueColumn = columnNames[1]; // 第二列作为数值列
+      } else {
+        // 如果第一列不是日期，尝试查找包含日期关键词的列
+        for (const colName of columnNames) {
+          if (this.isDateColumnName(colName)) {
+            dateColumn = colName;
+            break;
+          }
+        }
+        
+        // 查找数值列
+        for (const colName of columnNames) {
+          if (colName !== dateColumn && this.isValueColumnName(colName)) {
+            valueColumn = colName;
+            break;
+          }
+        }
+        
+        // 如果没找到明确的列名，使用第一列作为日期，第二列作为数值
+        if (!dateColumn) {
+          dateColumn = columnNames[0];
+        }
+        if (!valueColumn) {
+          valueColumn = columnNames[1];
+        }
+      }
+
+      // 验证找到的列
+      if (!dateColumn || !valueColumn) {
+        throw new Error('Could not identify date and value columns in CSV file');
       }
 
       // 解析数据
       const parsedData = data.map((row, index) => {
-        const dateStr = row.date;
-        const valueStr = row.value;
+        const dateStr = row[dateColumn];
+        const valueStr = row[valueColumn];
 
         // 验证日期格式 (YYYY-MM-DD)
         const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
@@ -297,6 +351,52 @@ export default {
       ];
 
       return series;
+    },
+
+    // 检测列值是否为日期格式
+    isDateColumn(value) {
+      if (!value || typeof value !== 'string') return false;
+      
+      // 检查常见的日期格式
+      const dateFormats = [
+        /^\d{4}-\d{2}-\d{2}$/,           // YYYY-MM-DD
+        /^\d{2}\/\d{2}\/\d{4}$/,         // MM/DD/YYYY
+        /^\d{2}-\d{2}-\d{4}$/,           // MM-DD-YYYY
+        /^\d{4}\/\d{2}\/\d{2}$/,         // YYYY/MM/DD
+        /^\d{2}\/\d{2}\/\d{2}$/,         // MM/DD/YY
+        /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/  // YYYY-MM-DD HH:MM:SS
+      ];
+      
+      return dateFormats.some(format => format.test(value.trim()));
+    },
+
+    // 检测列名是否包含日期关键词
+    isDateColumnName(columnName) {
+      if (!columnName || typeof columnName !== 'string') return false;
+      
+      const dateKeywords = [
+        'date', 'time', 'timestamp', 'day', 'month', 'year',
+        '日期', '时间', '时间戳', '天', '月', '年',
+        'created', 'updated', 'modified'
+      ];
+      
+      const lowerName = columnName.toLowerCase();
+      return dateKeywords.some(keyword => lowerName.includes(keyword));
+    },
+
+    // 检测列名是否包含数值关键词
+    isValueColumnName(columnName) {
+      if (!columnName || typeof columnName !== 'string') return false;
+      
+      const valueKeywords = [
+        'value', 'price', 'amount', 'quantity', 'count', 'number',
+        '数值', '价格', '金额', '数量', '计数', '数字',
+        'close', 'open', 'high', 'low', 'volume', 'vwap',
+        'price', 'cost', 'total', 'sum', 'avg', 'average'
+      ];
+      
+      const lowerName = columnName.toLowerCase();
+      return valueKeywords.some(keyword => lowerName.includes(keyword));
     }
   }
 };
