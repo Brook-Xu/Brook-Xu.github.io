@@ -1,27 +1,34 @@
 <template>
-  <div class="app animate__animated animate__fadeIn">
-    <h1>我的官网</h1>
-    <p>这里是官网的介绍信息。</p>
-
-    <StockFetcher />
-    <FileUploader />
-    <Chart />
+  <div id="app">
+    <nav>
+      <a href="/" @click.prevent="$router.push('/')">Home</a>
+      <a href="/upload" @click.prevent="$router.push('/upload')">Upload</a>
+      <a href="/charts" @click.prevent="$router.push('/charts')">Charts</a>
+    </nav>
+    <router-view />
   </div>
 </template>
 
-<script>
-import StockFetcher from './components/StockFetcher.vue';
-import FileUploader from './components/FileUploader.vue';
-import Chart from './components/Chart.vue';
-
-export default {
-  components: { StockFetcher, FileUploader, Chart }
-};
-</script>
-
 <style>
 body {
-  font-family: sans-serif;
-  margin: 20px;
+  margin: 0;
+  font-family: 'Arial', sans-serif;
+  background: #111;
+  color: #eee;
+}
+nav {
+  display: flex;
+  justify-content: center;
+  background: #222;
+  padding: 1rem;
+}
+nav a {
+  color: #eee;
+  margin: 0 1rem;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+nav a:hover {
+  color: #42b983;
 }
 </style>
