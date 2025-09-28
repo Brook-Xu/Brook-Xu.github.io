@@ -13,13 +13,13 @@
 body {
   margin: 0;
   font-family: 'Arial', sans-serif;
-  background: #111;
+  background: #153252;
   color: #eee;
 }
 nav {
   display: flex;
   justify-content: center;
-  background: #222;
+  background: #222222;
   padding: 1rem;
 }
 nav a {
