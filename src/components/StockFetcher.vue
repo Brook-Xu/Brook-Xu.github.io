@@ -1,7 +1,7 @@
 <template>
   <div>
-    <h2>股票数据</h2>
-    <button @click="fetchData">获取数据</button>
+    <h2>{{ $t('marketData.sp500') }}</h2>
+    <button @click="fetchData">{{ $t('common.refresh') }}</button>
     <ul>
       <li v-for="(item, index) in prices" :key="index">
         {{ item.time }}: {{ item.value }}

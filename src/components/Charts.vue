@@ -2,59 +2,57 @@
   <div class="charts-container">
     <!-- Upload Section -->
     <section class="upload-section" data-aos="fade-up">
-      <h2>Upload CSV File</h2>
+      <h2>{{ $t('charts.uploadSection') }}</h2>
       <div class="upload-area">
         <input type="file" @change="handleFileUpload" accept=".csv" />
-        <p class="upload-hint">Please select a CSV file to upload</p>
+        <p class="upload-hint">{{ $t('charts.uploadHint') }}</p>
         <div class="file-requirements">
-          <h4>File Requirements:</h4>
+          <h4>{{ $t('charts.fileRequirements') }}</h4>
           <ul>
-            <li>Only CSV files are supported</li>
-            <li>First column: date (various formats supported)</li>
-            <li>Second column: numeric value</li>
-            <li>Column names are automatically detected</li>
+            <li>{{ $t('charts.csvOnly') }}</li>
+            <li>{{ $t('charts.firstColumnDate') }}</li>
+            <li>{{ $t('charts.secondColumnValue') }}</li>
+            <li>{{ $t('charts.autoDetect') }}</li>
           </ul>
-          <h5>Supported Date Formats:</h5>
+          <h5>{{ $t('charts.supportedFormats') }}</h5>
           <ul>
-            <li>YYYY-MM-DD, MM/DD/YYYY, MM-DD-YYYY</li>
-            <li>YYYY/MM/DD, MM/DD/YY</li>
-            <li>YYYY-MM-DD HH:MM:SS</li>
+            <li v-for="format in $t('charts.dateFormats')" :key="format">{{ format }}</li>
           </ul>
-          <h5>Supported Column Names:</h5>
+          <h5>{{ $t('charts.supportedColumns') }}</h5>
           <ul>
-            <li>Date: date, time, timestamp, day, month, year, 日期, 时间, etc.</li>
-            <li>Value: value, price, amount, quantity, count, number, 数值, 价格, etc.</li>
+            <li>{{ $t('charts.columnNames.date') }}</li>
+            <li>{{ $t('charts.columnNames.value') }}</li>
           </ul>
         </div>
       </div>
       <div v-if="errorMessage" class="error-message">
-        <h3>Error</h3>
+        <h3>{{ $t('common.error') }}</h3>
         <p>{{ errorMessage }}</p>
       </div>
     </section>
 
     <section class="charts" data-aos="fade-up">
-      <h2>CSV Data Visualization Chart</h2>
+      <h2>{{ $t('charts.title') }}</h2>
       <div v-if="!chartData || chartData.length === 0" class="no-data">
-        <p>No data available. Please upload a CSV file above.</p>
+        <p>{{ $t('charts.noDataMessage') }}</p>
       </div>
       <div v-else>
         <div ref="chart" class="chart-container"></div>
         <div class="chart-info">
-          <p>Total data points: {{ chartData.length }}</p>
-          <p>Date range: {{ dateRange }}</p>
+          <p>{{ $t('charts.totalDataPoints') }}: {{ chartData.length }}</p>
+          <p>{{ $t('home.dateRange') }}: {{ dateRange }}</p>
         </div>
       </div>
     </section>
 
     <!-- API Market Data Section -->
     <div v-if="apiError" class="error-message">
-      <h3>API Error</h3>
+      <h3>{{ $t('home.apiError') }}</h3>
       <p>{{ apiError }}</p>
     </div>
     
     <div v-if="marketData" class="market-data-display">
-      <h3>Market Data Charts</h3>
+      <h3>{{ $t('home.marketDataCharts') }}</h3>
       <div class="charts-grid">
         <div v-for="(data, key) in marketData" :key="key" class="chart-item">
           <h4>{{ getDataTitle(key) }}</h4>
@@ -119,7 +117,7 @@ export default {
 
       // 检查文件类型
       if (!file.name.toLowerCase().endsWith('.csv')) {
-        this.errorMessage = 'Please select a CSV file only.';
+        this.errorMessage = this.$t('charts.selectCsvFile');
         this.parsedData = null;
         return;
       }
@@ -133,12 +131,12 @@ export default {
           try {
             this.parseCSVData(results.data);
           } catch (error) {
-            this.errorMessage = 'Error parsing CSV file: ' + error.message;
+            this.errorMessage = this.$t('charts.errorParsingCsv') + ': ' + error.message;
             this.parsedData = null;
           }
         },
         error: (error) => {
-          this.errorMessage = 'Error reading CSV file: ' + error.message;
+          this.errorMessage = this.$t('charts.errorReadingCsv') + ': ' + error.message;
           this.parsedData = null;
         }
       });
@@ -147,7 +145,7 @@ export default {
     parseCSVData(data) {
       // 验证数据结构
       if (!data || data.length === 0) {
-        throw new Error('CSV file is empty or invalid');
+        throw new Error(this.$t('charts.csvEmpty'));
       }
 
       // 智能检测列名
@@ -155,7 +153,7 @@ export default {
       const columnNames = Object.keys(firstRow);
       
       if (columnNames.length < 2) {
-        throw new Error('CSV file must have at least 2 columns');
+        throw new Error(this.$t('charts.csvMinColumns'));
       }
 
       // 查找日期列（第一列或包含日期关键词的列）
@@ -196,7 +194,7 @@ export default {
 
       // 验证找到的列
       if (!dateColumn || !valueColumn) {
-        throw new Error('Could not identify date and value columns in CSV file');
+        throw new Error(this.$t('charts.cannotIdentifyColumns'));
       }
 
       // 解析数据
@@ -207,13 +205,13 @@ export default {
         // 验证日期格式 (YYYY-MM-DD)
         const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
         if (!dateRegex.test(dateStr)) {
-          throw new Error(`Invalid date format at row ${index + 2}: "${dateStr}". Expected format: YYYY-MM-DD`);
+          throw new Error(this.$t('charts.invalidDateFormat', { row: index + 2, date: dateStr }));
         }
 
         // 验证数值
         const value = parseFloat(valueStr);
         if (isNaN(value)) {
-          throw new Error(`Invalid value at row ${index + 2}: "${valueStr}". Must be a number`);
+          throw new Error(this.$t('charts.invalidValue', { row: index + 2, value: valueStr }));
         }
 
         return {
@@ -288,7 +286,7 @@ export default {
       
       const option = {
         title: {
-          text: 'Data Trend Chart',
+          text: this.$t('charts.dataTrendChart'),
           left: 'center',
           textStyle: {
             color: '#42b983',
@@ -297,9 +295,9 @@ export default {
         },
         tooltip: {
           trigger: 'axis',
-          formatter: function(params) {
+          formatter: (params) => {
             const data = params[0];
-            return `Date: ${data.axisValue}<br/>Value: ${data.value}`;
+            return `${this.$t('tooltips.date', { date: data.axisValue })}<br/>${this.$t('tooltips.value', { value: data.value })}`;
           }
         },
         grid: {
@@ -338,7 +336,7 @@ export default {
           }
         },
         series: [{
-          name: 'Value',
+          name: this.$t('charts.value'),
           type: 'line',
           data: values,
           smooth: true,
@@ -397,7 +395,7 @@ export default {
       if (!data.results || data.results.length === 0) {
         chart.setOption({
           title: {
-            text: 'No Data Available',
+            text: this.$t('home.noDataAvailable'),
             left: 'center',
             top: 'middle',
             textStyle: { color: '#999' }
@@ -421,10 +419,10 @@ export default {
         tooltip: {
           trigger: 'axis',
           axisPointer: { type: 'cross' },
-          formatter: function(params) {
-            let result = `Date: ${params[0].axisValue}<br/>`;
+          formatter: (params) => {
+            let result = `${this.$t('tooltips.date', { date: params[0].axisValue })}<br/>`;
             params.forEach(param => {
-              if (param.seriesName === 'Volume') {
+              if (param.seriesName === this.$t('home.volume')) {
                 result += `${param.seriesName}: ${param.value.toLocaleString()}<br/>`;
               } else {
                 result += `${param.seriesName}: $${param.value.toFixed(2)}<br/>`;
@@ -460,7 +458,7 @@ export default {
         yAxis: [
           {
             type: 'value',
-            name: 'Price ($)',
+            name: this.$t('tooltips.price', { price: '' }).replace('${price}', ''),
             position: 'left',
             min: yAxisConfig.price.min,
             max: yAxisConfig.price.max,
@@ -478,7 +476,7 @@ export default {
           },
           {
             type: 'value',
-            name: 'Volume',
+            name: this.$t('home.volume'),
             position: 'right',
             min: yAxisConfig.volume.min,
             max: yAxisConfig.volume.max,
@@ -553,7 +551,7 @@ export default {
 
       const series = [
         { 
-          name: 'Volume', 
+          name: this.$t('home.volume'), 
           data: volumeData, 
           type: 'bar', 
           yAxisIndex: 1, 
@@ -561,7 +559,7 @@ export default {
           barWidth: '60%'
         },
         { 
-          name: 'Open', 
+          name: this.$t('home.open'), 
           data: results.map(item => item.o), 
           type: 'line', 
           yAxisIndex: 0, 
@@ -571,7 +569,7 @@ export default {
           symbolSize: 4
         },
         { 
-          name: 'High', 
+          name: this.$t('home.high'), 
           data: results.map(item => item.h), 
           type: 'line', 
           yAxisIndex: 0, 
@@ -581,7 +579,7 @@ export default {
           symbolSize: 4
         },
         { 
-          name: 'Low', 
+          name: this.$t('home.low'), 
           data: results.map(item => item.l), 
           type: 'line', 
           yAxisIndex: 0, 
@@ -591,7 +589,7 @@ export default {
           symbolSize: 4
         },
         { 
-          name: 'Close', 
+          name: this.$t('home.close'), 
           data: results.map(item => item.c), 
           type: 'line', 
           yAxisIndex: 0, 
@@ -601,7 +599,7 @@ export default {
           symbolSize: 5
         },
         { 
-          name: 'VWAP', 
+          name: this.$t('home.vwap'), 
           data: results.map(item => item.vw), 
           type: 'line', 
           yAxisIndex: 0, 
@@ -643,7 +641,7 @@ export default {
 .charts-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 100px 20px 0 20px; /* 添加顶部边距，避免导航栏遮盖内容 */
 }
 
 .charts {
@@ -838,6 +836,19 @@ export default {
 .file-requirements li {
   margin-bottom: 5px;
   font-size: 14px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .charts-container {
+    padding: 80px 15px 0 15px; /* 移动端减少顶部边距 */
+  }
+}
+
+@media (max-width: 480px) {
+  .charts-container {
+    padding: 70px 10px 0 10px; /* 小屏幕进一步减少顶部边距 */
+  }
 }
 
 </style>

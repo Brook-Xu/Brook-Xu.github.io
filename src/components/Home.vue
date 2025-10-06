@@ -1,168 +1,115 @@
 <template>
-  <div class="home-container">
-    <section class="hero" data-aos="fade-up">
-      <h1>Welcome to STARNET DIGITAL</h1>
-      <p>Upload your data. Generate charts. Export reports.</p>
-    </section>
-    
-
-    <div v-if="apiError" class="error-message">
-      <h3>API Error</h3>
-      <p>{{ apiError }}</p>
+  <div id="fullpage">
+    <!-- 使用独立的section组件 -->
+    <div class="section" data-anchor="home">
+      <HeroSection @scroll-to-section="scrollToSection" />
     </div>
-    
-    <div v-if="marketData" class="market-data-display">
-      <h3>Market Data Charts</h3>
-      <div class="charts-grid">
-        <div v-for="(data, key) in marketData" :key="key" class="chart-item">
-          <h4>{{ getDataTitle(key) }}</h4>
-          <div :ref="`chart-${key}`" class="chart-container"></div>
-        </div>
-      </div>
+    <div class="section" data-anchor="about">
+      <AboutSection />
+    </div>
+    <div class="section" data-anchor="values">
+      <ValuesSection />
+    </div>
+    <div class="section" data-anchor="products">
+      <ProductsSection />
+    </div>
+    <div class="section" data-anchor="risk">
+      <RiskSection />
+    </div>
+    <div class="section" data-anchor="partners">
+      <PartnersSection />
+    </div>
+    <div class="section" data-anchor="contact">
+      <ContactSection />
     </div>
   </div>
 </template>
 
 <script>
-import polygonApi from '../services/polygonApi';
-import * as echarts from 'echarts';
+import fullpage from 'fullpage.js';
+import HeroSection from './sections/HeroSection.vue';
+import AboutSection from './sections/AboutSection.vue';
+import ValuesSection from './sections/ValuesSection.vue';
+import ProductsSection from './sections/ProductsSection.vue';
+import RiskSection from './sections/RiskSection.vue';
+import PartnersSection from './sections/PartnersSection.vue';
+import ContactSection from './sections/ContactSection.vue';
 
 export default {
+  name: 'Home',
+  components: {
+    HeroSection,
+    AboutSection,
+    ValuesSection,
+    ProductsSection,
+    RiskSection,
+    PartnersSection,
+    ContactSection
+  },
   data() {
     return { 
-      marketData: null,
-      apiError: null
+      fullpageInstance: null
     };
   },
+  mounted() {
+    this.initFullPage();
+  },
+  beforeDestroy() {
+    if (this.fullpageInstance) {
+      this.fullpageInstance.destroy('all');
+    }
+  },
   methods: {
-
-    async fetchMarketData() {
-      this.apiError = null;
-      this.marketData = null;
-
-      try {
-        const result = await polygonApi.fetchAllMarketData();
-        
-        if (result.errors) {
-          console.warn('Some data failed to load:', result.errors);
-        }
-        
-        this.marketData = result.marketData;
-        
-        // 渲染图表
-        this.$nextTick(() => {
-          this.renderCharts();
-        });
-
-      } catch (error) {
-        this.apiError = error.message;
-        console.error('Error fetching market data:', error);
-      }
-    },
-
-    getDataTitle(key) {
-      return polygonApi.getDataTitle(key);
-    },
-
-    // 渲染图表
-    renderCharts() {
-      if (!this.marketData) return;
-
-      Object.keys(this.marketData).forEach(key => {
-        this.$nextTick(() => {
-          this.renderChart(key, this.marketData[key]);
-        });
-      });
-    },
-
-    // 渲染单个图表
-    renderChart(key, data) {
-      const chartRef = this.$refs[`chart-${key}`];
-      if (!chartRef || !chartRef[0]) return;
-
-      const chart = echarts.init(chartRef[0]);
-      
-      if (!data.results || data.results.length === 0) {
-        chart.setOption({
-          title: {
-            text: 'No Data Available',
-            left: 'center',
-            top: 'middle',
-            textStyle: { color: '#999' }
-          }
-        });
-        return;
-      }
-
-      // 处理数据
-      const dates = data.results.map(item => new Date(item.t).toLocaleDateString());
-      const series = this.createChartSeries(data.results);
-
-      const option = {
-        title: {
-          text: this.getDataTitle(key),
-          left: 'center',
-          textStyle: { color: '#42b983', fontSize: 16 }
-        },
-        tooltip: {
-          trigger: 'axis',
-          axisPointer: { type: 'cross' }
-        },
-        legend: {
-          data: series.map(s => s.name),
-          top: 30,
-          textStyle: { color: '#ccc' }
-        },
-        grid: {
-          left: '3%',
-          right: '4%',
-          bottom: '3%',
-          top: '15%',
-          containLabel: true
-        },
-        xAxis: {
-          type: 'category',
-          data: dates,
-          axisLabel: { 
-            color: '#ccc',
-            rotate: 45
+    // 初始化fullPage.js
+    initFullPage() {
+      this.$nextTick(() => {
+        this.fullpageInstance = new fullpage('#fullpage', {
+          // 基本配置
+          licenseKey: 'OPEN-SOURCE-GPLV3-LICENSE',
+          scrollingSpeed: 1000,
+          autoScrolling: true,
+          fitToSection: true,
+          fitToSectionDelay: 1000,
+          
+          // 导航配置
+          navigation: false,
+          
+          // 滚动配置
+          scrollBar: false,
+          easingcss3: 'ease',
+          easing: 'easeInOutCubic',
+          
+          // 响应式配置
+          responsiveWidth: 768,
+          responsiveHeight: 600,
+          
+          // 回调函数
+          onLeave: (origin, destination, direction) => {
+            // 更新导航栏活动状态
+            this.updateNavigationState(destination.anchor);
           },
-          axisLine: { lineStyle: { color: '#666' } }
-        },
-        yAxis: series.map((s, index) => ({
-          type: 'value',
-          name: s.name,
-          position: index === 0 ? 'left' : 'right',
-          axisLabel: { color: '#ccc' },
-          axisLine: { lineStyle: { color: '#666' } },
-          splitLine: { 
-            lineStyle: { color: '#333' },
-            show: index === 0
+          
+          afterLoad: (origin, destination, direction) => {
+            // 重新初始化AOS动画
+            this.$nextTick(() => {
+              AOS.refresh();
+            });
           }
-        })),
-        series: series
-      };
-
-      chart.setOption(option);
-
-      // 响应式调整
-      window.addEventListener('resize', () => {
-        chart.resize();
+        });
       });
     },
 
-    // 创建图表系列数据
-    createChartSeries(results) {
-      const series = [
-        { name: 'Volume', data: results.map(item => item.v), type: 'bar', yAxisIndex: 1, itemStyle: { color: '#ff6b6b' } },
-        { name: 'Open', data: results.map(item => item.o), type: 'line', yAxisIndex: 0, itemStyle: { color: '#42b983' } },
-        { name: 'High', data: results.map(item => item.h), type: 'line', yAxisIndex: 0, itemStyle: { color: '#ffa726' } },
-        { name: 'Low', data: results.map(item => item.l), type: 'line', yAxisIndex: 0, itemStyle: { color: '#ef5350' } },
-        { name: 'Close', data: results.map(item => item.c), type: 'line', yAxisIndex: 0, itemStyle: { color: '#42a5f5' } },
-        { name: 'VWAP', data: results.map(item => item.vw), type: 'line', yAxisIndex: 0, itemStyle: { color: '#ab47bc' } }
-      ];
+    // 滚动到指定section
+    scrollToSection(anchor) {
+      if (this.fullpageInstance) {
+        this.fullpageInstance.moveTo(anchor);
+      }
+    },
 
-      return series;
+    // 更新导航栏状态
+    updateNavigationState(anchor) {
+      // 通过事件总线通知导航栏更新状态
+      this.$emit('section-change', anchor);
     },
 
   }
@@ -170,103 +117,91 @@ export default {
 </script>
 
 <style>
-.home-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
+/* fullPage.js 基础样式 */
+#fullpage {
+  position: relative;
+  /* 确保导航栏始终可见，增加更多顶部边距 */
+  padding-top: 100px; /* 增加顶部边距，避免导航栏遮盖内容 */
 }
 
-.hero {
-  text-align: center;
-  padding: 100px 20px;
+/* fullPage.js 自动生成的overflow容器样式 */
+.fp-overflow {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  width: 100% !important;
+  height: 100% !important;
 }
 
-.hero h1 {
-  font-size: 3rem;
-  margin-bottom: 1rem;
-  color: #42b983;
-}
-
-.hero p {
-  font-size: 1.2rem;
-  color: #ccc;
-}
-
-
-.error-message {
-  background: #2d1b1b;
-  border: 1px solid #c53;
-  padding: 20px;
-  border-radius: 5px;
-  margin: 20px 0;
-}
-
-.error-message h3 {
-  color: #c53;
-  margin-bottom: 10px;
-  font-size: 18px;
-}
-
-.error-message p {
-  color: #ff6b6b;
-  margin: 0;
-  font-size: 14px;
-}
-
-
-/* API数据展示区域样式 */
-.market-data-display {
-  margin-top: 40px;
-}
-
-.market-data-display h3 {
-  color: #42b983;
-  margin-bottom: 20px;
-  font-size: 1.5rem;
-  text-align: center;
-}
-
-.charts-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 30px;
-  margin-top: 20px;
-}
-
-.chart-item {
-  background: #2a2a2a;
-  padding: 25px;
-  border-radius: 12px;
-  border: 1px solid #444;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-}
-
-.chart-item h4 {
-  color: #42b983;
-  margin-bottom: 20px;
-  font-size: 1.2rem;
-  text-align: center;
-  border-bottom: 2px solid #42b983;
-  padding-bottom: 10px;
-}
-
-.chart-container {
+.section {
+  position: relative;
   width: 100%;
-  height: 400px;
-  background: #1e1e1e;
-  border-radius: 8px;
-  padding: 15px;
+  height: calc(100vh - 100px); /* 减去增加的顶部边距 */
+  display: flex;
+  align-items: flex-start; /* 改为从顶部开始对齐 */
+  justify-content: center; /* 保持水平居中 */
+  background: linear-gradient(135deg, #153252 0%, #1e3a5f 100%);
+  overflow: hidden; /* 防止内部滚动 */
+  padding-top: 40px; /* 直接添加顶部内边距 */
+  padding-left: 20px; /* 添加左右内边距确保水平居中 */
+  padding-right: 20px;
+}
+
+.section-content {
+  max-width: 1200px;
+  width: 100%;
+  padding: 20px; /* 增加内边距 */
+  text-align: center;
+  height: auto; /* 改为自动高度 */
+  max-height: calc(100vh - 180px); /* 限制最大高度，为顶部边距留出空间 */
+  overflow-x: hidden; /* 防止横向滚动 */
+  overflow-y: hidden; /* 完全禁止内部滚动，强制内容适配 */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; /* 改为从顶部开始排列 */
+  box-sizing: border-box; /* 确保padding包含在宽度内 */
+  margin: 0 auto; /* 确保内容在容器内水平居中 */
+}
+
+/* 隐藏 fullPage.js 的 "made with" 标记 */
+.fp-watermark {
+  display: none !important;
 }
 
 /* 响应式设计 */
 @media (max-width: 768px) {
-  .api-data-section {
-    padding: 20px;
+  #fullpage {
+    padding-top: 80px; /* 移动端减少顶部边距 */
   }
   
-  .fetch-button {
-    width: 100%;
+  .section {
+    height: calc(100vh - 80px);
+    padding-top: 30px; /* 移动端减少section顶部内边距 */
+    padding-left: 15px; /* 移动端调整左右内边距 */
+    padding-right: 15px;
+  }
+  
+  .section-content {
     padding: 15px;
+    max-height: calc(100vh - 140px); /* 调整最大高度 */
+  }
+}
+
+@media (max-width: 480px) {
+  #fullpage {
+    padding-top: 70px; /* 小屏幕进一步减少顶部边距 */
+  }
+  
+  .section {
+    height: calc(100vh - 70px);
+    padding-top: 20px; /* 小屏幕进一步减少section顶部内边距 */
+    padding-left: 10px; /* 小屏幕调整左右内边距 */
+    padding-right: 10px;
+  }
+  
+  .section-content {
+    padding: 10px;
+    max-height: calc(100vh - 110px); /* 调整最大高度 */
   }
 }
 </style>

@@ -12,6 +12,12 @@ License: MIT
  */
 
 /*!
+ * vue-i18n v8.28.2 
+ * (c) 2022 kazuya kawaguchi
+ * Released under the MIT License.
+ */
+
+/*!
 * ZRender, a high performance 2d drawing library.
 *
 * Copyright (c) 2013, Baidu Inc.

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h2>文件上传解析</h2>
+    <h2>{{ $t('charts.uploadSection') }}</h2>
     <input type="file" @change="handleFile" />
     <pre>{{ parsedData }}</pre>
   </div>
