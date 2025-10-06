@@ -9,6 +9,7 @@
     "deploy": "gh-pages -d dist"
   },
   "dependencies": {
+    "@fontsource/montserrat": "^5.2.8",
     "aos": "^2.3.4",
     "echarts": "^5.5.0",
     "html2canvas": "^1.4.1",

@@ -5,41 +5,6 @@
       <p>Upload your data. Generate charts. Export reports.</p>
     </section>
     
-    <section class="upload-section" data-aos="fade-up">
-      <h2>Upload CSV File</h2>
-      <div class="upload-area">
-        <input type="file" @change="handleFileUpload" accept=".csv" />
-        <p class="upload-hint">Please select a CSV file to upload</p>
-        <div class="file-requirements">
-          <h4>File Requirements:</h4>
-          <ul>
-            <li>Only CSV files are supported</li>
-            <li>First column: date (various formats supported)</li>
-            <li>Second column: numeric value</li>
-            <li>Column names are automatically detected</li>
-          </ul>
-          <h5>Supported Date Formats:</h5>
-          <ul>
-            <li>YYYY-MM-DD, MM/DD/YYYY, MM-DD-YYYY</li>
-            <li>YYYY/MM/DD, MM/DD/YY</li>
-            <li>YYYY-MM-DD HH:MM:SS</li>
-          </ul>
-          <h5>Supported Column Names:</h5>
-          <ul>
-            <li>Date: date, time, timestamp, day, month, year, 日期, 时间, etc.</li>
-            <li>Value: value, price, amount, quantity, count, number, 数值, 价格, etc.</li>
-          </ul>
-        </div>
-      </div>
-      <div v-if="errorMessage" class="error-message">
-        <h3>Error</h3>
-        <p>{{ errorMessage }}</p>
-      </div>
-      <div v-if="parsedData" class="data-preview">
-        <h3>Parsed Data (JSON Format)</h3>
-        <pre>{{ JSON.stringify(parsedData, null, 2) }}</pre>
-      </div>
-    </section>
 
     <div v-if="apiError" class="error-message">
       <h3>API Error</h3>
@@ -59,170 +24,17 @@
 </template>
 
 <script>
-import Papa from 'papaparse';
 import polygonApi from '../services/polygonApi';
 import * as echarts from 'echarts';
 
 export default {
   data() {
     return { 
-      parsedData: null,
-      errorMessage: null,
       marketData: null,
       apiError: null
     };
   },
   methods: {
-    handleFileUpload(event) {
-      const file = event.target.files[0];
-      if (!file) {
-        this.parsedData = null;
-        this.errorMessage = null;
-        return;
-      }
-
-      // 检查文件类型
-      if (!file.name.toLowerCase().endsWith('.csv')) {
-        this.errorMessage = 'Please select a CSV file only.';
-        this.parsedData = null;
-        return;
-      }
-
-      this.errorMessage = null;
-
-      Papa.parse(file, {
-        header: true,
-        skipEmptyLines: true,
-        complete: (results) => {
-          try {
-            this.parseCSVData(results.data);
-          } catch (error) {
-            this.errorMessage = 'Error parsing CSV file: ' + error.message;
-            this.parsedData = null;
-          }
-        },
-        error: (error) => {
-          this.errorMessage = 'Error reading CSV file: ' + error.message;
-          this.parsedData = null;
-        }
-      });
-    },
-
-    parseCSVData(data) {
-      // 验证数据结构
-      if (!data || data.length === 0) {
-        throw new Error('CSV file is empty or invalid');
-      }
-
-      // 智能检测列名
-      const firstRow = data[0];
-      const columnNames = Object.keys(firstRow);
-      
-      if (columnNames.length < 2) {
-        throw new Error('CSV file must have at least 2 columns');
-      }
-
-      // 查找日期列（第一列或包含日期关键词的列）
-      let dateColumn = null;
-      let valueColumn = null;
-
-      // 优先检查第一列是否为日期
-      const firstColumnName = columnNames[0];
-      const firstColumnValue = firstRow[firstColumnName];
-      if (this.isDateColumn(firstColumnValue)) {
-        dateColumn = firstColumnName;
-        valueColumn = columnNames[1]; // 第二列作为数值列
-      } else {
-        // 如果第一列不是日期，尝试查找包含日期关键词的列
-        for (const colName of columnNames) {
-          if (this.isDateColumnName(colName)) {
-            dateColumn = colName;
-            break;
-          }
-        }
-        
-        // 查找数值列
-        for (const colName of columnNames) {
-          if (colName !== dateColumn && this.isValueColumnName(colName)) {
-            valueColumn = colName;
-            break;
-          }
-        }
-        
-        // 如果没找到明确的列名，使用第一列作为日期，第二列作为数值
-        if (!dateColumn) {
-          dateColumn = columnNames[0];
-        }
-        if (!valueColumn) {
-          valueColumn = columnNames[1];
-        }
-      }
-
-      // 验证找到的列
-      if (!dateColumn || !valueColumn) {
-        throw new Error('Could not identify date and value columns in CSV file');
-      }
-
-      // 解析数据
-      const parsedData = data.map((row, index) => {
-        const dateStr = row[dateColumn];
-        const valueStr = row[valueColumn];
-
-        // 验证日期格式 (YYYY-MM-DD)
-        const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
-        if (!dateRegex.test(dateStr)) {
-          throw new Error(`Invalid date format at row ${index + 2}: "${dateStr}". Expected format: YYYY-MM-DD`);
-        }
-
-        // 验证数值
-        const value = parseFloat(valueStr);
-        if (isNaN(value)) {
-          throw new Error(`Invalid value at row ${index + 2}: "${valueStr}". Must be a number`);
-        }
-
-        return {
-          date: dateStr,
-          value: value
-        };
-      });
-
-      this.parsedData = parsedData;
-      
-      // 解析成功后获取API数据，然后跳转
-      this.fetchMarketDataAndNavigate(parsedData);
-    },
-
-    async fetchMarketDataAndNavigate(csvData) {
-      try {
-        const result = await polygonApi.fetchAllMarketData();
-        
-        if (result.errors) {
-          console.warn('Some data failed to load:', result.errors);
-        }
-        
-        // 跳转到Charts页面，同时传递CSV数据和API数据
-        this.$router.push({
-          name: 'Charts',
-          params: { 
-            data: csvData,
-            marketData: result.marketData,
-            apiError: result.errors ? 'Some market data failed to load' : null
-          }
-        });
-
-      } catch (error) {
-        console.error('Error fetching market data:', error);
-        // 即使API失败，也要跳转到Charts页面显示CSV数据
-        this.$router.push({
-          name: 'Charts',
-          params: { 
-            data: csvData,
-            marketData: null,
-            apiError: error.message
-          }
-        });
-      }
-    },
 
     async fetchMarketData() {
       this.apiError = null;
@@ -353,51 +165,6 @@ export default {
       return series;
     },
 
-    // 检测列值是否为日期格式
-    isDateColumn(value) {
-      if (!value || typeof value !== 'string') return false;
-      
-      // 检查常见的日期格式
-      const dateFormats = [
-        /^\d{4}-\d{2}-\d{2}$/,           // YYYY-MM-DD
-        /^\d{2}\/\d{2}\/\d{4}$/,         // MM/DD/YYYY
-        /^\d{2}-\d{2}-\d{4}$/,           // MM-DD-YYYY
-        /^\d{4}\/\d{2}\/\d{2}$/,         // YYYY/MM/DD
-        /^\d{2}\/\d{2}\/\d{2}$/,         // MM/DD/YY
-        /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/  // YYYY-MM-DD HH:MM:SS
-      ];
-      
-      return dateFormats.some(format => format.test(value.trim()));
-    },
-
-    // 检测列名是否包含日期关键词
-    isDateColumnName(columnName) {
-      if (!columnName || typeof columnName !== 'string') return false;
-      
-      const dateKeywords = [
-        'date', 'time', 'timestamp', 'day', 'month', 'year',
-        '日期', '时间', '时间戳', '天', '月', '年',
-        'created', 'updated', 'modified'
-      ];
-      
-      const lowerName = columnName.toLowerCase();
-      return dateKeywords.some(keyword => lowerName.includes(keyword));
-    },
-
-    // 检测列名是否包含数值关键词
-    isValueColumnName(columnName) {
-      if (!columnName || typeof columnName !== 'string') return false;
-      
-      const valueKeywords = [
-        'value', 'price', 'amount', 'quantity', 'count', 'number',
-        '数值', '价格', '金额', '数量', '计数', '数字',
-        'close', 'open', 'high', 'low', 'volume', 'vwap',
-        'price', 'cost', 'total', 'sum', 'avg', 'average'
-      ];
-      
-      const lowerName = columnName.toLowerCase();
-      return valueKeywords.some(keyword => lowerName.includes(keyword));
-    }
   }
 };
 </script>
@@ -425,66 +192,6 @@ export default {
   color: #ccc;
 }
 
-.upload-section {
-  background: #2a2a2a;
-  padding: 40px;
-  border-radius: 10px;
-  margin: 40px 0;
-}
-
-.upload-section h2 {
-  text-align: center;
-  color: #42b983;
-  margin-bottom: 30px;
-  font-size: 2rem;
-}
-
-.upload-area {
-  text-align: center;
-  margin-bottom: 30px;
-}
-
-.upload-area input[type="file"] {
-  background: #333;
-  color: #eee;
-  padding: 10px 20px;
-  border: 2px dashed #42b983;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 16px;
-}
-
-.upload-hint {
-  margin-top: 10px;
-  color: #999;
-  font-size: 14px;
-}
-
-.file-requirements {
-  margin-top: 20px;
-  text-align: left;
-  background: #1a1a1a;
-  padding: 20px;
-  border-radius: 5px;
-  border: 1px solid #333;
-}
-
-.file-requirements h4 {
-  color: #42b983;
-  margin-bottom: 10px;
-  font-size: 16px;
-}
-
-.file-requirements ul {
-  color: #ccc;
-  margin: 0;
-  padding-left: 20px;
-}
-
-.file-requirements li {
-  margin-bottom: 5px;
-  font-size: 14px;
-}
 
 .error-message {
   background: #2d1b1b;
@@ -506,27 +213,6 @@ export default {
   font-size: 14px;
 }
 
-.data-preview {
-  background: #1a1a1a;
-  padding: 20px;
-  border-radius: 5px;
-  border: 1px solid #333;
-}
-
-.data-preview h3 {
-  color: #42b983;
-  margin-bottom: 15px;
-}
-
-.data-preview pre {
-  background: #000;
-  color: #0f0;
-  padding: 15px;
-  border-radius: 5px;
-  overflow-x: auto;
-  font-size: 12px;
-  line-height: 1.4;
-}
 
 /* API数据展示区域样式 */
 .market-data-display {

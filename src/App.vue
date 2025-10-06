@@ -13,27 +13,27 @@
         </li>
         <li class="menu-separator">|</li>
         <li class="menu-item">
-          <a href="#1" class="nav-link">About us</a>
+          <a href="#about" class="nav-link">About us</a>
         </li>
         <li class="menu-separator">|</li>
         <li class="menu-item">
-          <a href="#2" class="nav-link">Digital Management Solution</a>
+          <a href="#values" class="nav-link">Our core values</a>
         </li>
         <li class="menu-separator">|</li>
         <li class="menu-item">
-          <a href="#3" class="nav-link">Crypto Hedge Fund Management</a>
+          <a href="#products" class="nav-link">Our products</a>
         </li>
         <li class="menu-separator">|</li>
         <li class="menu-item">
-          <a href="#5" class="nav-link">News Engagement</a>
+          <a href="#risk" class="nav-link">Risk Management</a>
         </li>
         <li class="menu-separator">|</li>
         <li class="menu-item">
-          <a href="#6" class="nav-link">Career Development</a>
+          <a href="#partners" class="nav-link">Partners</a>
         </li>
         <li class="menu-separator">|</li>
         <li class="menu-item">
-          <a href="#7" class="nav-link">Contact us</a>
+          <a href="#contact" class="nav-link">Contact us</a>
         </li>
       </ul>
     </nav>
@@ -57,17 +57,17 @@ export default {
 <style>
 body {
   margin: 0;
-  font-family: 'Arial', sans-serif;
+  font-family: 'Montserrat', 'Arial', sans-serif;
   background: #153252;
   color: #eee;
 }
 nav {
   display: flex;
-  justify-content: space-between;
   align-items: center;
   background: #222222;
   padding: 1rem;
   min-height: 60px;
+  gap: 2rem;
 }
 .nav-logo {
   display: flex;
@@ -103,7 +103,7 @@ nav {
   list-style: none;
   margin: 0;
   padding: 0;
-  justify-content: flex-end;
+  justify-content: flex-start;
 }
 .menu-item {
   margin: 0;
@@ -142,9 +142,10 @@ nav {
   nav {
     flex-direction: column;
     padding: 0.5rem;
+    gap: 1rem;
   }
   .nav-logo {
-    margin-bottom: 1rem;
+    margin-bottom: 0;
   }
   .nav-menu {
     flex-wrap: wrap;

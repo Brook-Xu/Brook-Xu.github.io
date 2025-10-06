@@ -1,10 +1,42 @@
 <template>
   <div class="charts-container">
+    <!-- Upload Section -->
+    <section class="upload-section" data-aos="fade-up">
+      <h2>Upload CSV File</h2>
+      <div class="upload-area">
+        <input type="file" @change="handleFileUpload" accept=".csv" />
+        <p class="upload-hint">Please select a CSV file to upload</p>
+        <div class="file-requirements">
+          <h4>File Requirements:</h4>
+          <ul>
+            <li>Only CSV files are supported</li>
+            <li>First column: date (various formats supported)</li>
+            <li>Second column: numeric value</li>
+            <li>Column names are automatically detected</li>
+          </ul>
+          <h5>Supported Date Formats:</h5>
+          <ul>
+            <li>YYYY-MM-DD, MM/DD/YYYY, MM-DD-YYYY</li>
+            <li>YYYY/MM/DD, MM/DD/YY</li>
+            <li>YYYY-MM-DD HH:MM:SS</li>
+          </ul>
+          <h5>Supported Column Names:</h5>
+          <ul>
+            <li>Date: date, time, timestamp, day, month, year, 日期, 时间, etc.</li>
+            <li>Value: value, price, amount, quantity, count, number, 数值, 价格, etc.</li>
+          </ul>
+        </div>
+      </div>
+      <div v-if="errorMessage" class="error-message">
+        <h3>Error</h3>
+        <p>{{ errorMessage }}</p>
+      </div>
+    </section>
+
     <section class="charts" data-aos="fade-up">
       <h2>CSV Data Visualization Chart</h2>
       <div v-if="!chartData || chartData.length === 0" class="no-data">
-        <p>No data available. Please upload a CSV file from the home page.</p>
-        <router-link to="/" class="back-link">Go to Home</router-link>
+        <p>No data available. Please upload a CSV file above.</p>
       </div>
       <div v-else>
         <div ref="chart" class="chart-container"></div>
@@ -36,6 +68,7 @@
 <script>
 import * as echarts from 'echarts';
 import polygonApi from '../services/polygonApi';
+import Papa from 'papaparse';
 
 export default {
   name: 'Charts',
@@ -44,7 +77,9 @@ export default {
       chartData: null,
       chart: null,
       marketData: null,
-      apiError: null
+      apiError: null,
+      parsedData: null,
+      errorMessage: null
     };
   },
   computed: {
@@ -74,6 +109,174 @@ export default {
     }
   },
   methods: {
+    handleFileUpload(event) {
+      const file = event.target.files[0];
+      if (!file) {
+        this.parsedData = null;
+        this.errorMessage = null;
+        return;
+      }
+
+      // 检查文件类型
+      if (!file.name.toLowerCase().endsWith('.csv')) {
+        this.errorMessage = 'Please select a CSV file only.';
+        this.parsedData = null;
+        return;
+      }
+
+      this.errorMessage = null;
+
+      Papa.parse(file, {
+        header: true,
+        skipEmptyLines: true,
+        complete: (results) => {
+          try {
+            this.parseCSVData(results.data);
+          } catch (error) {
+            this.errorMessage = 'Error parsing CSV file: ' + error.message;
+            this.parsedData = null;
+          }
+        },
+        error: (error) => {
+          this.errorMessage = 'Error reading CSV file: ' + error.message;
+          this.parsedData = null;
+        }
+      });
+    },
+
+    parseCSVData(data) {
+      // 验证数据结构
+      if (!data || data.length === 0) {
+        throw new Error('CSV file is empty or invalid');
+      }
+
+      // 智能检测列名
+      const firstRow = data[0];
+      const columnNames = Object.keys(firstRow);
+      
+      if (columnNames.length < 2) {
+        throw new Error('CSV file must have at least 2 columns');
+      }
+
+      // 查找日期列（第一列或包含日期关键词的列）
+      let dateColumn = null;
+      let valueColumn = null;
+
+      // 优先检查第一列是否为日期
+      const firstColumnName = columnNames[0];
+      const firstColumnValue = firstRow[firstColumnName];
+      if (this.isDateColumn(firstColumnValue)) {
+        dateColumn = firstColumnName;
+        valueColumn = columnNames[1]; // 第二列作为数值列
+      } else {
+        // 如果第一列不是日期，尝试查找包含日期关键词的列
+        for (const colName of columnNames) {
+          if (this.isDateColumnName(colName)) {
+            dateColumn = colName;
+            break;
+          }
+        }
+        
+        // 查找数值列
+        for (const colName of columnNames) {
+          if (colName !== dateColumn && this.isValueColumnName(colName)) {
+            valueColumn = colName;
+            break;
+          }
+        }
+        
+        // 如果没找到明确的列名，使用第一列作为日期，第二列作为数值
+        if (!dateColumn) {
+          dateColumn = columnNames[0];
+        }
+        if (!valueColumn) {
+          valueColumn = columnNames[1];
+        }
+      }
+
+      // 验证找到的列
+      if (!dateColumn || !valueColumn) {
+        throw new Error('Could not identify date and value columns in CSV file');
+      }
+
+      // 解析数据
+      const parsedData = data.map((row, index) => {
+        const dateStr = row[dateColumn];
+        const valueStr = row[valueColumn];
+
+        // 验证日期格式 (YYYY-MM-DD)
+        const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+        if (!dateRegex.test(dateStr)) {
+          throw new Error(`Invalid date format at row ${index + 2}: "${dateStr}". Expected format: YYYY-MM-DD`);
+        }
+
+        // 验证数值
+        const value = parseFloat(valueStr);
+        if (isNaN(value)) {
+          throw new Error(`Invalid value at row ${index + 2}: "${valueStr}". Must be a number`);
+        }
+
+        return {
+          date: dateStr,
+          value: value
+        };
+      });
+
+      this.parsedData = parsedData;
+      this.chartData = parsedData;
+      
+      // 解析成功后获取API数据
+      this.fetchMarketDataAndUpdateCharts(parsedData);
+    },
+
+    async fetchMarketDataAndUpdateCharts(csvData) {
+      try {
+        const result = await polygonApi.fetchAllMarketData();
+        
+        if (result.errors) {
+          console.warn('Some data failed to load:', result.errors);
+        }
+        
+        this.marketData = result.marketData;
+        this.apiError = result.errors ? 'Some market data failed to load' : null;
+
+        // 更新图表
+        this.$nextTick(() => {
+          this.initChart();
+          this.renderMarketCharts();
+        });
+
+      } catch (error) {
+        console.error('Error fetching market data:', error);
+        this.apiError = error.message;
+        
+        // 即使API失败，也要显示CSV数据图表
+        this.$nextTick(() => {
+          this.initChart();
+        });
+      }
+    },
+
+    isDateColumn(value) {
+      if (!value) return false;
+      const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+      return dateRegex.test(value);
+    },
+
+    isDateColumnName(columnName) {
+      if (!columnName) return false;
+      const dateKeywords = ['date', 'time', 'timestamp', 'day', 'month', 'year', '日期', '时间'];
+      const lowerName = columnName.toLowerCase();
+      return dateKeywords.some(keyword => lowerName.includes(keyword));
+    },
+
+    isValueColumnName(columnName) {
+      if (!columnName) return false;
+      const valueKeywords = ['value', 'price', 'amount', 'quantity', 'count', 'number', '数值', '价格'];
+      const lowerName = columnName.toLowerCase();
+      return valueKeywords.some(keyword => lowerName.includes(keyword));
+    },
+
     initChart() {
       if (!this.$refs.chart) return;
       
@@ -562,4 +765,79 @@ export default {
   border-radius: 8px;
   padding: 15px;
 }
+
+/* Upload Section Styles */
+.upload-section {
+  background: #2a2a2a;
+  padding: 40px;
+  border-radius: 10px;
+  margin: 40px 0;
+}
+
+.upload-section h2 {
+  text-align: center;
+  color: #42b983;
+  margin-bottom: 30px;
+  font-size: 2rem;
+}
+
+.upload-area {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.upload-area input[type="file"] {
+  background: #333;
+  color: #eee;
+  padding: 10px 20px;
+  border: 2px dashed #42b983;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+.upload-area input[type="file"]:hover {
+  border-color: #66d9a3;
+  background: #444;
+}
+
+.upload-hint {
+  color: #ccc;
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+.file-requirements {
+  margin-top: 20px;
+  text-align: left;
+  background: #1a1a1a;
+  padding: 20px;
+  border-radius: 5px;
+  border: 1px solid #444;
+}
+
+.file-requirements h4 {
+  color: #42b983;
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+
+.file-requirements h5 {
+  color: #42b983;
+  margin: 15px 0 10px 0;
+  font-size: 14px;
+}
+
+.file-requirements ul {
+  color: #ccc;
+  margin: 0;
+  padding-left: 20px;
+}
+
+.file-requirements li {
+  margin-bottom: 5px;
+  font-size: 14px;
+}
+
 </style>
