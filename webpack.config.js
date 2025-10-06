@@ -37,6 +37,15 @@ module.exports = {
           outputPath: 'assets/',
           publicPath: '/assets/'
         } 
+      },
+      {
+        test: /\.(mp4|webm|ogg)$/,
+        loader: 'file-loader',
+        options: {
+          name: '[name].[ext]',
+          outputPath: 'assets/',
+          publicPath: '/assets/'
+        }
       }
     ]
   },

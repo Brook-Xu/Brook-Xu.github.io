@@ -27,6 +27,17 @@ License: MIT
 * https://github.com/ecomfe/zrender/blob/master/LICENSE.txt
 */
 
+/*!
+* fullPage 4.0.37
+* https://github.com/alvarotrigo/fullPage.js
+*
+* @license GPLv3 for open source use only
+* or Fullpage Commercial License for commercial use
+* http://alvarotrigo.com/fullPage/pricing/
+*
+* Copyright (C) 2018 http://alvarotrigo.com/fullPage - A project by Alvaro Trigo
+*/
+
 /*! *****************************************************************************
 Copyright (c) Microsoft Corporation.
 

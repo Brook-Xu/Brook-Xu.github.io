@@ -27,6 +27,7 @@
 
 <script>
 import fullpage from 'fullpage.js';
+import AOS from 'aos';
 import HeroSection from './sections/HeroSection.vue';
 import AboutSection from './sections/AboutSection.vue';
 import ValuesSection from './sections/ValuesSection.vue';
@@ -122,6 +123,19 @@ export default {
   position: relative;
   /* 确保导航栏始终可见，增加更多顶部边距 */
   padding-top: 100px; /* 增加顶部边距，避免导航栏遮盖内容 */
+}
+
+/* 仅针对首页第一个 section（Hero）去除左右内边距与内容边距，便于视频全幅铺满 */
+.section[data-anchor="home"] {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.section[data-anchor="home"] .section-content {
+  padding: 0 !important;
+  margin: 0 !important;
+  max-width: none;
+  width: 100%;
 }
 
 /* fullPage.js 自动生成的overflow容器样式 */
