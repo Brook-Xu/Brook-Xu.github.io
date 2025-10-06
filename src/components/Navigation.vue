@@ -137,8 +137,14 @@ export default {
         this.currentLanguage = langCode;
         setLanguage(langCode);
         
-        // 刷新页面以应用语言更改
-        window.location.reload();
+        // 如果在首页，平滑滚动到顶部（不刷新页面）
+        if (this.$route.path === '/') {
+          // 滚动到页面顶部
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+          // 非首页刷新页面以应用语言更改
+          window.location.reload();
+        }
       }
       this.showLanguageDropdown = false;
     },

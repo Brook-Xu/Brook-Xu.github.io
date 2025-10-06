@@ -41,7 +41,7 @@ export default {
 
   // 首页
   home: {
-    title: 'Unleash growth with diverse strategies',
+    title: '释放增长潜力，多元化策略驱动',
     subtitle: '',
     learnMore: '了解更多',
     viewCharts: '查看图表',
@@ -142,6 +142,12 @@ export default {
       submit: '发送消息',
       successMessage: '消息发送成功！我们会尽快回复您。'
     }
+  },
+
+  // About us
+  about: {
+    description: '在Starnet Digital，我们提供尖端的数字资产管理解决方案，帮助投资者驾驭区块链、加密货币和去中心化金融的动态世界。我们的平台建立在安全、可扩展和定制的基础设施之上——赋能客户释放其持有资产的全部价值。',
+    details: '凭借自营交易的根基，我们已发展成为全方位的数字资产管理公司，提供由严格风险管理支持的机构级策略。我们的重点涵盖高频交易（HFT）、先进的DeFi策略和全天候市场中性方法——旨在跨市场周期表现优异，满足机构和专业投资者不断变化的需求。'
   },
 
   // 图表页面

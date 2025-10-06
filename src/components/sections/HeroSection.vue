@@ -20,24 +20,49 @@
     <!-- 内容区域 -->
     <div class="section-content">
       <div class="hero" data-aos="fade-up">
-        <h1>{{ $t('home.title') }}</h1>
-        <p v-if="$t('home.subtitle')">{{ $t('home.subtitle') }}</p>
+        <h1 class="hero-title" :class="{ 'animate-text': showTextAnimation }">
+          <template v-if="isEnglish">
+            <span class="line" :class="{ 'animate-line': showTextAnimation }">Unleash growth</span>
+            <span class="line" :class="{ 'animate-line': showTextAnimation }" style="animation-delay: 0.5s;">with diverse strategies</span>
+          </template>
+          <template v-else>
+            <span class="line" :class="{ 'animate-line': showTextAnimation }">{{ $t('home.title') }}</span>
+          </template>
+        </h1>
+        <p v-if="$t('home.subtitle')" class="hero-subtitle" :class="{ 'animate-subtitle': showTextAnimation }">{{ $t('home.subtitle') }}</p>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+// 直接导入 src/assets 中的视频文件
+import videoSrc from '../../assets/starnet_bg_1.mp4';
+
 export default {
   name: 'HeroSection',
   data() {
     return {
-      videoSrc: '/assets/starnet_bg_1.mp4'
+      videoSrc: videoSrc,
+      showTextAnimation: false
     };
+  },
+  computed: {
+    isEnglish() {
+      return (this.$i18n && this.$i18n.locale === 'en');
+    }
   },
   mounted() {
     // 确保视频在移动设备上也能正常播放
     this.setupVideo();
+    
+    // 每次进入页面都展示动画效果
+    this.$nextTick(() => {
+      // 延迟启动以等待布局稳定
+      setTimeout(() => {
+        this.showTextAnimation = true;
+      }, 400);
+    });
   },
   methods: {
     setupVideo() {
@@ -120,15 +145,44 @@ export default {
 
 .hero {
   text-align: center;
-  padding: 0;
 }
 
-.hero h1 {
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
+/* 调大字体，并拆分两行 */
+.hero-title {
+  margin: 0 0 1rem 0;
   color: #42b983;
   font-weight: 700;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  line-height: 1.3;
+  font-size: 4rem; /* 统一字体大小，适用于所有语言 */
+  opacity: 0;
+  transform: translateY(30px);
+  filter: blur(8px);
+  transition: transform 1.1s ease-out, opacity 1.1s ease-out, filter 1.1s ease-out;
+}
+
+.hero-title.animate-text {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0px);
+}
+
+.hero-title .line {
+  display: block;
+  font-size: inherit; /* 继承父元素字体大小 */
+  opacity: 0;
+  transform: translateY(20px);
+  filter: blur(6px);
+  /* 使用clip-path做遮罩滑出 */
+  clip-path: inset(0 100% 0 0);
+  transition: transform 0.9s ease-out, opacity 0.9s ease-out, filter 0.9s ease-out;
+}
+
+.hero-title .line.animate-line {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0px);
+  animation: revealLine 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 .hero p {
@@ -139,6 +193,28 @@ export default {
   margin-left: auto;
   margin-right: auto;
   line-height: 1.5;
+}
+
+.hero-subtitle {
+  opacity: 0;
+  transform: translateY(20px);
+  filter: blur(6px);
+  letter-spacing: 0.2em;
+  transition: transform 1.0s ease-out, opacity 1.0s ease-out, filter 1.0s ease-out, letter-spacing 1.3s ease;
+  transition-delay: 0.8s;
+}
+
+.hero-subtitle.animate-subtitle {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0px);
+  letter-spacing: 0.02em;
+}
+
+/* 线条遮罩滑出动画（从右到左揭示） */
+@keyframes revealLine {
+  0% { clip-path: inset(0 100% 0 0); }
+  100% { clip-path: inset(0 0 0 0); }
 }
 
 
@@ -155,8 +231,8 @@ export default {
     font-size: 2rem;
   }
   
-  .hero h1 {
-    font-size: 2rem;
+  .hero-title {
+    font-size: 3.2rem;
   }
   
   .hero p {
@@ -177,8 +253,8 @@ export default {
     height: 100%;
   }
   
-  .hero h1 {
-    font-size: 1.5rem;
+  .hero-title {
+    font-size: 2.5rem;
   }
   
   .hero p {

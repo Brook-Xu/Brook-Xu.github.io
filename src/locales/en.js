@@ -144,6 +144,12 @@ export default {
     }
   },
 
+  // About us
+  about: {
+    description: 'At Starnet Digital, we deliver cutting-edge digital asset management solutions to help investors navigate the dynamic world of blockchain, cryptocurrency, and decentralized finance. Our platform is built on secure, scalable, and tailored infrastructure – empowering clients to unlock the full value of their holdings.',
+    details: 'With roots in proprietary trading, we have evolved into a full-spectrum digital asset manager, offering institutional-grade strategies backed by rigorous risk management. Our focus spans high-frequency trading (HFT), advanced DeFi strategies, and all-weather market-neutral approaches — designed to perform across market cycles and meet the evolving needs of institutional and professional investors.'
+  },
+
   // 图表页面
   charts: {
     title: 'CSV Data Visualization Chart',
