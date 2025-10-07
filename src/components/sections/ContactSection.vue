@@ -3,44 +3,28 @@
     <h2 class="gradient-title">{{ $t('navigation.contactUs') }}</h2>
     <div class="contact-content">
       <div class="contact-grid">
-        <div class="contact-info" data-aos="fade-up" data-aos-delay="100">
-          <h3>{{ $t('home.contactInfo.title') }}</h3>
+        <div class="contact-info">
+          <div class="contact-item">
+            <div class="contact-icon">💬</div>
+            <div class="contact-details">
+              <h4>Telegram</h4>
+              <p>starnetcapitalDan</p>
+            </div>
+          </div>
           <div class="contact-item">
             <div class="contact-icon">📧</div>
             <div class="contact-details">
-              <h4>{{ $t('home.contactInfo.email') }}</h4>
-              <p>contact@starnet-digital.com</p>
+              <h4>Email</h4>
+              <p>Xing@starnetdigital.cc</p>
             </div>
           </div>
           <div class="contact-item">
-            <div class="contact-icon">📱</div>
+            <div class="contact-icon">🔗</div>
             <div class="contact-details">
-              <h4>{{ $t('home.contactInfo.phone') }}</h4>
-              <p>+1 (555) 123-4567</p>
+              <h4>LinkedIn</h4>
+              <p><a class="external-link" href="https://www.linkedin.com/company/105309831/" target="_blank" rel="noopener noreferrer">https://www.linkedin.com/company/105309831/</a></p>
             </div>
           </div>
-          <div class="contact-item">
-            <div class="contact-icon">📍</div>
-            <div class="contact-details">
-              <h4>{{ $t('home.contactInfo.address') }}</h4>
-              <p>{{ $t('home.contactInfo.addressText') }}</p>
-            </div>
-          </div>
-        </div>
-        <div class="contact-form" data-aos="fade-up" data-aos-delay="200">
-          <h3>{{ $t('home.contactForm.title') }}</h3>
-          <form @submit.prevent="submitContactForm">
-            <div class="form-group">
-              <input type="text" v-model="contactForm.name" :placeholder="$t('home.contactForm.name')" required>
-            </div>
-            <div class="form-group">
-              <input type="email" v-model="contactForm.email" :placeholder="$t('home.contactForm.email')" required>
-            </div>
-            <div class="form-group">
-              <textarea v-model="contactForm.message" :placeholder="$t('home.contactForm.message')" rows="5" required></textarea>
-            </div>
-            <button type="submit" class="submit-btn">{{ $t('home.contactForm.submit') }}</button>
-          </form>
         </div>
       </div>
     </div>
@@ -50,29 +34,7 @@
 <script>
 export default {
   name: 'ContactSection',
-  data() {
-    return {
-      contactForm: {
-        name: '',
-        email: '',
-        message: ''
-      }
-    };
-  },
-  methods: {
-    submitContactForm() {
-      // 这里可以添加表单验证和提交逻辑
-      console.log('Contact form submitted:', this.contactForm);
-      // 重置表单
-      this.contactForm = {
-        name: '',
-        email: '',
-        message: ''
-      };
-      // 显示成功消息
-      alert(this.$t('home.contactForm.successMessage'));
-    }
-  }
+  
 };
 </script>
 
@@ -81,7 +43,7 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   padding: 40px 20px;
 }
 
@@ -107,7 +69,7 @@ export default {
 
 .contact-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 2rem;
   margin-top: 2rem;
   text-align: left;
@@ -115,17 +77,48 @@ export default {
   box-sizing: border-box;
 }
 
-.contact-info h3,
-.contact-form h3 {
+.contact-info h3 {
   color: #42b983;
   font-size: 1.5rem;
   margin-bottom: 1.5rem;
 }
 
+.contact-info {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: 0;
+  width: 100%;
+  flex-wrap: nowrap;
+}
+
 .contact-item {
   display: flex;
   align-items: center;
-  margin-bottom: 1rem;
+  margin: 0;
+  flex: 1 1 0;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-right: none;
+  padding: 1.25rem 1.5rem;
+  padding-bottom: 2.5rem;
+  box-sizing: border-box;
+  background: rgba(255, 255, 255, 0.03);
+  min-height: 100px;
+}
+
+.contact-item:last-child {
+  border-right: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.contact-item:first-child {
+  border-top-left-radius: 12px;
+  border-bottom-left-radius: 12px;
+}
+
+.contact-item:last-child {
+  border-top-right-radius: 12px;
+  border-bottom-right-radius: 12px;
 }
 
 .contact-icon {
@@ -145,59 +138,28 @@ export default {
   margin: 0;
 }
 
-.contact-form {
-  background: rgba(255, 255, 255, 0.05);
-  padding: 1.5rem;
-  border-radius: 15px;
-  border: 1px solid rgba(66, 185, 131, 0.2);
-  width: 100%;
-  box-sizing: border-box;
+.external-link {
+  color: #4fc3f7;
+  text-decoration: none;
+  border-bottom: 1px dashed rgba(79, 195, 247, 0.6);
+  transition: color 0.2s ease, border-color 0.2s ease;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
-.form-group {
-  margin-bottom: 1rem;
+.external-link:hover {
+  color: #66d9a3;
+  border-bottom-color: #66d9a3;
 }
 
-.form-group input,
-.form-group textarea {
-  width: 100%;
-  padding: 12px 15px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
-  font-size: 1rem;
+.external-link::after {
+  content: '↗';
+  margin-left: 6px;
+  font-size: 0.9em;
+  opacity: 0.8;
 }
 
-.form-group input::placeholder,
-.form-group textarea::placeholder {
-  color: #999;
-}
-
-.form-group input:focus,
-.form-group textarea:focus {
-  outline: none;
-  border-color: #42b983;
-  box-shadow: 0 0 10px rgba(66, 185, 131, 0.3);
-}
-
-.submit-btn {
-  background: linear-gradient(45deg, #42b983, #4fc3f7);
-  color: white;
-  border: none;
-  padding: 12px 30px;
-  font-size: 1rem;
-  font-weight: 600;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  width: 100%;
-}
-
-.submit-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(66, 185, 131, 0.3);
-}
+/* removed form styles */
 
 /* 响应式设计 */
 @media (max-width: 768px) {
@@ -213,15 +175,8 @@ export default {
     grid-template-columns: 1fr;
     gap: 2rem;
   }
-  
-  .contact-form {
-    padding: 1.5rem;
-  }
 }
 
 @media (max-width: 480px) {
-  .contact-form {
-    padding: 1rem;
-  }
 }
 </style>
