@@ -1,22 +1,31 @@
 <template>
   <div class="section-content">
-    <h2>{{ $t('navigation.riskManagement') }}</h2>
+    <h2 class="gradient-title">{{ $t('navigation.riskManagement') }}</h2>
     <div class="risk-content">
       <div class="risk-grid">
-        <div class="risk-item" data-aos="fade-up" data-aos-delay="100">
-          <div class="risk-icon">🛡️</div>
+        <div class="risk-item">
           <h3>{{ $t('home.risk1.title') }}</h3>
           <p>{{ $t('home.risk1.description') }}</p>
         </div>
-        <div class="risk-item" data-aos="fade-up" data-aos-delay="200">
-          <div class="risk-icon">📊</div>
+        <div class="risk-item">
           <h3>{{ $t('home.risk2.title') }}</h3>
           <p>{{ $t('home.risk2.description') }}</p>
         </div>
-        <div class="risk-item" data-aos="fade-up" data-aos-delay="300">
-          <div class="risk-icon">⚖️</div>
+        <div class="risk-item">
           <h3>{{ $t('home.risk3.title') }}</h3>
           <p>{{ $t('home.risk3.description') }}</p>
+        </div>
+        <div class="risk-item">
+          <h3>{{ $t('home.risk4.title') }}</h3>
+          <p>{{ $t('home.risk4.description') }}</p>
+        </div>
+        <div class="risk-item">
+          <h3>{{ $t('home.risk5.title') }}</h3>
+          <p>{{ $t('home.risk5.description') }}</p>
+        </div>
+        <div class="risk-item">
+          <h3>{{ $t('home.risk6.title') }}</h3>
+          <p>{{ $t('home.risk6.description') }}</p>
         </div>
       </div>
     </div>
@@ -30,19 +39,45 @@ export default {
 </script>
 
 <style scoped>
+.section-content {
+  padding-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+/* 渐变色标题 */
+.gradient-title {
+  font-size: 2.5rem;
+  background: linear-gradient(90deg, #42b983, #4fc3f7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 1rem;
+  margin-top: 0.5rem;
+  font-weight: 700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
 .section-content h2 {
   font-size: 2.5rem;
-  color: #42b983;
-  margin-bottom: 2rem;
+  background: linear-gradient(90deg, #42b983, #4fc3f7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 1rem;
+  margin-top: 0.5rem;
   font-weight: 700;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .risk-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 1.5rem;
-  margin-top: 2rem;
+  margin-top: 1rem;
   width: 100%;
   box-sizing: border-box;
 }
@@ -56,6 +91,14 @@ export default {
   width: 100%;
   box-sizing: border-box;
   overflow-wrap: break-word;
+  /* 确保元素在没有AOS动画时也可见 */
+  opacity: 1 !important;
+  visibility: visible !important;
+  /* 确保所有模块高度一致 */
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  text-align: left;
 }
 
 .risk-item:hover {
@@ -64,24 +107,34 @@ export default {
   box-shadow: 0 10px 30px rgba(66, 185, 131, 0.2);
 }
 
-.risk-icon {
-  font-size: 3rem;
-  margin-bottom: 1rem;
-}
-
 .risk-item h3 {
   color: #42b983;
   font-size: 1.5rem;
   margin-bottom: 1rem;
+  margin-top: 0;
+  text-align: left;
 }
 
 .risk-item p {
   color: #ccc;
   line-height: 1.6;
+  text-align: left;
+  flex-grow: 1;
+  margin: 0;
 }
 
 /* 响应式设计 */
+@media (max-width: 1024px) {
+  .risk-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 @media (max-width: 768px) {
+  .gradient-title {
+    font-size: 2rem;
+  }
+  
   .section-content h2 {
     font-size: 2rem;
   }

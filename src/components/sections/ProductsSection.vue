@@ -1,9 +1,9 @@
 <template>
   <div class="section-content">
-    <h2>{{ $t('navigation.products') }}</h2>
+    <h2 class="gradient-title">{{ $t('navigation.products') }}</h2>
     <div class="products-content">
       <div class="products-grid">
-        <div class="product-item" data-aos="fade-up" data-aos-delay="100">
+        <div class="product-item">
           <div class="product-icon">📈</div>
           <h3>{{ $t('home.product1.title') }}</h3>
           <p>{{ $t('home.product1.description') }}</p>
@@ -13,7 +13,7 @@
             <li>{{ $t('home.product1.feature3') }}</li>
           </ul>
         </div>
-        <div class="product-item" data-aos="fade-up" data-aos-delay="200">
+        <div class="product-item">
           <div class="product-icon">📊</div>
           <h3>{{ $t('home.product2.title') }}</h3>
           <p>{{ $t('home.product2.description') }}</p>
@@ -23,7 +23,7 @@
             <li>{{ $t('home.product2.feature3') }}</li>
           </ul>
         </div>
-        <div class="product-item" data-aos="fade-up" data-aos-delay="300">
+        <div class="product-item">
           <div class="product-icon">🤖</div>
           <h3>{{ $t('home.product3.title') }}</h3>
           <p>{{ $t('home.product3.description') }}</p>
@@ -45,6 +45,26 @@ export default {
 </script>
 
 <style scoped>
+.section-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+/* 渐变色标题 */
+.gradient-title {
+  font-size: 2.5rem;
+  background: linear-gradient(90deg, #42b983, #4fc3f7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 2rem;
+  font-weight: 700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
 .section-content h2 {
   font-size: 2.5rem;
   color: #42b983;
@@ -55,7 +75,7 @@ export default {
 
 .products-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 1.5rem;
   margin-top: 2rem;
   width: 100%;
@@ -116,7 +136,17 @@ export default {
 }
 
 /* 响应式设计 */
+@media (max-width: 1024px) {
+  .products-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 @media (max-width: 768px) {
+  .gradient-title {
+    font-size: 2rem;
+  }
+  
   .section-content h2 {
     font-size: 2rem;
   }

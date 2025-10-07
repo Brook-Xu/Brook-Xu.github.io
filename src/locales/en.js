@@ -71,16 +71,16 @@ export default {
       description: 'Comprehensive risk management system to protect your investment safety.'
     },
     value1: {
-      title: 'Professional',
-      description: 'We have a professional financial and technical team to provide you with the most professional service.'
+      title: 'Simplicity',
+      description: 'Crypto world seems highly volatile and rapidly evolving. However, quant strategies demystify digital assets and navigate crypto\'s volatility with confidence. Achieve your stable return without a high barrier to enter.'
     },
     value2: {
-      title: 'Innovation',
-      description: 'Continuous innovation, constantly launching new products and services to meet market demands.'
+      title: 'Professionalism',
+      description: 'Provide one of the best strategies in the market with our experience and expertise in technology, finance and investment.'
     },
     value3: {
-      title: 'Reliable',
-      description: 'Stable system architecture, 7x24 hours uninterrupted service to ensure your business continuity.'
+      title: 'Transparency',
+      description: 'Clear understanding of the strategy performance, trading team and their backgrounds.'
     },
     product1: {
       title: 'Quantitative Trading System',
@@ -104,16 +104,28 @@ export default {
       feature3: 'Personalized Service'
     },
     risk1: {
-      title: 'Market Risk',
-      description: 'Effectively control market risk through diversified portfolios and dynamic hedging strategies.'
+      title: 'Return Maximization',
+      description: 'Optimization algorithms seek to maximize expected returns given the specified risk tolerance or constraints. This involves selecting assets and strategies with the potential for higher returns while balancing the associated risks.'
     },
     risk2: {
-      title: 'Technical Risk',
-      description: 'Adopt advanced technical architecture and multiple backup mechanisms to ensure stable system operation.'
+      title: 'Asset Allocation',
+      description: 'Quantitative models analyze historical data and market trends to determine the optimal allocation of assets within the portfolio. This may include stocks, bonds, commodities, or derivatives, based on their expected returns, volatility, and correlation with other assets.'
     },
     risk3: {
-      title: 'Compliance Risk',
-      description: 'Strictly comply with relevant regulations and establish a comprehensive compliance management system.'
+      title: 'Constraints and Factors',
+      description: 'Optimization considers various constraints such as regulatory limits, liquidity requirements, and investor preferences. Factors like transaction costs, market impact, and rebalancing frequency are also taken into account to ensure practical implementation.'
+    },
+    risk4: {
+      title: 'Risk Management',
+      description: 'Portfolio optimization aims to minimize risk by diversifying across assets that have low correlation with each other. Risk metrics such as volatility, beta and Value at Risk (VaR) are used to quantify and manage the overall portfolio risk.'
+    },
+    risk5: {
+      title: 'Dynamic Adjustments',
+      description: 'Continuous monitoring and adjustment of portfolio weights based on changing market conditions and new data ensure that the portfolio remains aligned with its objectives and adapts to evolving market dynamics.'
+    },
+    risk6: {
+      title: 'Quantitative Models',
+      description: 'Advanced mathematical models, including mean-variance optimization, risk parity, and factor-based models, are employed to systematically allocate capital and optimize the portfolio\'s risk-return profile.'
     },
     partner1: {
       name: 'Leading Banks',
@@ -141,6 +153,10 @@ export default {
       message: 'Message',
       submit: 'Send Message',
       successMessage: 'Message sent successfully! We will reply to you as soon as possible.'
+    },
+    fundChart: {
+      title: 'Fund Performance',
+      subtitle: 'Real-time NAV trend analysis'
     }
   },
 

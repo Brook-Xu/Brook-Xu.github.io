@@ -138,6 +138,12 @@ export default {
   width: 100%;
 }
 
+.section[data-anchor="values"] .section-content {
+  max-width: 1800px !important;
+  width: 100% !important;
+  padding: 0 !important;
+}
+
 /* fullPage.js 自动生成的overflow容器样式 */
 .fp-overflow {
   display: flex !important;

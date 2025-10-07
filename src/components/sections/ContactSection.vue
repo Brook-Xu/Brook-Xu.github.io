@@ -1,6 +1,6 @@
 <template>
   <div class="section-content">
-    <h2>{{ $t('navigation.contactUs') }}</h2>
+    <h2 class="gradient-title">{{ $t('navigation.contactUs') }}</h2>
     <div class="contact-content">
       <div class="contact-grid">
         <div class="contact-info" data-aos="fade-up" data-aos-delay="100">
@@ -77,6 +77,26 @@ export default {
 </script>
 
 <style scoped>
+.section-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+/* 渐变色标题 */
+.gradient-title {
+  font-size: 2.5rem;
+  background: linear-gradient(90deg, #42b983, #4fc3f7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 2rem;
+  font-weight: 700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
 .section-content h2 {
   font-size: 2.5rem;
   color: #42b983;
@@ -181,6 +201,10 @@ export default {
 
 /* 响应式设计 */
 @media (max-width: 768px) {
+  .gradient-title {
+    font-size: 2rem;
+  }
+  
   .section-content h2 {
     font-size: 2rem;
   }

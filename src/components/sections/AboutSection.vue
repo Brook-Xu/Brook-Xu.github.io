@@ -2,19 +2,34 @@
   <div class="about-section">
     <!-- 视频背景 -->
     <div class="video-background">
-      <video 
-        ref="backgroundVideo"
-        autoplay 
-        muted 
-        loop 
-        playsinline
-        class="background-video"
-      >
-        <source :src="videoSrc" type="video/mp4">
-        您的浏览器不支持视频播放。
-      </video>
-      <!-- 视频遮罩层 -->
-      <div class="video-overlay"></div>
+      <div class="video-container video-left-container">
+        <video 
+          ref="backgroundVideo1"
+          autoplay 
+          muted 
+          loop 
+          playsinline
+          class="background-video video-left"
+        >
+          <source :src="videoSrc" type="video/mp4">
+          您的浏览器不支持视频播放。
+        </video>
+        <div class="video-overlay"></div>
+      </div>
+      <div class="video-container video-right-container">
+        <video 
+          ref="backgroundVideo2"
+          autoplay 
+          muted 
+          loop 
+          playsinline
+          class="background-video video-right"
+        >
+          <source :src="videoSrc" type="video/mp4">
+          您的浏览器不支持视频播放。
+        </video>
+        <div class="video-overlay"></div>
+      </div>
     </div>
     
     <!-- 内容区域 -->
@@ -47,17 +62,26 @@ export default {
   },
   methods: {
     setupVideo() {
-      const video = this.$refs.backgroundVideo;
-      if (video) {
-        // 设置视频播放属性
-        video.muted = true;
-        video.loop = true;
-        video.playsInline = true;
-        
-        // 尝试播放视频
-        video.play().catch(error => {
-          console.log('视频自动播放被阻止:', error);
-          // 如果自动播放失败，可以添加用户交互来启动播放
+      const video1 = this.$refs.backgroundVideo1;
+      const video2 = this.$refs.backgroundVideo2;
+      
+      // 设置第一个视频
+      if (video1) {
+        video1.muted = true;
+        video1.loop = true;
+        video1.playsInline = true;
+        video1.play().catch(error => {
+          console.log('视频1自动播放被阻止:', error);
+        });
+      }
+      
+      // 设置第二个视频
+      if (video2) {
+        video2.muted = true;
+        video2.loop = true;
+        video2.playsInline = true;
+        video2.play().catch(error => {
+          console.log('视频2自动播放被阻止:', error);
         });
       }
     }
@@ -88,6 +112,18 @@ export default {
   height: 100%;
   z-index: 0;
   pointer-events: none;
+  display: flex;
+  overflow: hidden;
+  align-items: center;
+  justify-content: center;
+}
+
+.video-container {
+  position: relative;
+  width: 50vw;
+  height: 50vw;
+  flex-shrink: 0;
+  overflow: hidden;
 }
 
 .background-video {
@@ -97,6 +133,18 @@ export default {
   object-position: center;
 }
 
+.video-left {
+  object-position: right center;
+  transform: rotate(90deg);
+  transform-origin: center center;
+}
+
+.video-right {
+  object-position: left center;
+  transform: rotate(270deg);
+  transform-origin: center center;
+}
+
 /* 视频遮罩层，用于降低视频亮度，确保文字可读性 */
 .video-overlay {
   position: absolute;
@@ -104,7 +152,7 @@ export default {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(0, 0, 0, 0.2);
   z-index: 1;
   pointer-events: none;
 }
@@ -150,7 +198,7 @@ export default {
 }
 
 .about-text p {
-  font-size: 1.1rem;
+  font-size: 1.3rem;
   color: #ccc;
   margin-bottom: 1.5rem;
   line-height: 1.7;
@@ -161,13 +209,13 @@ export default {
 }
 
 .about-description {
-  font-size: 1.2rem;
+  font-size: 1.5rem;
   font-weight: 500;
   margin-bottom: 2rem;
 }
 
 .about-details {
-  font-size: 1.1rem;
+  font-size: 1.3rem;
   line-height: 1.8;
 }
 
@@ -189,22 +237,22 @@ export default {
   }
   
   .about-text p {
-    font-size: 1rem;
+    font-size: 1.2rem;
     max-width: 100%;
     padding: 0 1rem;
   }
   
   .about-description {
-    font-size: 1.1rem;
+    font-size: 1.3rem;
   }
   
   .about-details {
-    font-size: 1rem;
+    font-size: 1.2rem;
   }
   
   /* 移动端增加遮罩层透明度，确保文字可读性 */
   .video-overlay {
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.3);
   }
 }
 
@@ -221,29 +269,56 @@ export default {
   }
   
   .about-text p {
-    font-size: 0.95rem;
+    font-size: 1.1rem;
     padding: 0 0.5rem;
   }
   
   .about-description {
-    font-size: 1rem;
+    font-size: 1.2rem;
   }
   
   .about-details {
-    font-size: 0.95rem;
+    font-size: 1.1rem;
   }
   
   /* 小屏幕进一步增加遮罩层透明度 */
   .video-overlay {
-    background: rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, 0.4);
   }
 }
 
 /* 确保视频在移动设备上正确显示 */
 @media (max-width: 1024px) {
+  .video-background {
+    display: flex;
+    overflow: hidden;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .video-container {
+    width: 50vw;
+    height: 50vw;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+  
   .background-video {
+    width: 100%;
+    height: 100%;
     object-fit: cover;
-    object-position: center center;
+  }
+  
+  .video-left {
+    object-position: right center;
+    transform: rotate(90deg);
+    transform-origin: center center;
+  }
+  
+  .video-right {
+    object-position: left center;
+    transform: rotate(270deg);
+    transform-origin: center center;
   }
 }
 
