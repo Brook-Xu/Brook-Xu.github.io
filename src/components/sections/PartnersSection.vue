@@ -1,14 +1,31 @@
 <template>
-  <div class="section-content">
-    <h2 class="gradient-title">{{ $t('navigation.partners') }}</h2>
-    <div class="partners-content">
-      <div class="logo-ticker" aria-label="合作伙伴" tabindex="0">
-        <div class="track">
-          <div class="partner-item" v-for="(partner, index) in partners" :key="index">
-            <img :src="partner.logo" :alt="partner.name" class="partner-logo" />
-          </div>
-          <div class="partner-item" v-for="(partner, index) in partners" :key="'copy-' + index" aria-hidden="true">
-            <img :src="partner.logo" alt="" class="partner-logo" />
+  <div class="partners-section">
+    <div class="video-background">
+      <video 
+        ref="backgroundVideo"
+        autoplay 
+        muted 
+        loop 
+        playsinline
+        class="background-video"
+      >
+        <source :src="videoSrc" type="video/mp4">
+        您的浏览器不支持视频播放。
+      </video>
+      <div class="video-overlay"></div>
+    </div>
+
+    <div class="section-content">
+      <h2 class="gradient-title">{{ $t('navigation.partners') }}</h2>
+      <div class="partners-content">
+        <div class="logo-ticker" aria-label="合作伙伴" tabindex="0">
+          <div class="track">
+            <div class="partner-item" v-for="(partner, index) in partners" :key="index">
+              <img :src="partner.logo" :alt="partner.name" class="partner-logo" />
+            </div>
+            <div class="partner-item" v-for="(partner, index) in partners" :key="'copy-' + index" aria-hidden="true">
+              <img :src="partner.logo" alt="" class="partner-logo" />
+            </div>
           </div>
         </div>
       </div>
@@ -24,11 +41,13 @@ import microsoftLogo from '../../assets/MS_Standard_Logo_2022_Black.svg';
 import cuBlueLogo from '../../assets/cu-blue-logo.svg';
 import goldBlueLogo from '../../assets/logo-variations-thumbnail-gold-blue-1.png';
 import imageLogo from '../../assets/image.svg';
+import videoSrc from '../../assets/bg_3.mp4';
 
 export default {
   name: 'PartnersSection',
   data() {
     return {
+      videoSrc: videoSrc,
       partners: [
         {
           name: 'AT&T',
@@ -106,6 +125,13 @@ export default {
     };
   },
   mounted() {
+    const video = this.$refs.backgroundVideo;
+    if (video) {
+      video.muted = true;
+      video.loop = true;
+      video.playsInline = true;
+      video.play().catch(err => console.log('视频自动播放被阻止:', err));
+    }
     this.computeMoveDistance();
     window.addEventListener('resize', this.computeMoveDistance);
   },
@@ -127,12 +153,71 @@ export default {
 </script>
 
 <style scoped>
+.partners-section {
+  position: relative;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  height: 100%;
+  overflow: hidden;
+  /* 抵消父级.section的 padding-top，确保视频顶到可视区域顶部 */
+  margin-top: -40px;
+}
+
+.video-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  display: flex;
+  overflow: hidden;
+  align-items: center;
+  justify-content: center;
+}
+
+.background-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.video-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.35);
+  z-index: 1;
+  pointer-events: none;
+}
+
 .section-content {
+  position: relative;
+  z-index: 2;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 40px 20px;
+  height: 100%;
+}
+
+/* 强制突破父容器限制，确保视频背景完全铺满（对齐 AboutSection 实现） */
+.partners-section {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  z-index: 1;
 }
 
 /* 渐变色标题 */

@@ -1,28 +1,45 @@
 <template>
-  <div class="section-content">
-    <h2 class="gradient-title">{{ $t('navigation.contactUs') }}</h2>
-    <div class="contact-content">
-      <div class="contact-grid">
-        <div class="contact-info">
-          <div class="contact-item">
-            <div class="contact-icon">💬</div>
-            <div class="contact-details">
-              <h4>Telegram</h4>
-              <p>starnetcapitalDan</p>
+  <div class="contact-section">
+    <div class="video-background">
+      <video 
+        ref="backgroundVideo"
+        autoplay 
+        muted 
+        loop 
+        playsinline
+        class="background-video"
+      >
+        <source :src="videoSrc" type="video/mp4">
+        您的浏览器不支持视频播放。
+      </video>
+      <div class="video-overlay"></div>
+    </div>
+
+    <div class="section-content">
+      <h2 class="gradient-title">{{ $t('navigation.contactUs') }}</h2>
+      <div class="contact-content">
+        <div class="contact-grid">
+          <div class="contact-info">
+            <div class="contact-item">
+              <div class="contact-icon">💬</div>
+              <div class="contact-details">
+                <h4>Telegram</h4>
+                <p>starnetcapitalDan</p>
+              </div>
             </div>
-          </div>
-          <div class="contact-item">
-            <div class="contact-icon">📧</div>
-            <div class="contact-details">
-              <h4>Email</h4>
-              <p>Xing@starnetdigital.cc</p>
+            <div class="contact-item">
+              <div class="contact-icon">📧</div>
+              <div class="contact-details">
+                <h4>Email</h4>
+                <p>Xing@starnetdigital.cc</p>
+              </div>
             </div>
-          </div>
-          <div class="contact-item">
-            <div class="contact-icon">🔗</div>
-            <div class="contact-details">
-              <h4>LinkedIn</h4>
-              <p><a class="external-link" href="https://www.linkedin.com/company/105309831/" target="_blank" rel="noopener noreferrer">https://www.linkedin.com/company/105309831/</a></p>
+            <div class="contact-item">
+              <div class="contact-icon">🔗</div>
+              <div class="contact-details">
+                <h4>LinkedIn</h4>
+                <p><a class="external-link" href="https://www.linkedin.com/company/105309831/" target="_blank" rel="noopener noreferrer">https://www.linkedin.com/company/105309831/</a></p>
+              </div>
             </div>
           </div>
         </div>
@@ -32,19 +49,93 @@
 </template>
 
 <script>
+import videoSrc from '../../assets/bg_3.mp4';
+
 export default {
   name: 'ContactSection',
-  
+  data() {
+    return {
+      videoSrc: videoSrc
+    };
+  },
+  mounted() {
+    const video = this.$refs.backgroundVideo;
+    if (video) {
+      video.muted = true;
+      video.loop = true;
+      video.playsInline = true;
+      video.play().catch(err => console.log('视频自动播放被阻止:', err));
+    }
+  }
 };
 </script>
 
 <style scoped>
+.contact-section {
+  position: relative;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  height: 100%;
+  overflow: hidden;
+  /* 抵消父级.section的 padding-top，确保视频顶到可视区域顶部 */
+  margin-top: -40px;
+}
+
+.video-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  display: flex;
+  overflow: hidden;
+  align-items: center;
+  justify-content: center;
+}
+
+.background-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.video-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 1;
+  pointer-events: none;
+}
+
 .section-content {
+  position: relative;
+  z-index: 2;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   padding: 40px 20px;
+  height: 100%;
+}
+
+/* 强制突破父容器限制，确保视频背景完全铺满（对齐 AboutSection 实现） */
+.contact-section {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  z-index: 1;
 }
 
 /* 渐变色标题 */
