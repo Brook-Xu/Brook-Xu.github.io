@@ -6,6 +6,7 @@
 
 <script>
 import * as echarts from 'echarts';
+import ohlcData from '../assets/ohlc_data.js';
 
 export default {
   name: 'FundChart',
@@ -31,10 +32,7 @@ export default {
   methods: {
     async loadData() {
       try {
-        // 加载OHLC数据
-        const response = await fetch('./ohlc_data.json');
-        const ohlcData = await response.json();
-        
+        // 直接使用本地导入的OHLC数据
         this.processData(ohlcData);
         this.initChart();
       } catch (error) {
