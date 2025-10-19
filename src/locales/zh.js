@@ -221,5 +221,43 @@ export default {
     value: '数值：{value}',
     volume: '成交量：{volume}',
     price: '价格：${price}'
+  },
+
+  // 加密货币策略页面
+  cryptoStrategies: {
+    title: '领先的加密货币量化策略',
+    yield2024: '2024年收益率',
+    yield2025: '2025年至今收益率',
+    maxDrawdown: '最大回撤',
+    minInvestment: '最低投资金额',
+    fees: '费用',
+    strategy1: {
+      title: '混合套利策略',
+      yield: '24.27%',
+      maxDrawdown: '0.37%',
+      minInvestment: '30万美元',
+      fees: '无管理费，30%业绩费'
+    },
+    strategy2: {
+      title: 'JLP对冲套利策略',
+      yield: '20.13%',
+      maxDrawdown: '0.12%',
+      minInvestment: '30万美元',
+      fees: '无管理费，30%业绩费'
+    },
+    strategy3: {
+      title: 'HFT多空策略',
+      yield: '152.6%',
+      maxDrawdown: '7.7%',
+      minInvestment: '30万美元',
+      fees: '无管理费，40%业绩费'
+    },
+    strategy4: {
+      title: 'HFT做市策略',
+      yield: '116%',
+      maxDrawdown: '9.2%',
+      minInvestment: '30万美元',
+      fees: '无管理费，40%业绩费'
+    }
   }
 }

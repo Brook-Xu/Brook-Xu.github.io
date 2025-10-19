@@ -27,7 +27,7 @@
           </ul>
         </div>
         <div class="product-item">
-          <div class="product-icon">👥</div>
+          <div class="product-icon">📊</div>
           <h3>{{ $t('home.product3.title') }}</h3>
           <ul class="product-features">
             <li>{{ $t('home.product3.feature1') }}</li>
@@ -50,10 +50,15 @@ export default {
   name: 'ProductsSection',
   methods: {
     handleMoreClick(productType) {
-      // TODO: 后续可以自定义跳转链接
-      console.log(`Clicked more button for ${productType}`);
-      // 示例：可以根据productType跳转到不同链接
-      // window.open('https://example.com/' + productType, '_blank');
+      if (productType === 'product1') {
+        // 跳转到加密货币策略页面
+        this.$router.push('/crypto-strategies');
+      } else {
+        // TODO: 后续可以自定义其他产品的跳转链接
+        console.log(`Clicked more button for ${productType}`);
+        // 示例：可以根据productType跳转到不同链接
+        // window.open('https://example.com/' + productType, '_blank');
+      }
     }
   }
 };

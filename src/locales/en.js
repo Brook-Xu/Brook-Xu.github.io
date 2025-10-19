@@ -221,5 +221,43 @@ export default {
     value: 'Value: {value}',
     volume: 'Volume: {volume}',
     price: 'Price: ${price}'
+  },
+
+  // 加密货币策略页面
+  cryptoStrategies: {
+    title: 'Leading Crypto Quantative Strategies',
+    yield2024: '2024 yield',
+    yield2025: '2025 YTD yield',
+    maxDrawdown: 'Max drawdown',
+    minInvestment: 'Min investment amount',
+    fees: 'Fees',
+    strategy1: {
+      title: 'Hybrid Arbitrage Strategy',
+      yield: '24.27%',
+      maxDrawdown: '0.37%',
+      minInvestment: 'USD 300k',
+      fees: 'no management fee, 30% performance fee'
+    },
+    strategy2: {
+      title: 'JLP Hedging Arbitrage Strategy',
+      yield: '20.13%',
+      maxDrawdown: '0.12%',
+      minInvestment: 'USD 300k',
+      fees: 'no management fee, 30% performance fee'
+    },
+    strategy3: {
+      title: 'HFT Long Short Strategy',
+      yield: '152.6%',
+      maxDrawdown: '7.7%',
+      minInvestment: 'USD 300k',
+      fees: 'no management fee, 40% performance fee'
+    },
+    strategy4: {
+      title: 'HFT Market Making Strategy',
+      yield: '116%',
+      maxDrawdown: '9.2%',
+      minInvestment: 'USD 300k',
+      fees: 'no management fee, 40% performance fee'
+    }
   }
 }
