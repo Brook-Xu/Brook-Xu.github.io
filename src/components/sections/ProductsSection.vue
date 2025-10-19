@@ -6,6 +6,11 @@
         <div class="product-item">
           <div class="product-icon">🔄</div>
           <h3>{{ $t('home.product1.title') }}</h3>
+          <ul class="product-features">
+            <li>{{ $t('home.product1.feature1') }}</li>
+            <li>{{ $t('home.product1.feature2') }}</li>
+            <li>{{ $t('home.product1.feature3') }}</li>
+          </ul>
           <div class="more-container">
             <div class="more-button" @click="handleMoreClick('product1')">
               More >>
@@ -15,15 +20,20 @@
         <div class="product-item">
           <div class="product-icon">📈</div>
           <h3>{{ $t('home.product2.title') }}</h3>
-          <div class="more-container">
-            <div class="more-button" @click="handleMoreClick('product2')">
-              More >>
-            </div>
-          </div>
+          <ul class="product-features">
+            <li>{{ $t('home.product2.feature1') }}</li>
+            <li>{{ $t('home.product2.feature2') }}</li>
+            <li>{{ $t('home.product2.feature3') }}</li>
+          </ul>
         </div>
         <div class="product-item">
           <div class="product-icon">👥</div>
           <h3>{{ $t('home.product3.title') }}</h3>
+          <ul class="product-features">
+            <li>{{ $t('home.product3.feature1') }}</li>
+            <li>{{ $t('home.product3.feature2') }}</li>
+            <li>{{ $t('home.product3.feature3') }}</li>
+          </ul>
           <div class="more-container">
             <div class="more-button" @click="handleMoreClick('product3')">
               More >>
@@ -132,14 +142,30 @@ export default {
 }
 
 .product-item li:before {
-  content: "✓";
+  content: "◆";
   color: #FFC000;
   font-weight: bold;
   margin-right: 0.5rem;
 }
 
+.product-features {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0 4rem 0;
+}
+
+.product-features li {
+  color: #ccc;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
 .more-container {
-  margin-top: 1.5rem;
+  position: absolute;
+  bottom: 1.5rem;
+  right: 1.5rem;
   text-align: right;
 }
 

@@ -31,8 +31,8 @@ export default {
     home: '首页',
     aboutUs: '关于我们',
     coreValues: '核心价值观',
-    products: '加密货币量化策略',
-    productsTitle: '领先的加密货币量化策略',
+    products: '我们的产品',
+    productsTitle: '我们的产品',
     riskManagement: '风险管理',
     partners: '合作伙伴',
     contactUs: '联系我们',
@@ -84,25 +84,25 @@ export default {
       description: '清晰了解策略表现、交易团队及其背景。'
     },
     product1: {
-      title: '多策略支持',
+      title: '领先的加密货币量化策略',
       description: '跨多个加密货币市场的综合交易策略',
-      feature1: '高级算法交易',
-      feature2: '风险管理协议',
-      feature3: '实时市场分析'
+      feature1: '多策略支持',
+      feature2: '无与伦比的收益',
+      feature3: '顶级交易团队'
     },
     product2: {
-      title: '无与伦比的收益',
+      title: '加密货币挖矿',
       description: '通过复杂的量化方法实现卓越回报',
-      feature1: '高频交易策略',
-      feature2: '套利机会',
-      feature3: '做市算法'
+      feature1: '亚洲前三挖矿农场',
+      feature2: '稳定的矿机来源',
+      feature3: '投资后托管服务'
     },
     product3: {
-      title: '顶级交易团队',
+      title: '数据分析平台',
       description: '专业的量化分析师和交易员',
-      feature1: '经验丰富的加密专业人士',
-      feature2: '先进的技术专长',
-      feature3: '经过验证的业绩记录'
+      feature1: '多维度分析',
+      feature2: '可视化图表',
+      feature3: '定制化指标对比'
     },
     risk1: {
       title: '高级数学模型',

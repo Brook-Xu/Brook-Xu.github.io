@@ -31,8 +31,8 @@ export default {
     home: 'Home',
     aboutUs: 'About us',
     coreValues: 'Core values',
-    products: 'Crypto Quantative Strategies',
-    productsTitle: 'Leading Crypto Quantative Strategies',
+    products: 'Our Products',
+    productsTitle: 'Our Products',
     riskManagement: 'Risk Management',
     partners: 'Partners',
     contactUs: 'Contact us',
@@ -84,25 +84,25 @@ export default {
       description: 'Clear understanding of the strategy performance, trading team and their backgrounds.'
     },
     product1: {
-      title: 'Multi-Strategy Support',
+      title: 'Leading Crypto Quantative Strategies',
       description: 'Comprehensive trading strategies across multiple crypto markets',
-      feature1: 'Advanced algorithmic trading',
-      feature2: 'Risk management protocols',
-      feature3: 'Real-time market analysis'
+      feature1: 'Multi-strategy support',
+      feature2: 'Unparalleled yields',
+      feature3: 'Top trading teams'
     },
     product2: {
-      title: 'Unparalleled Yields',
+      title: 'Crypto Mining',
       description: 'Superior returns through sophisticated quantitative methods',
-      feature1: 'High-frequency trading strategies',
-      feature2: 'Arbitrage opportunities',
-      feature3: 'Market making algorithms'
+      feature1: 'Asia top3 mining farm',
+      feature2: 'Stable mining machine sources',
+      feature3: 'Hosting service post investment'
     },
     product3: {
-      title: 'Top Trading Teams',
+      title: 'Data Analysis Platform',
       description: 'Expert quantitative analysts and traders',
-      feature1: 'Experienced crypto professionals',
-      feature2: 'Advanced technical expertise',
-      feature3: 'Proven track record'
+      feature1: 'Multi-dimensional analysis',
+      feature2: 'Visualization charts',
+      feature3: 'Customized indicators to compare'
     },
     risk1: {
       title: 'Advanced Mathematical Models',
