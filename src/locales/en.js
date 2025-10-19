@@ -104,28 +104,21 @@ export default {
       feature3: 'Personalized Service'
     },
     risk1: {
-      title: 'Return Maximization',
-      description: 'Optimization algorithms seek to maximize expected returns given the specified risk tolerance or constraints. This involves selecting assets and strategies with the potential for higher returns while balancing the associated risks.'
+      title: 'Advanced Mathematical Models',
+      point1: 'Including mean-variance optimization, risk parity, and factor-based models',
+      point2: 'Systematically allocate capital and optimize the portfolio\'s risk-return profile'
     },
     risk2: {
-      title: 'Asset Allocation',
-      description: 'Quantitative models analyze historical data and market trends to determine the optimal allocation of assets within the portfolio. This may include stocks, bonds, commodities, or derivatives, based on their expected returns, volatility, and correlation with other assets.'
+      title: 'Portfolio Controls',
+      point1: 'Exchange, symbol, and sector concentration limits',
+      point2: 'Inventory bands and auto-reversion; daily loss halts; drawdown brakes; time-of-day/maintenance blacklists',
+      point3: 'Dynamic risk controls and position sizing'
     },
     risk3: {
-      title: 'Constraints and Factors',
-      description: 'Optimization considers various constraints such as regulatory limits, liquidity requirements, and investor preferences. Factors like transaction costs, market impact, and rebalancing frequency are also taken into account to ensure practical implementation.'
-    },
-    risk4: {
-      title: 'Risk Management',
-      description: 'Portfolio optimization aims to minimize risk by diversifying across assets that have low correlation with each other. Risk metrics such as volatility, beta and Value at Risk (VaR) are used to quantify and manage the overall portfolio risk.'
-    },
-    risk5: {
-      title: 'Dynamic Adjustments',
-      description: 'Continuous monitoring and adjustment of portfolio weights based on changing market conditions and new data ensure that the portfolio remains aligned with its objectives and adapts to evolving market dynamics.'
-    },
-    risk6: {
-      title: 'Quantitative Models',
-      description: 'Advanced mathematical models, including mean-variance optimization, risk parity, and factor-based models, are employed to systematically allocate capital and optimize the portfolio\'s risk-return profile.'
+      title: 'Real-time Monitoring',
+      point1: '24/7 alerts',
+      point2: 'Dynamic leverage control',
+      point3: 'Abnormal state handling'
     },
     partner1: {
       name: 'Leading Banks',

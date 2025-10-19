@@ -5,27 +5,26 @@
       <div class="risk-grid">
         <div class="risk-item">
           <h3>{{ $t('home.risk1.title') }}</h3>
-          <p>{{ $t('home.risk1.description') }}</p>
+          <ul class="risk-bullets">
+            <li>{{ $t('home.risk1.point1') }}</li>
+            <li>{{ $t('home.risk1.point2') }}</li>
+          </ul>
         </div>
         <div class="risk-item">
           <h3>{{ $t('home.risk2.title') }}</h3>
-          <p>{{ $t('home.risk2.description') }}</p>
+          <ul class="risk-bullets">
+            <li>{{ $t('home.risk2.point1') }}</li>
+            <li>{{ $t('home.risk2.point2') }}</li>
+            <li>{{ $t('home.risk2.point3') }}</li>
+          </ul>
         </div>
         <div class="risk-item">
           <h3>{{ $t('home.risk3.title') }}</h3>
-          <p>{{ $t('home.risk3.description') }}</p>
-        </div>
-        <div class="risk-item">
-          <h3>{{ $t('home.risk4.title') }}</h3>
-          <p>{{ $t('home.risk4.description') }}</p>
-        </div>
-        <div class="risk-item">
-          <h3>{{ $t('home.risk5.title') }}</h3>
-          <p>{{ $t('home.risk5.description') }}</p>
-        </div>
-        <div class="risk-item">
-          <h3>{{ $t('home.risk6.title') }}</h3>
-          <p>{{ $t('home.risk6.description') }}</p>
+          <ul class="risk-bullets">
+            <li>{{ $t('home.risk3.point1') }}</li>
+            <li>{{ $t('home.risk3.point2') }}</li>
+            <li>{{ $t('home.risk3.point3') }}</li>
+          </ul>
         </div>
       </div>
     </div>
@@ -70,9 +69,10 @@ export default {
 .risk-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 1.5rem;
+  gap: 2.5rem;
   margin-top: 1rem;
   width: 100%;
+  max-width: 1400px;
   box-sizing: border-box;
 }
 
@@ -103,10 +103,14 @@ export default {
 
 .risk-item h3 {
   color: #FFC000;
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   margin-bottom: 1rem;
   margin-top: 0;
   text-align: left;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .risk-item p {
@@ -117,10 +121,57 @@ export default {
   margin: 0;
 }
 
+.risk-bullets {
+  color: #ccc;
+  line-height: 1.6;
+  text-align: left;
+  flex-grow: 1;
+  margin: 0;
+  padding-left: 1rem;
+  list-style: none;
+  font-size: 1.1rem;
+}
+
+.risk-bullets li {
+  position: relative;
+  margin-bottom: 0.5rem;
+  padding-left: 1rem;
+}
+
+.risk-bullets li::before {
+  content: "·";
+  position: absolute;
+  left: 0;
+  color: #ccc;
+  font-weight: bold;
+  font-size: 1.2em;
+}
+
 /* 响应式设计 */
+@media (max-width: 1400px) {
+  .risk-grid {
+    max-width: 1200px;
+    gap: 2rem;
+  }
+}
+
+@media (max-width: 1200px) {
+  .risk-grid {
+    max-width: 1000px;
+    gap: 1.8rem;
+  }
+}
+
 @media (max-width: 1024px) {
   .risk-grid {
     grid-template-columns: repeat(2, 1fr);
+    max-width: 800px;
+    gap: 1.5rem;
+  }
+  
+  .risk-item h3 {
+    white-space: normal;
+    font-size: 1.1rem;
   }
 }
 
