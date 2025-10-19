@@ -1,18 +1,18 @@
 <template>
-  <div class="section-content">
+  <div class="section-content" ref="sectionRef">
     <h2 class="gradient-title">{{ $t('navigation.coreValues') }}</h2>
     <div class="values-content">
       <div class="values-container">
         <!-- 左侧图表区域 -->
-        <div class="values-left">
+        <div class="values-left" :class="{ 'fade-in-left': isVisible }" :style="{ animationDelay: isVisible ? '0.4s' : '0s' }">
           <FundChart />
         </div>
         
         <!-- 右侧下拉框区域 -->
-        <div class="values-right">
+        <div class="values-right" :class="{ 'fade-in-right': isVisible }" :style="{ animationDelay: isVisible ? '0.6s' : '0s' }">
           <div class="dropdown-container">
             <!-- 第一个价值观 -->
-            <div class="dropdown-item" :class="{ 'active': activeDropdown === 1 }">
+            <div class="dropdown-item" :class="{ 'active': activeDropdown === 1, 'fade-in-item': isVisible }" :style="{ animationDelay: isVisible ? '0.8s' : '0s' }">
               <div class="dropdown-header" @click="toggleDropdown(1)">
                 <div class="dropdown-title">
                   <div class="value-icon">✨</div>
@@ -28,7 +28,7 @@
             </div>
 
             <!-- 第二个价值观 -->
-            <div class="dropdown-item" :class="{ 'active': activeDropdown === 2 }">
+            <div class="dropdown-item" :class="{ 'active': activeDropdown === 2, 'fade-in-item': isVisible }" :style="{ animationDelay: isVisible ? '1.0s' : '0s' }">
               <div class="dropdown-header" @click="toggleDropdown(2)">
                 <div class="dropdown-title">
                   <div class="value-icon">💼</div>
@@ -44,7 +44,7 @@
             </div>
 
             <!-- 第三个价值观 -->
-            <div class="dropdown-item" :class="{ 'active': activeDropdown === 3 }">
+            <div class="dropdown-item" :class="{ 'active': activeDropdown === 3, 'fade-in-item': isVisible }" :style="{ animationDelay: isVisible ? '1.2s' : '0s' }">
               <div class="dropdown-header" @click="toggleDropdown(3)">
                 <div class="dropdown-title">
                   <div class="value-icon">🔍</div>
@@ -75,10 +75,47 @@ export default {
   },
   data() {
     return {
-      activeDropdown: 1 // 默认展开第一个下拉框
+      activeDropdown: 1, // 默认展开第一个下拉框
+      isVisible: false,
+      observer: null
     };
   },
+  mounted() {
+    this.setupIntersectionObserver();
+  },
+  beforeUnmount() {
+    if (this.observer) {
+      this.observer.disconnect();
+    }
+  },
   methods: {
+    setupIntersectionObserver() {
+      const options = {
+        root: null,
+        rootMargin: '0px 0px -100px 0px', // 当元素距离视口底部100px时触发
+        threshold: 0.1 // 当10%的元素可见时触发
+      };
+
+      this.observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            // 重置动画状态
+            this.isVisible = false;
+            // 使用nextTick确保DOM更新后再触发动画
+            this.$nextTick(() => {
+              this.isVisible = true;
+            });
+          } else {
+            // 当元素离开视口时重置状态，为下次进入做准备
+            this.isVisible = false;
+          }
+        });
+      }, options);
+
+      if (this.$refs.sectionRef) {
+        this.observer.observe(this.$refs.sectionRef);
+      }
+    },
     toggleDropdown(index) {
       // 如果点击的是当前展开的下拉框，则收起
       if (this.activeDropdown === index) {
@@ -100,6 +137,107 @@ export default {
   margin-bottom: 1rem;
   font-weight: 700;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* 动画关键帧 */
+@keyframes fadeInFromBottom {
+  0% {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInFromLeft {
+  0% {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeInFromRight {
+  0% {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes fadeInTitle {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 标题淡入动画 */
+.fade-in-title {
+  animation: fadeInTitle 0.8s ease-out forwards;
+}
+
+/* 左侧区域渐变出现 */
+.fade-in-left {
+  opacity: 0;
+  animation: scaleIn 0.8s ease-out forwards;
+}
+
+/* 右侧区域从右侧淡入 */
+.fade-in-right {
+  opacity: 0;
+  animation: fadeInFromRight 0.8s ease-out forwards;
+}
+
+/* 下拉框项目从右方淡入 */
+.fade-in-item {
+  opacity: 0;
+  animation: fadeInFromRight 0.6s ease-out forwards;
+}
+
+/* 当动画需要重新播放时，重置状态 */
+.values-left:not(.fade-in-left) {
+  opacity: 0;
+  transform: scale(0.8);
+}
+
+.values-right:not(.fade-in-right) {
+  opacity: 0;
+  transform: translateX(50px);
+}
+
+.dropdown-item:not(.fade-in-item) {
+  opacity: 0;
+  transform: translateX(50px);
+}
+
+/* 标题始终可见，无动画 */
+.gradient-title {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 /* 确保整个section有足够的高度 */
@@ -141,6 +279,9 @@ export default {
   border: 2px solid rgba(255, 192, 0, 0.3);
   border-radius: 15px;
   background: rgba(255, 255, 255, 0.02);
+  /* 初始隐藏状态 - 缩放效果 */
+  opacity: 0;
+  transform: scale(0.8);
 }
 
 .values-left :deep(.fund-chart-container) {
@@ -164,6 +305,9 @@ export default {
   flex-direction: column;
   justify-content: center; /* 垂直居中对齐 */
   padding-left: 1rem;
+  /* 初始隐藏状态 - 从右侧开始 */
+  opacity: 0;
+  transform: translateX(50px);
 }
 
 /* 下拉框容器 */
@@ -182,6 +326,9 @@ export default {
   transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
   margin-bottom: 1rem;
+  /* 初始隐藏状态 - 从右方开始 */
+  opacity: 0;
+  transform: translateX(50px);
 }
 
 .dropdown-item:hover {

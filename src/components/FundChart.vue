@@ -1,5 +1,5 @@
 <template>
-  <div class="fund-chart-container">
+  <div class="fund-chart-container" :style="{ width: width, height: height }">
     <div ref="chartContainer" class="chart-wrapper"></div>
   </div>
 </template>
@@ -10,6 +10,16 @@ import ohlcData from '../assets/ohlc_data.js';
 
 export default {
   name: 'FundChart',
+  props: {
+    width: {
+      type: [String, Number],
+      default: '100%'
+    },
+    height: {
+      type: [String, Number],
+      default: '400px'
+    }
+  },
   data() {
     return {
       chart: null,
@@ -61,7 +71,11 @@ export default {
     initChart() {
       if (!this.$refs.chartContainer) return;
       
-      this.chart = echarts.init(this.$refs.chartContainer);
+      // 可以在这里设置图表的宽度和高度
+      this.chart = echarts.init(this.$refs.chartContainer, null, {
+        width: 700,  // 设置图表宽度
+        height: 500  // 设置图表高度
+      });
       
       // 确保图表容器大小正确
       this.$nextTick(() => {
@@ -218,7 +232,7 @@ export default {
 
 <style scoped>
 .fund-chart-container {
-  width: 100%;
+  width: 100%; /* 可以改为具体数值，如 800px, 90%, 等 */
   height: 100%;
   display: flex;
   flex-direction: column;

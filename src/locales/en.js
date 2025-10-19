@@ -73,15 +73,15 @@ export default {
     },
     value1: {
       title: 'Simplicity',
-      description: 'Crypto world seems highly volatile and rapidly evolving. However, quant strategies demystify digital assets and navigate crypto\'s volatility with confidence. Achieve your stable return without a high barrier to enter.'
+      description: 'Lower the barrier, demystify crypto and navigate volatility through quantative methods.'
     },
     value2: {
       title: 'Professionalism',
-      description: 'Provide one of the best strategies in the market with our experience and expertise in technology, finance and investment.'
+      description: 'Provide the best strategies in the market with our experience and expertise in technology, finance and investment.'
     },
     value3: {
       title: 'Transparency',
-      description: 'Clear understanding of the strategy performance, trading team and their backgrounds.'
+      description: 'Open and real historical data for clients to gain a clear understanding of investment logics, team, and performances.'
     },
     product1: {
       title: 'Leading Crypto Quantative Strategies',

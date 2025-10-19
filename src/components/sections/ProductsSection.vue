@@ -1,9 +1,9 @@
 <template>
-  <div class="section-content">
-    <h2 class="gradient-title">{{ $t('navigation.productsTitle') }}</h2>
+  <div class="section-content" ref="sectionRef">
+    <h2 class="gradient-title" :class="{ 'fade-in-title': isVisible }">{{ $t('navigation.productsTitle') }}</h2>
     <div class="products-content">
       <div class="products-grid">
-        <div class="product-item">
+        <div class="product-item" :class="{ 'fade-in-item': isVisible }" :style="{ animationDelay: isVisible ? '0.2s' : '0s' }">
           <div class="product-icon">🔄</div>
           <h3>{{ $t('home.product1.title') }}</h3>
           <ul class="product-features">
@@ -17,7 +17,7 @@
             </div>
           </div>
         </div>
-        <div class="product-item">
+        <div class="product-item" :class="{ 'fade-in-item': isVisible }" :style="{ animationDelay: isVisible ? '0.4s' : '0s' }">
           <div class="product-icon">📈</div>
           <h3>{{ $t('home.product2.title') }}</h3>
           <ul class="product-features">
@@ -26,7 +26,7 @@
             <li>{{ $t('home.product2.feature3') }}</li>
           </ul>
         </div>
-        <div class="product-item">
+        <div class="product-item" :class="{ 'fade-in-item': isVisible }" :style="{ animationDelay: isVisible ? '0.6s' : '0s' }">
           <div class="product-icon">📊</div>
           <h3>{{ $t('home.product3.title') }}</h3>
           <ul class="product-features">
@@ -48,7 +48,48 @@
 <script>
 export default {
   name: 'ProductsSection',
+  data() {
+    return {
+      isVisible: false,
+      observer: null
+    };
+  },
+  mounted() {
+    this.setupIntersectionObserver();
+  },
+  beforeUnmount() {
+    if (this.observer) {
+      this.observer.disconnect();
+    }
+  },
   methods: {
+    setupIntersectionObserver() {
+      const options = {
+        root: null,
+        rootMargin: '0px 0px -100px 0px', // 当元素距离视口底部100px时触发
+        threshold: 0.1 // 当10%的元素可见时触发
+      };
+
+      this.observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            // 重置动画状态
+            this.isVisible = false;
+            // 使用nextTick确保DOM更新后再触发动画
+            this.$nextTick(() => {
+              this.isVisible = true;
+            });
+          } else {
+            // 当元素离开视口时重置状态，为下次进入做准备
+            this.isVisible = false;
+          }
+        });
+      }, options);
+
+      if (this.$refs.sectionRef) {
+        this.observer.observe(this.$refs.sectionRef);
+      }
+    },
     handleMoreClick(productType) {
       if (productType === 'product1') {
         // 跳转到加密货币策略页面
@@ -85,6 +126,52 @@ export default {
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
+/* 动画关键帧 */
+@keyframes fadeInFromBottom {
+  0% {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInTitle {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 标题淡入动画 */
+.fade-in-title {
+  animation: fadeInTitle 0.8s ease-out forwards;
+}
+
+/* 产品项目淡入动画 */
+.fade-in-item {
+  opacity: 0;
+  animation: fadeInFromBottom 0.8s ease-out forwards;
+}
+
+/* 当动画需要重新播放时，重置状态 */
+.product-item:not(.fade-in-item) {
+  opacity: 0;
+  transform: translateY(50px);
+}
+
+/* 初始状态 - 元素在动画触发前是隐藏的 */
+.gradient-title {
+  opacity: 0;
+  transform: translateY(-20px);
+}
+
 .section-content h2 {
   font-size: 2.5rem;
   color: #FFC000;
@@ -113,6 +200,9 @@ export default {
   box-sizing: border-box;
   overflow-wrap: break-word;
   position: relative;
+  /* 初始隐藏状态 */
+  opacity: 0;
+  transform: translateY(50px);
 }
 
 .product-item:hover {
