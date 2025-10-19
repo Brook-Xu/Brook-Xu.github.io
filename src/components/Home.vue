@@ -138,10 +138,15 @@ export default {
   width: 100%;
 }
 
+.section[data-anchor="values"] {
+  background: linear-gradient(135deg, #0d1b2a 0%, #1b263b 100%) !important; /* 更深的深蓝色渐变背景 */
+}
+
 .section[data-anchor="values"] .section-content {
   max-width: 1800px !important;
   width: 100% !important;
   padding: 0 !important;
+  background: transparent !important; /* 确保内容区域透明，使用父级背景 */
 }
 
 /* fullPage.js 自动生成的overflow容器样式 */

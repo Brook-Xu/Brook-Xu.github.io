@@ -110,6 +110,7 @@ export default {
   align-items: center;
   justify-content: center;
   padding: 40px 20px;
+  background: transparent; /* 使用父级背景色 */
 }
 
 .section-content h2 {
@@ -131,7 +132,7 @@ export default {
 }
 
 .values-left {
-  flex: 1.5;
+  flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: center; /* 垂直居中对齐 */
@@ -142,8 +143,23 @@ export default {
   background: rgba(255, 255, 255, 0.02);
 }
 
+.values-left :deep(.fund-chart-container) {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.values-left :deep(.chart-wrapper) {
+  width: 100%;
+  height: 100%;
+  min-height: 400px;
+}
+
 .values-right {
-  flex: 1.4;
+  flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: center; /* 垂直居中对齐 */

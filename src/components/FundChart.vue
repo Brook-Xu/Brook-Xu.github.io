@@ -63,16 +63,23 @@ export default {
       
       this.chart = echarts.init(this.$refs.chartContainer);
       
+      // 确保图表容器大小正确
+      this.$nextTick(() => {
+        if (this.chart) {
+          this.chart.resize();
+        }
+      });
+      
       const option = {
         backgroundColor: 'transparent',
         tooltip: {
           show: false // 屏蔽鼠标hover时的数据弹窗
         },
         grid: {
-          left: '5%',
-          right: '5%',
-          bottom: '2%',
-          top: '2%',
+          left: '3%',
+          right: '3%',
+          bottom: '3%',
+          top: '3%',
           containLabel: true
         },
         xAxis: {
@@ -112,12 +119,12 @@ export default {
           {
             name: '基金净值',
             type: 'candlestick',
-            data: this.chartData,
+            data: [], // 初始为空数组，让图表从空状态开始
             itemStyle: {
-              color: '#FFC000',      // 上涨颜色
-              color0: '#ff6b6b',     // 下跌颜色
-              borderColor: '#FFC000',
-              borderColor0: '#ff6b6b'
+              color: '#4caf50',      // 上涨颜色 - 柔和绿色
+              color0: '#f44336',     // 下跌颜色 - 柔和红色
+              borderColor: '#4caf50',
+              borderColor0: '#f44336'
             },
             emphasis: {
               itemStyle: {
@@ -142,6 +149,11 @@ export default {
       
       this.chart.setOption(option);
       
+      // 延迟一点时间后开始第一次绘制动画
+      setTimeout(() => {
+        this.startFirstAnimation();
+      }, 100);
+      
       // 添加持续循环动画
       this.startLoopAnimation();
       
@@ -152,6 +164,23 @@ export default {
     handleResize() {
       if (this.chart) {
         this.chart.resize();
+      }
+    },
+    
+    startFirstAnimation() {
+      // 开始第一次绘制动画
+      if (this.chart) {
+        this.chart.setOption({
+          series: [{
+            data: this.chartData,
+            animation: true,
+            animationDuration: 3000,
+            animationEasing: 'cubicOut',
+            animationDelay: function (idx) {
+              return idx * 30; // 每个蜡烛图间隔30ms出现
+            }
+          }]
+        });
       }
     },
     
@@ -203,6 +232,16 @@ export default {
   flex: 1;
   min-height: 400px;
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chart-wrapper canvas {
+  max-width: 100% !important;
+  max-height: 100% !important;
+  width: 100% !important;
+  height: 100% !important;
 }
 
 /* 响应式设计 */

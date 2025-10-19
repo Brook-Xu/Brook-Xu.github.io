@@ -285,7 +285,7 @@ export default {
   height: 180px;
   display: block;
   object-fit: contain;
-  background: rgba(255, 255, 255, 0.05);
+  background: #ffffff;
   border-radius: 8px;
   padding: 8px;
 }
