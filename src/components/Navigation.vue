@@ -172,7 +172,7 @@ nav {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #222222;
+  background: linear-gradient(135deg, #0d1b2a 0%, #1b263b 100%);
   padding: 0.75rem 1rem;
   min-height: 50px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);

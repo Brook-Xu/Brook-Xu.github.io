@@ -31,7 +31,8 @@ export default {
     home: 'Home',
     aboutUs: 'About us',
     coreValues: 'Core values',
-    products: 'Our products',
+    products: 'Crypto Quantative Strategies',
+    productsTitle: 'Leading Crypto Quantative Strategies',
     riskManagement: 'Risk Management',
     partners: 'Partners',
     contactUs: 'Contact us',
@@ -83,25 +84,25 @@ export default {
       description: 'Clear understanding of the strategy performance, trading team and their backgrounds.'
     },
     product1: {
-      title: 'Quantitative Trading System',
-      description: 'Advanced algorithm-based quantitative trading system to help you achieve automated trading.',
-      feature1: 'Multi-strategy Support',
-      feature2: 'Real-time Risk Control',
-      feature3: 'Backtesting Analysis'
+      title: 'Multi-Strategy Support',
+      description: 'Comprehensive trading strategies across multiple crypto markets',
+      feature1: 'Advanced algorithmic trading',
+      feature2: 'Risk management protocols',
+      feature3: 'Real-time market analysis'
     },
     product2: {
-      title: 'Data Analysis Platform',
-      description: 'Powerful data analysis platform providing comprehensive market insights.',
-      feature1: 'Multi-dimensional Analysis',
-      feature2: 'Visualization Charts',
-      feature3: 'Custom Indicators'
+      title: 'Unparalleled Yields',
+      description: 'Superior returns through sophisticated quantitative methods',
+      feature1: 'High-frequency trading strategies',
+      feature2: 'Arbitrage opportunities',
+      feature3: 'Market making algorithms'
     },
     product3: {
-      title: 'AI Smart Assistant',
-      description: 'AI-based smart assistant providing personalized investment advice.',
-      feature1: 'Smart Recommendations',
-      feature2: 'Risk Alerts',
-      feature3: 'Personalized Service'
+      title: 'Top Trading Teams',
+      description: 'Expert quantitative analysts and traders',
+      feature1: 'Experienced crypto professionals',
+      feature2: 'Advanced technical expertise',
+      feature3: 'Proven track record'
     },
     risk1: {
       title: 'Advanced Mathematical Models',

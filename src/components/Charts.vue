@@ -645,7 +645,7 @@ export default {
 }
 
 .charts {
-  background: #2a2a2a;
+  background: linear-gradient(135deg, #0d1b2a 0%, #1b263b 100%);
   padding: 40px;
   border-radius: 10px;
   margin: 40px 0;
@@ -661,7 +661,7 @@ export default {
 .chart-container {
   width: 100%;
   height: 500px;
-  background: #1a1a1a;
+  background: linear-gradient(135deg, #0d1b2a 0%, #1b263b 100%);
   border-radius: 5px;
   padding: 20px;
 }
@@ -704,7 +704,7 @@ export default {
 
 /* API Market Data Styles */
 .error-message {
-  background: #2d1b1b;
+  background: linear-gradient(135deg, #0d1b2a 0%, #1b263b 100%);
   border: 1px solid #c53;
   padding: 20px;
   border-radius: 5px;
@@ -742,7 +742,7 @@ export default {
 }
 
 .chart-item {
-  background: #2a2a2a;
+  background: linear-gradient(135deg, #0d1b2a 0%, #1b263b 100%);
   padding: 25px;
   border-radius: 12px;
   border: 1px solid #444;
@@ -759,14 +759,14 @@ export default {
 }
 
 .chart-item .chart-container {
-  background: #1e1e1e;
+  background: linear-gradient(135deg, #0d1b2a 0%, #1b263b 100%);
   border-radius: 8px;
   padding: 15px;
 }
 
 /* Upload Section Styles */
 .upload-section {
-  background: #2a2a2a;
+  background: linear-gradient(135deg, #0d1b2a 0%, #1b263b 100%);
   padding: 40px;
   border-radius: 10px;
   margin: 40px 0;
@@ -809,7 +809,7 @@ export default {
 .file-requirements {
   margin-top: 20px;
   text-align: left;
-  background: #1a1a1a;
+  background: linear-gradient(135deg, #0d1b2a 0%, #1b263b 100%);
   padding: 20px;
   border-radius: 5px;
   border: 1px solid #444;

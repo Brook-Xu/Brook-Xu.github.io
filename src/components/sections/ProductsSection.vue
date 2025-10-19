@@ -1,37 +1,34 @@
 <template>
   <div class="section-content">
-    <h2 class="gradient-title">{{ $t('navigation.products') }}</h2>
+    <h2 class="gradient-title">{{ $t('navigation.productsTitle') }}</h2>
     <div class="products-content">
       <div class="products-grid">
         <div class="product-item">
-          <div class="product-icon">📈</div>
+          <div class="product-icon">🔄</div>
           <h3>{{ $t('home.product1.title') }}</h3>
-          <p>{{ $t('home.product1.description') }}</p>
-          <ul>
-            <li>{{ $t('home.product1.feature1') }}</li>
-            <li>{{ $t('home.product1.feature2') }}</li>
-            <li>{{ $t('home.product1.feature3') }}</li>
-          </ul>
+          <div class="more-container">
+            <div class="more-button" @click="handleMoreClick('product1')">
+              More >>
+            </div>
+          </div>
         </div>
         <div class="product-item">
-          <div class="product-icon">📊</div>
+          <div class="product-icon">📈</div>
           <h3>{{ $t('home.product2.title') }}</h3>
-          <p>{{ $t('home.product2.description') }}</p>
-          <ul>
-            <li>{{ $t('home.product2.feature1') }}</li>
-            <li>{{ $t('home.product2.feature2') }}</li>
-            <li>{{ $t('home.product2.feature3') }}</li>
-          </ul>
+          <div class="more-container">
+            <div class="more-button" @click="handleMoreClick('product2')">
+              More >>
+            </div>
+          </div>
         </div>
         <div class="product-item">
-          <div class="product-icon">🤖</div>
+          <div class="product-icon">👥</div>
           <h3>{{ $t('home.product3.title') }}</h3>
-          <p>{{ $t('home.product3.description') }}</p>
-          <ul>
-            <li>{{ $t('home.product3.feature1') }}</li>
-            <li>{{ $t('home.product3.feature2') }}</li>
-            <li>{{ $t('home.product3.feature3') }}</li>
-          </ul>
+          <div class="more-container">
+            <div class="more-button" @click="handleMoreClick('product3')">
+              More >>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -40,7 +37,15 @@
 
 <script>
 export default {
-  name: 'ProductsSection'
+  name: 'ProductsSection',
+  methods: {
+    handleMoreClick(productType) {
+      // TODO: 后续可以自定义跳转链接
+      console.log(`Clicked more button for ${productType}`);
+      // 示例：可以根据productType跳转到不同链接
+      // window.open('https://example.com/' + productType, '_blank');
+    }
+  }
 };
 </script>
 
@@ -89,6 +94,7 @@ export default {
   width: 100%;
   box-sizing: border-box;
   overflow-wrap: break-word;
+  position: relative;
 }
 
 .product-item:hover {
@@ -98,7 +104,7 @@ export default {
 }
 
 .product-icon {
-  font-size: 3rem;
+  font-size: 4rem;
   margin-bottom: 1rem;
 }
 
@@ -132,6 +138,51 @@ export default {
   margin-right: 0.5rem;
 }
 
+.more-container {
+  margin-top: 1.5rem;
+  text-align: right;
+}
+
+.more-button {
+  display: inline-block;
+  color: #FFC000;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  animation: blink 3s ease-in-out infinite;
+  text-decoration: none;
+  background: rgba(255, 192, 0, 0.1);
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 192, 0, 0.3);
+}
+
+.more-button:hover {
+  background: rgba(255, 192, 0, 0.2);
+  border-color: #FFC000;
+  transform: scale(1.05);
+  animation: none;
+}
+
+@keyframes blink {
+  0% {
+    opacity: 1;
+  }
+  25% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 0.4;
+  }
+  75% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
 /* 响应式设计 */
 @media (max-width: 1024px) {
   .products-grid {
@@ -161,6 +212,15 @@ export default {
 @media (max-width: 480px) {
   .product-item {
     padding: 1rem;
+  }
+  
+  .more-button {
+    font-size: 0.8rem;
+    padding: 0.2rem 0.5rem;
+  }
+  
+  .more-container {
+    margin-top: 1rem;
   }
 }
 </style>

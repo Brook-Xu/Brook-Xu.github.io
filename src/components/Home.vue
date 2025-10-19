@@ -165,7 +165,7 @@ export default {
   display: flex;
   align-items: flex-start; /* 改为从顶部开始对齐 */
   justify-content: center; /* 保持水平居中 */
-  background: linear-gradient(135deg, #153252 0%, #1e3a5f 100%);
+  background: linear-gradient(135deg, #0d1b2a 0%, #1b263b 100%);
   overflow: hidden; /* 防止内部滚动 */
   padding-top: 40px; /* 直接添加顶部内边距 */
   padding-left: 20px; /* 添加左右内边距确保水平居中 */
