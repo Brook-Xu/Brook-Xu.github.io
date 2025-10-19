@@ -206,7 +206,7 @@ nav {
 }
 
 .logo-text {
-  color: #42b983;
+  color: #FFC000;
   font-weight: bold;
   font-size: 20px;
   letter-spacing: 1px;
@@ -214,7 +214,7 @@ nav {
 }
 
 .logo-text:hover {
-  color: #66d9a3;
+  color: #FFD700;
 }
 
 .nav-menu {
@@ -245,11 +245,11 @@ nav {
 }
 
 .nav-link:hover {
-  color: #42b983;
+  color: #FFC000;
 }
 
 .nav-link.active {
-  color: #42b983;
+  color: #FFC000;
 }
 
 /* 右侧按钮区域样式 */
@@ -264,9 +264,9 @@ nav {
   align-items: center;
   gap: 0.3rem;
   padding: 0.5rem 1rem;
-  border: 1px solid #42b983;
+  border: 1px solid #FFC000;
   background: transparent;
-  color: #42b983;
+  color: #FFC000;
   border-radius: 5px;
   cursor: pointer;
   font-family: 'Montserrat', 'Arial', sans-serif;
@@ -279,24 +279,24 @@ nav {
 }
 
 .action-btn:hover {
-  background: #42b983;
+  background: #FFC000;
   color: #222222;
   transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(66, 185, 131, 0.3);
+  box-shadow: 0 2px 8px rgba(255, 192, 0, 0.3);
 }
 
 .action-btn:active {
   transform: translateY(0);
-  box-shadow: 0 1px 4px rgba(66, 185, 131, 0.3);
+  box-shadow: 0 1px 4px rgba(255, 192, 0, 0.3);
 }
 
 .login-btn {
-  border-color: #42b983;
-  color: #42b983;
+  border-color: #FFC000;
+  color: #FFC000;
 }
 
 .login-btn:hover {
-  background: #42b983;
+  background: #FFC000;
   color: #222222;
 }
 
@@ -305,14 +305,14 @@ nav {
 }
 
 .language-btn {
-  border-color: #42b983;
-  color: #42b983;
+  border-color: #FFC000;
+  color: #FFC000;
 }
 
 .language-btn:hover {
-  background: #42b983;
+  background: #FFC000;
   color: #222222;
-  border-color: #42b983;
+  border-color: #FFC000;
 }
 
 /* 图标样式 */
@@ -329,7 +329,7 @@ nav {
 
 .icon-globe::before {
   content: "🌐";
-  color: #42b983;
+  color: #FFC000;
   font-size: 18px;
 }
 
@@ -408,12 +408,12 @@ nav {
 }
 
 .language-option.active {
-  background: #42b983;
+  background: #FFC000;
   color: #222;
 }
 
 .language-option.active:hover {
-  background: #66d9a3;
+  background: #FFD700;
 }
 
 .flag {

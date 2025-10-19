@@ -22,11 +22,44 @@
       <div class="hero" data-aos="fade-up">
         <h1 class="hero-title" :class="{ 'animate-text': showTextAnimation }">
           <template v-if="isEnglish">
-            <span class="line" :class="{ 'animate-line': showTextAnimation }">Unleash growth</span>
-            <span class="line" :class="{ 'animate-line': showTextAnimation }" style="animation-delay: 0.5s;">with diverse strategies</span>
+            <div class="line">
+              <span 
+                v-for="(word, index) in englishLine1" 
+                :key="'en1-' + index"
+                class="word" 
+                :class="{ 'animate-word': showTextAnimation }"
+                :style="{ 'transition-delay': (index * 0.3) + 's' }"
+              >{{ word }}</span>
+            </div>
+            <div class="line">
+              <span 
+                v-for="(word, index) in englishLine2" 
+                :key="'en2-' + index"
+                class="word" 
+                :class="{ 'animate-word': showTextAnimation }"
+                :style="{ 'transition-delay': (englishLine1.length * 0.3 + index * 0.3) + 's' }"
+              >{{ word }}</span>
+            </div>
           </template>
           <template v-else>
-            <span class="line" :class="{ 'animate-line': showTextAnimation }">{{ $t('home.title') }}</span>
+            <div class="line">
+              <span 
+                v-for="(word, index) in chineseLine1" 
+                :key="'zh1-' + index"
+                class="word" 
+                :class="{ 'animate-word': showTextAnimation }"
+                :style="{ 'transition-delay': (index * 0.4) + 's' }"
+              >{{ word }}</span>
+            </div>
+            <div class="line">
+              <span 
+                v-for="(word, index) in chineseLine2" 
+                :key="'zh2-' + index"
+                class="word" 
+                :class="{ 'animate-word': showTextAnimation }"
+                :style="{ 'transition-delay': (chineseLine1.length * 0.4 + index * 0.4) + 's' }"
+              >{{ word }}</span>
+            </div>
           </template>
         </h1>
         <p v-if="$t('home.subtitle')" class="hero-subtitle" :class="{ 'animate-subtitle': showTextAnimation }">{{ $t('home.subtitle') }}</p>
@@ -44,7 +77,11 @@ export default {
   data() {
     return {
       videoSrc: videoSrc,
-      showTextAnimation: false
+      showTextAnimation: false,
+      englishLine1: ['Unleash', 'your', 'growth'],
+      englishLine2: ['with', 'diverse', 'strategies'],
+      chineseLine1: ['释放', '您的', '增长', '潜力'],
+      chineseLine2: ['多元化', '策略', '驱动']
     };
   },
   computed: {
@@ -58,10 +95,10 @@ export default {
     
     // 每次进入页面都展示动画效果
     this.$nextTick(() => {
-      // 延迟启动以等待布局稳定
+      // 延迟启动以等待布局稳定，增加延迟时间让动画更慢
       setTimeout(() => {
         this.showTextAnimation = true;
-      }, 400);
+      }, 800);
     });
   },
   methods: {
@@ -137,7 +174,7 @@ export default {
 
 .section-content h2 {
   font-size: 2.5rem;
-  color: #42b983;
+  color: #FFC000;
   margin-bottom: 2rem;
   font-weight: 700;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
@@ -150,18 +187,12 @@ export default {
 /* 调大字体，并拆分两行 */
 .hero-title {
   margin: 0 0 1rem 0;
-  color: #42b983;
+  color: #ffffff;
   font-weight: 700;
+  font-style: italic;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   line-height: 1.3;
   font-size: 4rem; /* 统一字体大小，适用于所有语言 */
-  opacity: 0;
-  transform: translateY(30px);
-  filter: blur(8px);
-  transition: transform 1.1s ease-out, opacity 1.1s ease-out, filter 1.1s ease-out;
-}
-
-.hero-title.animate-text {
   opacity: 1;
   transform: translateY(0);
   filter: blur(0px);
@@ -170,19 +201,22 @@ export default {
 .hero-title .line {
   display: block;
   font-size: inherit; /* 继承父元素字体大小 */
-  opacity: 0;
-  transform: translateY(20px);
-  filter: blur(6px);
-  /* 使用clip-path做遮罩滑出 */
-  clip-path: inset(0 100% 0 0);
-  transition: transform 0.9s ease-out, opacity 0.9s ease-out, filter 0.9s ease-out;
+  margin-bottom: 0.5rem; /* 两行之间的间距 */
 }
 
-.hero-title .line.animate-line {
+.hero-title .word {
+  display: inline-block;
+  margin-right: 0.3em; /* 单词之间的间距 */
+  opacity: 0;
+  transform: translateX(-30px);
+  filter: blur(8px);
+  transition: transform 1.2s ease-out, opacity 1.2s ease-out, filter 1.2s ease-out;
+}
+
+.hero-title .word.animate-word {
   opacity: 1;
-  transform: translateY(0);
+  transform: translateX(0);
   filter: blur(0px);
-  animation: revealLine 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 .hero p {
@@ -211,11 +245,6 @@ export default {
   letter-spacing: 0.02em;
 }
 
-/* 线条遮罩滑出动画（从右到左揭示） */
-@keyframes revealLine {
-  0% { clip-path: inset(0 100% 0 0); }
-  100% { clip-path: inset(0 0 0 0); }
-}
 
 
 /* 响应式设计 */

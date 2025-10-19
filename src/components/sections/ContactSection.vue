@@ -141,10 +141,7 @@ export default {
 /* 渐变色标题 */
 .gradient-title {
   font-size: 2.5rem;
-  background: linear-gradient(90deg, #42b983, #4fc3f7);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #FFC000;
   margin-bottom: 2rem;
   font-weight: 700;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
@@ -152,7 +149,7 @@ export default {
 
 .section-content h2 {
   font-size: 2.5rem;
-  color: #42b983;
+  color: #FFC000;
   margin-bottom: 2rem;
   font-weight: 700;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
@@ -169,7 +166,7 @@ export default {
 }
 
 .contact-info h3 {
-  color: #42b983;
+  color: #FFC000;
   font-size: 1.5rem;
   margin-bottom: 1.5rem;
 }
@@ -220,7 +217,7 @@ export default {
 }
 
 .contact-details h4 {
-  color: #42b983;
+  color: #FFC000;
   margin-bottom: 0.5rem;
 }
 
@@ -239,8 +236,8 @@ export default {
 }
 
 .external-link:hover {
-  color: #66d9a3;
-  border-bottom-color: #66d9a3;
+  color: #FFD700;
+  border-bottom-color: #FFD700;
 }
 
 .external-link::after {

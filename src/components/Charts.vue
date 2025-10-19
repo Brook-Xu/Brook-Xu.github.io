@@ -289,7 +289,7 @@ export default {
           text: this.$t('charts.dataTrendChart'),
           left: 'center',
           textStyle: {
-            color: '#42b983',
+            color: '#FFC000',
             fontSize: 20
           }
         },
@@ -341,11 +341,11 @@ export default {
           data: values,
           smooth: true,
           lineStyle: {
-            color: '#42b983',
+            color: '#FFC000',
             width: 2
           },
           itemStyle: {
-            color: '#42b983'
+            color: '#FFC000'
           },
           areaStyle: {
             color: {
@@ -355,9 +355,9 @@ export default {
               x2: 0,
               y2: 1,
               colorStops: [{
-                offset: 0, color: 'rgba(66, 185, 131, 0.3)'
+                offset: 0, color: 'rgba(255, 192, 0, 0.3)'
               }, {
-                offset: 1, color: 'rgba(66, 185, 131, 0.1)'
+                offset: 1, color: 'rgba(255, 192, 0, 0.1)'
               }]
             }
           }
@@ -414,7 +414,7 @@ export default {
         title: {
           text: this.getDataTitle(key),
           left: 'center',
-          textStyle: { color: '#42b983', fontSize: 16 }
+          textStyle: { color: '#FFC000', fontSize: 16 }
         },
         tooltip: {
           trigger: 'axis',
@@ -509,7 +509,7 @@ export default {
             height: 20,
             bottom: 10,
             handleStyle: {
-              color: '#42b983'
+              color: '#FFC000'
             },
             textStyle: {
               color: '#ccc'
@@ -563,7 +563,7 @@ export default {
           data: results.map(item => item.o), 
           type: 'line', 
           yAxisIndex: 0, 
-          itemStyle: { color: '#42b983' },
+          itemStyle: { color: '#FFC000' },
           lineStyle: { width: 2 },
           symbol: 'circle',
           symbolSize: 4
@@ -653,7 +653,7 @@ export default {
 
 .charts h2 {
   text-align: center;
-  color: #42b983;
+  color: #FFC000;
   margin-bottom: 30px;
   font-size: 2rem;
 }
@@ -679,7 +679,7 @@ export default {
 
 .back-link {
   display: inline-block;
-  background: #42b983;
+  background: #FFC000;
   color: white;
   padding: 10px 20px;
   text-decoration: none;
@@ -688,7 +688,7 @@ export default {
 }
 
 .back-link:hover {
-  background: #66d9a3;
+  background: #FFD700;
 }
 
 .chart-info {
@@ -728,7 +728,7 @@ export default {
 }
 
 .market-data-display h3 {
-  color: #42b983;
+  color: #FFC000;
   margin-bottom: 20px;
   font-size: 1.5rem;
   text-align: center;
@@ -750,11 +750,11 @@ export default {
 }
 
 .chart-item h4 {
-  color: #42b983;
+  color: #FFC000;
   margin-bottom: 20px;
   font-size: 1.2rem;
   text-align: center;
-  border-bottom: 2px solid #42b983;
+  border-bottom: 2px solid #FFC000;
   padding-bottom: 10px;
 }
 
@@ -774,7 +774,7 @@ export default {
 
 .upload-section h2 {
   text-align: center;
-  color: #42b983;
+  color: #FFC000;
   margin-bottom: 30px;
   font-size: 2rem;
 }
@@ -788,7 +788,7 @@ export default {
   background: #333;
   color: #eee;
   padding: 10px 20px;
-  border: 2px dashed #42b983;
+  border: 2px dashed #FFC000;
   border-radius: 5px;
   cursor: pointer;
   font-size: 16px;
@@ -796,7 +796,7 @@ export default {
 }
 
 .upload-area input[type="file"]:hover {
-  border-color: #66d9a3;
+  border-color: #FFD700;
   background: #444;
 }
 
@@ -816,13 +816,13 @@ export default {
 }
 
 .file-requirements h4 {
-  color: #42b983;
+  color: #FFC000;
   margin-bottom: 10px;
   font-size: 16px;
 }
 
 .file-requirements h5 {
-  color: #42b983;
+  color: #FFC000;
   margin: 15px 0 10px 0;
   font-size: 14px;
 }

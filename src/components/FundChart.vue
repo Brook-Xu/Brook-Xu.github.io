@@ -114,9 +114,9 @@ export default {
             type: 'candlestick',
             data: this.chartData,
             itemStyle: {
-              color: '#42b983',      // 上涨颜色
+              color: '#FFC000',      // 上涨颜色
               color0: '#ff6b6b',     // 下跌颜色
-              borderColor: '#42b983',
+              borderColor: '#FFC000',
               borderColor0: '#ff6b6b'
             },
             emphasis: {

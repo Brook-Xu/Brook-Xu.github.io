@@ -41,7 +41,7 @@ export default {
 
   // 首页
   home: {
-    title: '释放增长潜力，多元化策略驱动',
+    title: '释放您的增长潜力 多元化策略驱动',
     subtitle: '',
     learnMore: '了解更多',
     viewCharts: '查看图表',

@@ -223,10 +223,7 @@ export default {
 /* 渐变色标题 */
 .gradient-title {
   font-size: 2.5rem;
-  background: linear-gradient(90deg, #42b983, #4fc3f7);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #FFC000;
   margin-bottom: 4rem;
   font-weight: 700;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
@@ -234,10 +231,7 @@ export default {
 
 .section-content h2 {
   font-size: 2.5rem;
-  background: linear-gradient(90deg, #42b983, #4fc3f7);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #FFC000;
   margin-bottom: 4rem;
   font-weight: 700;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
@@ -270,7 +264,7 @@ export default {
   background: rgba(255, 255, 255, 0.15);
   padding: 1rem;
   border-radius: 12px;
-  border: 1px solid rgba(66, 185, 131, 0.3);
+  border: 1px solid rgba(255, 192, 0, 0.3);
   transition: all 0.3s ease;
   width: 320px;
   height: 240px;
@@ -282,8 +276,8 @@ export default {
 }
 
 .logo-ticker .partner-item:hover {
-  border-color: #42b983;
-  box-shadow: 0 10px 30px rgba(66, 185, 131, 0.2);
+  border-color: #FFC000;
+  box-shadow: 0 10px 30px rgba(255, 192, 0, 0.2);
 }
 
 .logo-ticker .partner-logo {

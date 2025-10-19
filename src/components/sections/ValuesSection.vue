@@ -96,10 +96,7 @@ export default {
 /* 渐变色标题 */
 .gradient-title {
   font-size: 2.5rem;
-  background: linear-gradient(90deg, #42b983, #4fc3f7);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #FFC000;
   margin-bottom: 1rem;
   font-weight: 700;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
@@ -117,7 +114,7 @@ export default {
 
 .section-content h2 {
   font-size: 2.5rem;
-  color: #42b983;
+  color: #FFC000;
   margin-bottom: 1rem;
   font-weight: 700;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
@@ -138,8 +135,11 @@ export default {
   display: flex;
   flex-direction: column;
   justify-content: center; /* 垂直居中对齐 */
-  padding-right: 1rem;
+  padding: 1rem;
   min-height: 500px; /* 确保有足够的高度显示图表 */
+  border: 2px solid rgba(255, 192, 0, 0.3);
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.02);
 }
 
 .values-right {
@@ -162,20 +162,20 @@ export default {
 .dropdown-item {
   background: rgba(255, 255, 255, 0.05);
   border-radius: 15px;
-  border: 1px solid rgba(66, 185, 131, 0.2);
+  border: 1px solid rgba(255, 192, 0, 0.2);
   transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
   margin-bottom: 1rem;
 }
 
 .dropdown-item:hover {
-  border-color: #42b983;
-  box-shadow: 0 5px 15px rgba(66, 185, 131, 0.1);
+  border-color: #FFC000;
+  box-shadow: 0 5px 15px rgba(255, 192, 0, 0.1);
 }
 
 .dropdown-item.active {
-  border-color: #42b983;
-  box-shadow: 0 10px 30px rgba(66, 185, 131, 0.2);
+  border-color: #FFC000;
+  box-shadow: 0 10px 30px rgba(255, 192, 0, 0.2);
 }
 
 /* 下拉框头部 */
@@ -189,7 +189,7 @@ export default {
 }
 
 .dropdown-header:hover {
-  background: rgba(66, 185, 131, 0.05);
+  background: rgba(255, 192, 0, 0.05);
 }
 
 .dropdown-title {
@@ -200,7 +200,7 @@ export default {
 
 .dropdown-arrow {
   font-size: 1.5rem;
-  color: #42b983;
+  color: #FFC000;
   /* 收起时快速隐藏，展开时较慢显示 */
   transition: opacity 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   user-select: none;
@@ -243,6 +243,7 @@ export default {
   color: #ccc;
   line-height: 1.6;
   margin: 0;
+  text-align: left;
 }
 
 .value-icon {
@@ -251,7 +252,7 @@ export default {
 }
 
 .dropdown-title h3 {
-  color: #42b983;
+  color: #FFC000;
   font-size: 1.5rem;
   margin: 0;
   font-weight: 600;

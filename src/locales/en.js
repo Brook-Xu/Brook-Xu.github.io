@@ -30,7 +30,7 @@ export default {
   navigation: {
     home: 'Home',
     aboutUs: 'About us',
-    coreValues: 'Our core values',
+    coreValues: 'Core values',
     products: 'Our products',
     riskManagement: 'Risk Management',
     partners: 'Partners',
@@ -41,7 +41,7 @@ export default {
 
   // 首页
   home: {
-    title: 'Unleash growth with diverse strategies',
+    title: 'Unleash your growth with diverse strategies',
     subtitle: '',
     learnMore: 'Learn More',
     viewCharts: 'View Charts',
