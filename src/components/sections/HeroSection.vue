@@ -130,6 +130,7 @@ export default {
   margin-left: calc(50% - 50vw);
   margin-right: calc(50% - 50vw);
   height: 100%;
+  min-height: 100vh; /* 确保覆盖完整视口高度 */
   overflow: hidden;
 }
 
@@ -253,7 +254,12 @@ export default {
     width: 100vw;
     margin-left: calc(50% - 50vw);
     margin-right: calc(50% - 50vw);
-    height: 100%;
+    height: 100vh; /* 移动端使用完整视口高度 */
+    min-height: 100vh;
+  }
+  
+  .video-background {
+    height: 100vh; /* 确保视频背景也覆盖完整高度 */
   }
   
   .section-content {
@@ -292,7 +298,12 @@ export default {
     width: 100vw;
     margin-left: calc(50% - 50vw);
     margin-right: calc(50% - 50vw);
-    height: 100%;
+    height: 100vh; /* 小屏幕使用完整视口高度 */
+    min-height: 100vh;
+  }
+  
+  .video-background {
+    height: 100vh; /* 确保视频背景也覆盖完整高度 */
   }
   
   .section-content {
