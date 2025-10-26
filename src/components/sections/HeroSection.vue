@@ -127,11 +127,13 @@ export default {
   position: relative;
   /* 使容器突破父级左右内边距，铺满整个视口宽度 */
   width: 100vw;
+  max-width: 100vw; /* 防止横向溢出 */
   margin-left: calc(50% - 50vw);
   margin-right: calc(50% - 50vw);
   height: 100%;
   min-height: 100vh; /* 确保覆盖完整视口高度 */
   overflow: hidden;
+  box-sizing: border-box;
 }
 
 .video-background {
@@ -252,14 +254,16 @@ export default {
 @media (max-width: 768px) {
   .hero-section {
     width: 100vw;
+    max-width: 100vw; /* 防止横向溢出 */
     margin-left: calc(50% - 50vw);
     margin-right: calc(50% - 50vw);
-    height: 100vh; /* 移动端使用完整视口高度 */
+    height: calc(100vh + 10px); /* 增加额外高度确保完全覆盖 */
     min-height: 100vh;
+    overflow-x: hidden; /* 强制隐藏横向滚动 */
   }
   
   .video-background {
-    height: 100vh; /* 确保视频背景也覆盖完整高度 */
+    height: calc(100vh + 10px); /* 确保视频背景也覆盖完整高度 */
   }
   
   .section-content {
@@ -296,14 +300,16 @@ export default {
 @media (max-width: 480px) {
   .hero-section {
     width: 100vw;
+    max-width: 100vw; /* 防止横向溢出 */
     margin-left: calc(50% - 50vw);
     margin-right: calc(50% - 50vw);
-    height: 100vh; /* 小屏幕使用完整视口高度 */
+    height: calc(100vh + 10px); /* 增加额外高度确保完全覆盖 */
     min-height: 100vh;
+    overflow-x: hidden; /* 强制隐藏横向滚动 */
   }
   
   .video-background {
-    height: 100vh; /* 确保视频背景也覆盖完整高度 */
+    height: calc(100vh + 10px); /* 确保视频背景也覆盖完整高度 */
   }
   
   .section-content {
