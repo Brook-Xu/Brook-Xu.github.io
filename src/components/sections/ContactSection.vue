@@ -251,6 +251,13 @@ export default {
 
 /* 响应式设计 */
 @media (max-width: 768px) {
+  .contact-section {
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+    height: 100%;
+  }
+  
   .gradient-title {
     font-size: 2rem;
   }
@@ -263,8 +270,68 @@ export default {
     grid-template-columns: 1fr;
     gap: 2rem;
   }
+  
+  .contact-info {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .contact-item {
+    border-right: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 12px;
+    padding-bottom: 1.25rem;
+    width: 100%;
+  }
+  
+  .contact-item:first-child,
+  .contact-item:last-child {
+    border-radius: 12px;
+  }
+  
+  /* 移动端增加遮罩层透明度，确保文字可读性 */
+  .video-overlay {
+    background: rgba(0, 0, 0, 0.5);
+  }
 }
 
 @media (max-width: 480px) {
+  .contact-section {
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+    height: 100%;
+  }
+  
+  .gradient-title {
+    font-size: 1.8rem;
+  }
+  
+  .section-content h2 {
+    font-size: 1.8rem;
+  }
+  
+  .contact-item {
+    padding: 1rem;
+    padding-bottom: 1.25rem;
+  }
+  
+  .contact-icon {
+    font-size: 1.3rem;
+    margin-right: 0.8rem;
+    width: 35px;
+  }
+  
+  .contact-details h4 {
+    font-size: 0.9rem;
+  }
+  
+  .contact-details p {
+    font-size: 0.85rem;
+  }
+  
+  /* 小屏幕进一步增加遮罩层透明度 */
+  .video-overlay {
+    background: rgba(0, 0, 0, 0.6);
+  }
 }
 </style>

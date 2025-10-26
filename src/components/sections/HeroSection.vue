@@ -256,16 +256,29 @@ export default {
     height: 100%;
   }
   
+  .section-content {
+    padding: 20px;
+  }
+  
   .section-content h2 {
     font-size: 2rem;
   }
   
   .hero-title {
-    font-size: 3.2rem;
+    font-size: 3rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .hero-title .line {
+    margin-bottom: 0.3rem;
   }
   
   .hero p {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
+  }
+  
+  .hero-subtitle {
+    font-size: 1.1rem;
   }
   
   /* 移动端增加遮罩层透明度，确保文字可读性 */
@@ -282,17 +295,34 @@ export default {
     height: 100%;
   }
   
+  .section-content {
+    padding: 15px;
+  }
+  
   .hero-title {
-    font-size: 2.5rem;
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+  
+  .hero-title .line {
+    margin-bottom: 0.25rem;
+  }
+  
+  .hero-title .word {
+    margin-right: 0.2em; /* 减小单词间距 */
   }
   
   .hero p {
-    font-size: 1rem;
+    font-size: 0.95rem;
+  }
+  
+  .hero-subtitle {
+    font-size: 0.95rem;
   }
   
   /* 小屏幕进一步增加遮罩层透明度 */
   .video-overlay {
-    background: rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, 0.75);
   }
 }
 

@@ -80,9 +80,17 @@ export default {
           easingcss3: 'ease',
           easing: 'easeInOutCubic',
           
-          // 响应式配置
-          responsiveWidth: 768,
-          responsiveHeight: 600,
+          // 响应式配置 - 在所有屏幕尺寸都启用自动滚动
+          // 注意：responsiveWidth 设置为 0 会完全禁用响应式模式
+          // 这样所有设备（包括移动端）都会使用全屏滚动
+          responsiveWidth: 0, // 完全启用fullpage在所有设备上
+          responsiveHeight: 0, // 完全启用fullpage在所有设备上
+          
+          // 移动端支持触摸滑动
+          touchSensitivity: 5, // 触摸灵敏度（默认值）
+          continuousVertical: false, // 不连续滚动
+          loopBottom: false, // 不循环到底部
+          loopTop: false, // 不循环到顶部
           
           // 回调函数
           onLeave: (origin, destination, direction) => {
@@ -161,13 +169,14 @@ export default {
 .section {
   position: relative;
   width: 100%;
-  height: calc(100vh - 100px); /* 减去增加的顶部边距 */
+  /* section应该占据完整的视口高度，因为fullpage已经有padding-top处理导航栏 */
+  height: 100vh; 
   display: flex;
   align-items: flex-start; /* 改为从顶部开始对齐 */
   justify-content: center; /* 保持水平居中 */
   background: linear-gradient(135deg, #0d1b2a 0%, #1b263b 100%);
   overflow: hidden; /* 防止内部滚动 */
-  padding-top: 40px; /* 直接添加顶部内边距 */
+  padding-top: 0; /* 移除顶部内边距，因为fullpage已经有padding-top */
   padding-left: 20px; /* 添加左右内边距确保水平居中 */
   padding-right: 20px;
 }
@@ -177,8 +186,8 @@ export default {
   width: 100%;
   padding: 20px; /* 增加内边距 */
   text-align: center;
-  height: auto; /* 改为自动高度 */
-  max-height: calc(100vh - 180px); /* 限制最大高度，为顶部边距留出空间 */
+  height: 100%; /* 占满父容器高度 */
+  max-height: 100%; /* 限制最大高度 */
   overflow-x: hidden; /* 防止横向滚动 */
   overflow-y: hidden; /* 完全禁止内部滚动，强制内容适配 */
   display: flex;
@@ -196,19 +205,30 @@ export default {
 /* 响应式设计 */
 @media (max-width: 768px) {
   #fullpage {
-    padding-top: 80px; /* 移动端减少顶部边距 */
+    padding-top: 80px; /* 移动端减少顶部边距，为导航栏留出空间 */
   }
   
   .section {
-    height: calc(100vh - 80px);
-    padding-top: 30px; /* 移动端减少section顶部内边距 */
-    padding-left: 15px; /* 移动端调整左右内边距 */
+    /* section应该占据完整的视口高度 */
+    height: 100vh !important; /* 完整视口高度 */
+    padding-top: 0; /* 移除顶部内边距 */
+    padding-left: 15px;
     padding-right: 15px;
+    padding-bottom: 0; /* 移除底部内边距 */
   }
   
   .section-content {
     padding: 15px;
-    max-height: calc(100vh - 140px); /* 调整最大高度 */
+    padding-top: 20px; /* 添加顶部内边距避免导航栏遮挡 */
+    overflow: hidden;
+    height: 100%;
+    max-height: 100%;
+  }
+  
+  /* 特殊处理首页 */
+  .section[data-anchor="home"] {
+    height: 100vh !important; /* 完整视口高度 */
+    padding-top: 0;
   }
 }
 
@@ -218,15 +238,76 @@ export default {
   }
   
   .section {
-    height: calc(100vh - 70px);
-    padding-top: 20px; /* 小屏幕进一步减少section顶部内边距 */
-    padding-left: 10px; /* 小屏幕调整左右内边距 */
+    /* section应该占据完整的视口高度 */
+    height: 100vh !important; /* 完整视口高度 */
+    padding-top: 0;
+    padding-left: 10px;
     padding-right: 10px;
+    padding-bottom: 0;
   }
   
   .section-content {
     padding: 10px;
-    max-height: calc(100vh - 110px); /* 调整最大高度 */
+    padding-top: 15px; /* 添加顶部内边距避免导航栏遮挡 */
+    overflow: hidden;
+    height: 100%;
+    max-height: 100%;
+  }
+  
+  /* 特殊处理首页 */
+  .section[data-anchor="home"] {
+    height: 100vh !important; /* 完整视口高度 */
+    padding-top: 0;
+  }
+}
+
+/* 超小屏幕优化 */
+@media (max-width: 360px) {
+  #fullpage {
+    padding-top: 65px; /* 超小屏幕进一步减少顶部边距 */
+  }
+  
+  .section {
+    height: 100vh !important; /* 完整视口高度 */
+    padding-top: 0;
+    padding-left: 8px;
+    padding-right: 8px;
+    padding-bottom: 0;
+  }
+  
+  .section-content {
+    padding: 8px;
+    padding-top: 12px; /* 添加顶部内边距避免导航栏遮挡 */
+  }
+  
+  .section[data-anchor="home"] {
+    height: 100vh !important;
+    padding-top: 0;
+  }
+}
+
+/* 极超小屏幕优化 */
+@media (max-width: 320px) {
+  #fullpage {
+    padding-top: 60px; /* 极超小屏幕进一步减少顶部边距 */
+  }
+  
+  .section {
+    height: 100vh !important; /* 完整视口高度 */
+    padding-top: 0;
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-bottom: 0;
+  }
+  
+  .section-content {
+    padding: 5px;
+    padding-top: 10px; /* 添加顶部内边距避免导航栏遮挡 */
+  }
+  
+  .section[data-anchor="home"] {
+    height: 100vh !important;
+    padding-top: 0;
   }
 }
 </style>

@@ -315,6 +315,13 @@ export default {
 
 /* 响应式设计 */
 @media (max-width: 768px) {
+  .partners-section {
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+    height: 100%;
+  }
+  
   .gradient-title {
     font-size: 2rem;
   }
@@ -323,36 +330,71 @@ export default {
     font-size: 2rem;
   }
   
-  .logo-ticker .track {
-    gap: 3.3rem;
+  .logo-ticker {
+    --height: 160px;
+    margin-top: 1.5rem;
   }
   
-  .logo-ticker .partner-item {
-    padding: 0.8rem;
-    width: 150px;
-    height: 80px;
-  }
-  
-  .logo-ticker .partner-logo {
-    width: 120px;
-    height: 60px;
-  }
-}
-
-@media (max-width: 480px) {
   .logo-ticker .track {
     gap: 2.5rem;
   }
   
   .logo-ticker .partner-item {
-    padding: 0.6rem;
+    padding: 0.8rem;
+    width: 140px;
+    height: 100px;
+  }
+  
+  .logo-ticker .partner-logo {
     width: 120px;
     height: 70px;
   }
   
-  .logo-ticker .partner-logo {
+  /* 移动端增加遮罩层透明度，确保文字可读性 */
+  .video-overlay {
+    background: rgba(0, 0, 0, 0.5);
+  }
+}
+
+@media (max-width: 480px) {
+  .partners-section {
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+    height: 100%;
+  }
+  
+  .gradient-title {
+    font-size: 1.8rem;
+  }
+  
+  .section-content h2 {
+    font-size: 1.8rem;
+  }
+  
+  .logo-ticker {
+    --height: 140px;
+    margin-top: 1rem;
+  }
+  
+  .logo-ticker .track {
+    gap: 2rem;
+  }
+  
+  .logo-ticker .partner-item {
+    padding: 0.6rem;
     width: 100px;
-    height: 50px;
+    height: 80px;
+  }
+  
+  .logo-ticker .partner-logo {
+    width: 90px;
+    height: 60px;
+  }
+  
+  /* 小屏幕进一步增加遮罩层透明度 */
+  .video-overlay {
+    background: rgba(0, 0, 0, 0.6);
   }
 }
 </style>

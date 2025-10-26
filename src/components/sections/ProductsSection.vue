@@ -315,36 +315,82 @@ export default {
 }
 
 @media (max-width: 768px) {
+  .section-content {
+    padding: 20px 15px;
+  }
+  
   .gradient-title {
     font-size: 2rem;
+    margin-bottom: 1.5rem;
   }
   
   .section-content h2 {
     font-size: 2rem;
+    margin-bottom: 1.5rem;
   }
   
   .products-grid {
     grid-template-columns: 1fr;
     gap: 1.5rem;
+    margin-top: 1rem;
   }
   
   .product-item {
     padding: 1.5rem;
   }
+  
+  .product-item h3 {
+    font-size: 1.3rem;
+  }
+  
+  .product-icon {
+    font-size: 3.5rem;
+  }
 }
 
 @media (max-width: 480px) {
+  .section-content {
+    padding: 15px 10px;
+  }
+  
+  .gradient-title {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+  }
+  
+  .section-content h2 {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+  }
+  
   .product-item {
-    padding: 1rem;
+    padding: 1.2rem;
+  }
+  
+  .product-item h3 {
+    font-size: 1.2rem;
+  }
+  
+  .product-icon {
+    font-size: 3rem;
   }
   
   .more-button {
     font-size: 0.8rem;
-    padding: 0.2rem 0.5rem;
+    padding: 0.3rem 0.6rem;
   }
   
   .more-container {
-    margin-top: 1rem;
+    bottom: 1rem;
+    right: 1rem;
+  }
+  
+  .product-features {
+    margin: 1rem 0 3rem 0;
+  }
+  
+  .product-features li {
+    font-size: 0.9rem;
   }
 }
 </style>

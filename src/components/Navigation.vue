@@ -494,4 +494,75 @@ nav {
     font-size: 18px;
   }
 }
+
+/* 移动端优化 */
+@media (max-width: 768px) {
+  nav {
+    padding: 0.5rem 0.75rem;
+    min-height: 60px; /* 增加移动端导航栏高度 */
+  }
+  
+  .nav-actions {
+    gap: 0.4rem;
+  }
+  
+  .action-btn {
+    padding: 0.35rem 0.6rem;
+    font-size: 12px;
+    min-width: 60px;
+    gap: 0.2rem;
+  }
+  
+  .logo-image {
+    height: 32px;
+  }
+  
+  .logo-text {
+    font-size: 16px;
+  }
+  
+  .language-dropdown-menu {
+    width: 100px;
+  }
+}
+
+/* 小屏幕优化 */
+@media (max-width: 480px) {
+  nav {
+    padding: 0.4rem 0.5rem;
+    min-height: 55px;
+  }
+  
+  .nav-actions {
+    gap: 0.3rem;
+  }
+  
+  /* 调整按钮大小，保留部分文字 */
+  .action-btn {
+    font-size: 0.7rem;
+    min-width: 45px;
+    width: auto;
+    padding: 0.35rem 0.4rem;
+    justify-content: center;
+  }
+  
+  /* 只对语言按钮隐藏文字 */
+  .language-btn {
+    font-size: 0;
+    width: 40px;
+    padding: 0.3rem;
+  }
+  
+  .logo-image {
+    height: 28px;
+  }
+  
+  .logo-text {
+    font-size: 14px;
+  }
+  
+  .language-dropdown-menu {
+    width: 90px;
+  }
+}
 </style>

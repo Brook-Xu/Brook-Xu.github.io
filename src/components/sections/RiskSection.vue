@@ -267,27 +267,70 @@ export default {
 }
 
 @media (max-width: 768px) {
+  .section-content {
+    padding: 20px 15px;
+  }
+  
   .gradient-title {
     font-size: 2rem;
+    margin-bottom: 1.5rem;
   }
   
   .section-content h2 {
     font-size: 2rem;
+    margin-bottom: 1.5rem;
   }
   
   .risk-grid {
     grid-template-columns: 1fr;
     gap: 1.5rem;
+    margin-top: 0.5rem;
   }
   
   .risk-item {
     padding: 1.5rem;
   }
+  
+  .risk-item h3 {
+    font-size: 1.1rem;
+    white-space: normal;
+  }
+  
+  .risk-bullets {
+    font-size: 1rem;
+  }
 }
 
 @media (max-width: 480px) {
+  .section-content {
+    padding: 15px 10px;
+  }
+  
+  .gradient-title {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+  }
+  
+  .section-content h2 {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+  }
+  
+  .risk-grid {
+    gap: 1.2rem;
+  }
+  
   .risk-item {
-    padding: 1rem;
+    padding: 1.2rem;
+  }
+  
+  .risk-item h3 {
+    font-size: 1rem;
+  }
+  
+  .risk-bullets {
+    font-size: 0.9rem;
+    line-height: 1.4;
   }
 }
 </style>

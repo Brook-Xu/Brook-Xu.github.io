@@ -92,16 +92,13 @@ export default {
 <style scoped>
 /* 视频背景容器 */
 .about-section {
-  position: relative;
-  /* 使容器突破父级左右内边距，铺满整个视口宽度 */
-  width: 100vw;
-  margin-left: calc(50% - 50vw);
-  margin-right: calc(50% - 50vw);
+  position: absolute; /* 相对于section定位 */
+  top: 0;
+  left: -20px; /* 抵消父容器padding-left: 20px */
+  right: -20px; /* 抵消父容器padding-right: 20px */
+  width: calc(100% + 40px); /* 突破左右padding */
   height: 100%;
   overflow: hidden;
-  /* 确保突破父容器的内边距限制 */
-  margin-top: -40px; /* 抵消父容器的padding-top */
-  margin-bottom: 0;
 }
 
 .video-background {
@@ -113,15 +110,15 @@ export default {
   z-index: 0;
   pointer-events: none;
   display: flex;
+  flex-direction: row; /* 默认横屏左右布局 */
   overflow: hidden;
-  align-items: center;
-  justify-content: center;
 }
 
+/* 横屏PC端和宽屏：左右布局 */
 .video-container {
   position: relative;
-  width: 50vw;
-  height: 50vw;
+  width: 50%; /* 各占50%宽度 */
+  height: 100%; /* 完整高度 */
   flex-shrink: 0;
   overflow: hidden;
 }
@@ -129,7 +126,9 @@ export default {
 .background-video {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  min-width: 100%; /* 确保最小宽度 */
+  min-height: 100%; /* 确保最小高度 */
+  object-fit: cover; /* 确保视频覆盖整个容器 */
   object-position: center;
 }
 
@@ -218,117 +217,123 @@ export default {
 
 /* 响应式设计 */
 @media (max-width: 768px) {
+  /* 移动端section padding为15px */
   .about-section {
-    width: 100vw;
-    margin-left: calc(50% - 50vw);
-    margin-right: calc(50% - 50vw);
-    height: 100%;
+    left: -15px; /* 抵消父容器padding-left: 15px */
+    right: -15px; /* 抵消父容器padding-right: 15px */
+    width: calc(100% + 30px); /* 突破左右padding */
+  }
+  
+  /* 移动端竖屏：上下布局 */
+  .video-background {
+    flex-direction: column; /* 改为上下布局 */
+  }
+  
+  .video-container {
+    width: 100%; /* 各占100%宽度 */
+    height: 50%; /* 各占50%高度 */
+  }
+  
+  .section-content {
+    padding: 30px 20px;
   }
   
   .gradient-title {
     font-size: 2rem;
+    margin-bottom: 1.5rem;
   }
   
   .section-content h2 {
     font-size: 2rem;
+    margin-bottom: 1.5rem;
   }
   
   .about-text p {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     max-width: 100%;
-    padding: 0 1rem;
+    padding: 0 0.5rem;
+    line-height: 1.6;
   }
   
   .about-description {
-    font-size: 1.3rem;
+    font-size: 1.2rem;
+    margin-bottom: 1.5rem;
   }
   
   .about-details {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
+    line-height: 1.6;
   }
   
   /* 移动端增加遮罩层透明度，确保文字可读性 */
-  .video-overlay {
-    background: rgba(0, 0, 0, 0.3);
-  }
-}
-
-@media (max-width: 480px) {
-  .about-section {
-    width: 100vw;
-    margin-left: calc(50% - 50vw);
-    margin-right: calc(50% - 50vw);
-    height: 100%;
-  }
-  
-  .gradient-title {
-    font-size: 1.8rem;
-  }
-  
-  .about-text p {
-    font-size: 1.1rem;
-    padding: 0 0.5rem;
-  }
-  
-  .about-description {
-    font-size: 1.2rem;
-  }
-  
-  .about-details {
-    font-size: 1.1rem;
-  }
-  
-  /* 小屏幕进一步增加遮罩层透明度 */
   .video-overlay {
     background: rgba(0, 0, 0, 0.4);
   }
 }
 
-/* 确保视频在移动设备上正确显示 */
-@media (max-width: 1024px) {
+@media (max-width: 480px) {
+  /* 小屏幕section padding为10px */
+  .about-section {
+    left: -10px; /* 抵消父容器padding-left: 10px */
+    right: -10px; /* 抵消父容器padding-right: 10px */
+    width: calc(100% + 20px); /* 突破左右padding */
+  }
+  
+  /* 小屏幕竖屏：上下布局 */
   .video-background {
-    display: flex;
-    overflow: hidden;
-    align-items: center;
-    justify-content: center;
+    flex-direction: column; /* 保持上下布局 */
   }
   
   .video-container {
-    width: 50vw;
-    height: 50vw;
-    flex-shrink: 0;
-    overflow: hidden;
+    width: 100%; /* 各占100%宽度 */
+    height: 50%; /* 各占50%高度 */
   }
   
-  .background-video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+  .section-content {
+    padding: 20px 15px;
   }
   
-  .video-left {
-    object-position: right center;
-    transform: rotate(90deg);
-    transform-origin: center center;
+  .gradient-title {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
   }
   
-  .video-right {
-    object-position: left center;
-    transform: rotate(270deg);
-    transform-origin: center center;
+  .section-content h2 {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+  }
+  
+  .about-text p {
+    font-size: 1rem;
+    padding: 0;
+    line-height: 1.5;
+  }
+  
+  .about-description {
+    font-size: 1.1rem;
+    margin-bottom: 1.2rem;
+  }
+  
+  .about-details {
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+  
+  /* 小屏幕进一步增加遮罩层透明度 */
+  .video-overlay {
+    background: rgba(0, 0, 0, 0.5);
   }
 }
 
-/* 强制突破父容器限制，确保视频背景完全铺满 */
-.about-section {
-  position: absolute !important;
-  top: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  z-index: 1;
+/* 横屏（landscape）时保持左右布局 */
+@media screen and (max-height: 500px) {
+  .video-background {
+    flex-direction: row !important; /* 横屏时强制左右布局 */
+  }
+  
+  .video-container {
+    width: 50% !important; /* 各占50%宽度 */
+    height: 100% !important; /* 完整高度 */
+  }
 }
 </style>

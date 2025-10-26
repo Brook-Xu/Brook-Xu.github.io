@@ -423,37 +423,47 @@ export default {
 
 /* 响应式设计 */
 @media (max-width: 768px) {
+  .section-content {
+    padding: 20px 15px;
+    min-height: auto; /* 移动端移除固定最小高度 */
+  }
+  
   .gradient-title {
     font-size: 2rem;
+    margin-bottom: 1.5rem;
   }
   
   .section-content h2 {
     font-size: 2rem;
+    margin-bottom: 1.5rem;
   }
   
   .values-container {
     flex-direction: column;
     gap: 1.5rem;
-    padding: 0 1rem; /* 移动端减少内边距 */
+    padding: 0 0.5rem; /* 移动端减少内边距 */
+    min-height: auto;
   }
   
   .values-left {
-    padding-right: 0;
-    padding-bottom: 0; /* 移除padding-bottom，保持居中对齐 */
-    justify-content: center; /* 移动端也保持居中对齐 */
-    min-height: 400px; /* 移动端调整最小高度 */
-    flex: 1; /* 移动端恢复等宽 */
+    padding: 0.8rem;
+    min-height: 350px; /* 移动端调整最小高度 */
+    justify-content: center;
+    flex: 1;
+  }
+  
+  .values-left :deep(.chart-wrapper) {
+    min-height: 300px;
   }
   
   .values-right {
-    padding-left: 0;
-    padding-top: 0; /* 移除padding-top，保持居中对齐 */
-    justify-content: center; /* 移动端也保持居中对齐 */
-    flex: 1; /* 移动端恢复等宽 */
+    padding: 0;
+    justify-content: center;
+    flex: 1;
   }
   
   .dropdown-container {
-    margin: 0; /* 移动端也移除margin-top */
+    margin: 0;
   }
   
   .dropdown-header {
@@ -462,20 +472,7 @@ export default {
   
   .dropdown-content.expanded {
     padding: 0 1rem 1rem 1rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .dropdown-header {
-    padding: 0.8rem;
-  }
-  
-  .dropdown-content.expanded {
-    padding: 0 0.8rem 0.8rem 0.8rem;
-  }
-  
-  .values-left {
-    min-height: 300px; /* 小屏幕调整最小高度 */
+    max-height: 300px; /* 移动端减小最大高度 */
   }
   
   .dropdown-title h3 {
@@ -483,7 +480,58 @@ export default {
   }
   
   .value-icon {
+    font-size: 1.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .section-content {
+    padding: 15px 10px;
+  }
+  
+  .gradient-title {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+  }
+  
+  .section-content h2 {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+  }
+  
+  .values-container {
+    gap: 1.2rem;
+    padding: 0;
+  }
+  
+  .values-left {
+    padding: 0.6rem;
+    min-height: 300px; /* 小屏幕调整最小高度 */
+  }
+  
+  .values-left :deep(.chart-wrapper) {
+    min-height: 250px;
+  }
+  
+  .dropdown-header {
+    padding: 0.8rem;
+  }
+  
+  .dropdown-content.expanded {
+    padding: 0 0.8rem 0.8rem 0.8rem;
+    max-height: 250px; /* 小屏幕进一步减小最大高度 */
+  }
+  
+  .dropdown-title h3 {
+    font-size: 1.1rem;
+  }
+  
+  .value-icon {
     font-size: 1.5rem;
+  }
+  
+  .dropdown-arrow {
+    font-size: 1.2rem;
   }
 }
 </style>
