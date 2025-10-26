@@ -296,7 +296,7 @@ export default {
 .values-left :deep(.chart-wrapper) {
   width: 100%;
   height: 100%;
-  min-height: 400px;
+  min-height: 0;
 }
 
 .values-right {
@@ -424,46 +424,56 @@ export default {
 /* 响应式设计 */
 @media (max-width: 768px) {
   .section-content {
-    padding: 20px 15px;
-    min-height: auto; /* 移动端移除固定最小高度 */
+    padding: 15px 20px;
+    min-height: auto;
   }
   
   .gradient-title {
-    font-size: 2rem;
-    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
   }
   
   .section-content h2 {
-    font-size: 2rem;
-    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
   }
   
   .values-container {
     flex-direction: column;
-    gap: 1.5rem;
-    padding: 0 0.5rem; /* 移动端减少内边距 */
+    gap: 1rem;
+    padding: 0;
     min-height: auto;
   }
   
   .values-left {
-    padding: 0.8rem;
-    min-height: 350px; /* 移动端调整最小高度 */
+    padding: 0;
+    border: 1px solid rgba(255, 192, 0, 0.3);
+    min-height: 0;
     justify-content: center;
-    flex: 1;
+    flex: 0 0 auto;
   }
   
   .values-left :deep(.chart-wrapper) {
-    min-height: 300px;
+    min-height: 0;
+  }
+  
+  .values-left :deep(.chart-wrapper) canvas {
+    height: 220px !important;
   }
   
   .values-right {
     padding: 0;
     justify-content: center;
-    flex: 1;
+    flex: 0 0 auto;
   }
   
   .dropdown-container {
     margin: 0;
+    gap: 0.6rem;
+  }
+  
+  .dropdown-item {
+    margin-bottom: 0.6rem;
   }
   
   .dropdown-header {
@@ -472,45 +482,71 @@ export default {
   
   .dropdown-content.expanded {
     padding: 0 1rem 1rem 1rem;
-    max-height: 300px; /* 移动端减小最大高度 */
+    max-height: 180px;
+  }
+  
+  .dropdown-content p {
+    font-size: 0.9rem;
+    line-height: 1.5;
   }
   
   .dropdown-title h3 {
-    font-size: 1.3rem;
+    font-size: 1.2rem;
   }
   
   .value-icon {
-    font-size: 1.8rem;
+    font-size: 1.5rem;
+  }
+  
+  .dropdown-arrow {
+    font-size: 1.3rem;
   }
 }
 
 @media (max-width: 480px) {
   .section-content {
-    padding: 15px 10px;
+    padding: 10px 15px;
   }
   
   .gradient-title {
-    font-size: 1.8rem;
-    margin-bottom: 1rem;
+    font-size: 1.3rem;
+    margin-bottom: 0.3rem;
   }
   
   .section-content h2 {
-    font-size: 1.8rem;
-    margin-bottom: 1rem;
+    font-size: 1.3rem;
+    margin-bottom: 0.3rem;
   }
   
   .values-container {
-    gap: 1.2rem;
+    gap: 0.8rem;
     padding: 0;
   }
   
   .values-left {
-    padding: 0.6rem;
-    min-height: 300px; /* 小屏幕调整最小高度 */
+    padding: 0;
+    border: 1px solid rgba(255, 192, 0, 0.3);
+    min-height: 0;
   }
   
   .values-left :deep(.chart-wrapper) {
-    min-height: 250px;
+    min-height: 0;
+  }
+  
+  .values-left :deep(.chart-wrapper) canvas {
+    height: 180px !important;
+  }
+  
+  .values-right {
+    padding: 0;
+  }
+  
+  .dropdown-container {
+    gap: 0.5rem;
+  }
+  
+  .dropdown-item {
+    margin-bottom: 0.5rem;
   }
   
   .dropdown-header {
@@ -519,7 +555,12 @@ export default {
   
   .dropdown-content.expanded {
     padding: 0 0.8rem 0.8rem 0.8rem;
-    max-height: 250px; /* 小屏幕进一步减小最大高度 */
+    max-height: 150px;
+  }
+  
+  .dropdown-content p {
+    font-size: 0.85rem;
+    line-height: 1.4;
   }
   
   .dropdown-title h3 {
@@ -527,11 +568,73 @@ export default {
   }
   
   .value-icon {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
   }
   
   .dropdown-arrow {
-    font-size: 1.2rem;
+    font-size: 1.15rem;
+  }
+}
+
+/* 竖屏优化 - 进一步减少空间 */
+@media (max-width: 768px) and (orientation: portrait) {
+  .section-content {
+    padding: 10px 15px;
+    overflow-y: auto;
+    max-height: calc(100vh - 100px);
+  }
+  
+  .values-container {
+    gap: 0.9rem;
+  }
+  
+  .values-left {
+    padding: 0;
+    border: 1px solid rgba(255, 192, 0, 0.3);
+    min-height: 0;
+    height: 220px;
+  }
+  
+  .values-left :deep(.fund-chart-container) {
+    height: 220px !important;
+  }
+  
+  .values-left :deep(.chart-wrapper) {
+    min-height: 0;
+  }
+  
+  .values-left :deep(.chart-wrapper) canvas {
+    height: 200px !important;
+  }
+  
+  .dropdown-container {
+    gap: 0.5rem;
+  }
+  
+  .dropdown-item {
+    margin-bottom: 0.5rem;
+  }
+  
+  .dropdown-header {
+    padding: 0.9rem;
+  }
+  
+  .dropdown-content.expanded {
+    max-height: 160px;
+    padding: 0 0.9rem 0.9rem 0.9rem;
+  }
+  
+  .dropdown-content p {
+    font-size: 0.88rem;
+    line-height: 1.4;
+  }
+  
+  .dropdown-title h3 {
+    font-size: 1.15rem;
+  }
+  
+  .value-icon {
+    font-size: 1.4rem;
   }
 }
 </style>

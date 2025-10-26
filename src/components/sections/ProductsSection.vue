@@ -4,7 +4,9 @@
     <div class="products-content">
       <div class="products-grid">
         <div class="product-item" :class="{ 'fade-in-item': isVisible }" :style="{ animationDelay: isVisible ? '0.2s' : '0s' }">
-          <div class="product-icon">🔄</div>
+          <div class="product-icon">
+            <img :src="strategiesImg" alt="strategies" />
+          </div>
           <h3>{{ $t('home.product1.title') }}</h3>
           <ul class="product-features">
             <li>{{ $t('home.product1.feature1') }}</li>
@@ -18,7 +20,9 @@
           </div>
         </div>
         <div class="product-item" :class="{ 'fade-in-item': isVisible }" :style="{ animationDelay: isVisible ? '0.4s' : '0s' }">
-          <div class="product-icon">📈</div>
+          <div class="product-icon">
+            <img :src="cryptoImg" alt="crypto" />
+          </div>
           <h3>{{ $t('home.product2.title') }}</h3>
           <ul class="product-features">
             <li>{{ $t('home.product2.feature1') }}</li>
@@ -27,7 +31,9 @@
           </ul>
         </div>
         <div class="product-item" :class="{ 'fade-in-item': isVisible }" :style="{ animationDelay: isVisible ? '0.6s' : '0s' }">
-          <div class="product-icon">📊</div>
+          <div class="product-icon">
+            <img :src="dataImg" alt="data" />
+          </div>
           <h3>{{ $t('home.product3.title') }}</h3>
           <ul class="product-features">
             <li>{{ $t('home.product3.feature1') }}</li>
@@ -46,12 +52,19 @@
 </template>
 
 <script>
+import strategiesImg from '../../assets/strategies.jpg';
+import cryptoImg from '../../assets/crypto.jpg';
+import dataImg from '../../assets/data.jpg';
+
 export default {
   name: 'ProductsSection',
   data() {
     return {
       isVisible: false,
-      observer: null
+      observer: null,
+      strategiesImg,
+      cryptoImg,
+      dataImg
     };
   },
   mounted() {
@@ -212,8 +225,22 @@ export default {
 }
 
 .product-icon {
-  font-size: 4rem;
   margin-bottom: 1rem;
+  width: 100%;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.product-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
 }
 
 .product-item h3 {
@@ -316,81 +343,110 @@ export default {
 
 @media (max-width: 768px) {
   .section-content {
-    padding: 20px 15px;
+    padding: 15px 8px;
   }
   
   .gradient-title {
-    font-size: 2rem;
-    margin-bottom: 1.5rem;
+    font-size: 1.6rem;
+    margin-bottom: 0.75rem;
   }
   
   .section-content h2 {
-    font-size: 2rem;
-    margin-bottom: 1.5rem;
+    font-size: 1.6rem;
+    margin-bottom: 0.75rem;
   }
   
   .products-grid {
     grid-template-columns: 1fr;
-    gap: 1.5rem;
-    margin-top: 1rem;
+    gap: 0.8rem;
+    margin-top: 0.3rem;
   }
   
   .product-item {
-    padding: 1.5rem;
+    padding: 1rem 0.9rem;
   }
   
   .product-item h3 {
-    font-size: 1.3rem;
+    font-size: 1.15rem;
+    margin-bottom: 0.75rem;
   }
   
   .product-icon {
-    font-size: 3.5rem;
+    display: none;
+  }
+  
+  .product-features {
+    margin: 0.5rem 0 1rem 0;
+  }
+  
+  .product-features li {
+    padding: 0.5rem 0;
+    font-size: 0.95rem;
+    line-height: 1.4;
+  }
+  
+  .more-container {
+    bottom: 0.7rem;
+    right: 0.7rem;
+  }
+  
+  .more-button {
+    font-size: 0.8rem;
+    padding: 0.25rem 0.5rem;
   }
 }
 
 @media (max-width: 480px) {
   .section-content {
-    padding: 15px 10px;
+    padding: 12px 6px;
   }
   
   .gradient-title {
-    font-size: 1.8rem;
-    margin-bottom: 1rem;
+    font-size: 1.3rem;
+    margin-bottom: 0.5rem;
   }
   
   .section-content h2 {
-    font-size: 1.8rem;
-    margin-bottom: 1rem;
+    font-size: 1.3rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .products-grid {
+    gap: 0.6rem;
+    margin-top: 0.2rem;
   }
   
   .product-item {
-    padding: 1.2rem;
+    padding: 0.8rem;
   }
   
   .product-item h3 {
-    font-size: 1.2rem;
+    font-size: 1rem;
+    margin-bottom: 0.6rem;
   }
   
   .product-icon {
-    font-size: 3rem;
-  }
-  
-  .more-button {
-    font-size: 0.8rem;
-    padding: 0.3rem 0.6rem;
-  }
-  
-  .more-container {
-    bottom: 1rem;
-    right: 1rem;
+    display: none;
   }
   
   .product-features {
-    margin: 1rem 0 3rem 0;
+    margin: 0.4rem 0 0.8rem 0;
   }
   
   .product-features li {
+    padding: 0.4rem 0;
     font-size: 0.9rem;
+    line-height: 1.35;
+  }
+  
+  .more-button {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.4rem;
+  }
+  
+  .more-container {
+    bottom: 0.5rem;
+    right: 0.5rem;
   }
 }
 </style>

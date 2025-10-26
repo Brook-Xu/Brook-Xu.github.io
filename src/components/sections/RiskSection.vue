@@ -4,6 +4,9 @@
     <div class="risk-content">
       <div class="risk-grid">
         <div class="risk-item" :class="{ 'fade-in-item': isVisible }" :style="{ animationDelay: isVisible ? '0.2s' : '0s' }">
+          <div class="risk-icon">
+            <img :src="risk1Img" alt="risk1" />
+          </div>
           <h3>{{ $t('home.risk1.title') }}</h3>
           <ul class="risk-bullets">
             <li>{{ $t('home.risk1.point1') }}</li>
@@ -11,6 +14,9 @@
           </ul>
         </div>
         <div class="risk-item" :class="{ 'fade-in-item': isVisible }" :style="{ animationDelay: isVisible ? '0.4s' : '0s' }">
+          <div class="risk-icon">
+            <img :src="risk2Img" alt="risk2" />
+          </div>
           <h3>{{ $t('home.risk2.title') }}</h3>
           <ul class="risk-bullets">
             <li>{{ $t('home.risk2.point1') }}</li>
@@ -19,6 +25,9 @@
           </ul>
         </div>
         <div class="risk-item" :class="{ 'fade-in-item': isVisible }" :style="{ animationDelay: isVisible ? '0.6s' : '0s' }">
+          <div class="risk-icon">
+            <img :src="risk3Img" alt="risk3" />
+          </div>
           <h3>{{ $t('home.risk3.title') }}</h3>
           <ul class="risk-bullets">
             <li>{{ $t('home.risk3.point1') }}</li>
@@ -32,12 +41,19 @@
 </template>
 
 <script>
+import risk1Img from '../../assets/risk1.jpg';
+import risk2Img from '../../assets/risk2.jpg';
+import risk3Img from '../../assets/risk3.jpg';
+
 export default {
   name: 'RiskSection',
   data() {
     return {
       isVisible: false,
-      observer: null
+      observer: null,
+      risk1Img,
+      risk2Img,
+      risk3Img
     };
   },
   mounted() {
@@ -192,6 +208,25 @@ export default {
   box-shadow: 0 10px 30px rgba(255, 192, 0, 0.2);
 }
 
+.risk-icon {
+  margin-bottom: 1rem;
+  width: 100%;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.risk-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
 .risk-item h3 {
   color: #FFC000;
   font-size: 1.2rem;
@@ -268,32 +303,39 @@ export default {
 
 @media (max-width: 768px) {
   .section-content {
-    padding: 20px 15px;
+    padding: 20px 15px 10px;
   }
   
   .gradient-title {
     font-size: 2rem;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.2rem;
+    margin-top: 1rem;
   }
   
   .section-content h2 {
     font-size: 2rem;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.2rem;
+    margin-top: 1rem;
   }
   
   .risk-grid {
     grid-template-columns: 1fr;
-    gap: 1.5rem;
-    margin-top: 0.5rem;
+    gap: 1.2rem;
+    margin-top: 0.3rem;
   }
   
   .risk-item {
-    padding: 1.5rem;
+    padding: 1.2rem;
+  }
+  
+  .risk-icon {
+    display: none;
   }
   
   .risk-item h3 {
     font-size: 1.1rem;
     white-space: normal;
+    margin-bottom: 0.8rem;
   }
   
   .risk-bullets {
@@ -303,29 +345,36 @@ export default {
 
 @media (max-width: 480px) {
   .section-content {
-    padding: 15px 10px;
+    padding: 15px 10px 8px;
   }
   
   .gradient-title {
     font-size: 1.8rem;
-    margin-bottom: 1rem;
+    margin-bottom: 0.8rem;
+    margin-top: 0.8rem;
   }
   
   .section-content h2 {
     font-size: 1.8rem;
-    margin-bottom: 1rem;
+    margin-bottom: 0.8rem;
+    margin-top: 0.8rem;
   }
   
   .risk-grid {
-    gap: 1.2rem;
+    gap: 1rem;
   }
   
   .risk-item {
-    padding: 1.2rem;
+    padding: 1rem;
+  }
+  
+  .risk-icon {
+    display: none;
   }
   
   .risk-item h3 {
     font-size: 1rem;
+    margin-bottom: 0.6rem;
   }
   
   .risk-bullets {

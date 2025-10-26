@@ -71,10 +71,15 @@ export default {
     initChart() {
       if (!this.$refs.chartContainer) return;
       
-      // 可以在这里设置图表的宽度和高度
+      // 响应式设置图表宽度和高度
+      const isMobile = window.innerWidth <= 768;
+      const isSmallMobile = window.innerWidth <= 480;
+      const chartWidth = isMobile ? (window.innerWidth - 80) : 700;
+      const chartHeight = isSmallMobile ? 180 : (isMobile ? 220 : 500);
+      
       this.chart = echarts.init(this.$refs.chartContainer, null, {
-        width: 700,  // 设置图表宽度
-        height: 500  // 设置图表高度
+        width: chartWidth,  // 设置图表宽度
+        height: chartHeight  // 设置图表高度
       });
       
       // 确保图表容器大小正确
@@ -177,7 +182,15 @@ export default {
     
     handleResize() {
       if (this.chart) {
-        this.chart.resize();
+        const isMobile = window.innerWidth <= 768;
+        const isSmallMobile = window.innerWidth <= 480;
+        const chartWidth = isMobile ? (window.innerWidth - 80) : 700;
+        const chartHeight = isSmallMobile ? 180 : (isMobile ? 220 : 500);
+        
+        this.chart.resize({
+          width: chartWidth,
+          height: chartHeight
+        });
       }
     },
     
@@ -244,7 +257,7 @@ export default {
 
 .chart-wrapper {
   flex: 1;
-  min-height: 400px;
+  min-height: 0;
   position: relative;
   display: flex;
   align-items: center;
@@ -261,13 +274,13 @@ export default {
 /* 响应式设计 */
 @media (max-width: 768px) {
   .chart-wrapper {
-    min-height: 300px;
+    min-height: 0;
   }
 }
 
 @media (max-width: 480px) {
   .chart-wrapper {
-    min-height: 250px;
+    min-height: 0;
   }
 }
 </style>

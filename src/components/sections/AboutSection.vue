@@ -1,35 +1,19 @@
 <template>
   <div class="about-section">
-    <!-- 视频背景 -->
+    <!-- 视频背景 - 单个视频铺满整个section -->
     <div class="video-background">
-      <div class="video-container video-left-container">
-        <video 
-          ref="backgroundVideo1"
-          autoplay 
-          muted 
-          loop 
-          playsinline
-          class="background-video video-left"
-        >
-          <source :src="videoSrc" type="video/mp4">
-          您的浏览器不支持视频播放。
-        </video>
-        <div class="video-overlay"></div>
-      </div>
-      <div class="video-container video-right-container">
-        <video 
-          ref="backgroundVideo2"
-          autoplay 
-          muted 
-          loop 
-          playsinline
-          class="background-video video-right"
-        >
-          <source :src="videoSrc" type="video/mp4">
-          您的浏览器不支持视频播放。
-        </video>
-        <div class="video-overlay"></div>
-      </div>
+      <video 
+        ref="backgroundVideo"
+        autoplay 
+        muted 
+        loop 
+        playsinline
+        class="background-video"
+      >
+        <source :src="videoSrc" type="video/mp4">
+        您的浏览器不支持视频播放。
+      </video>
+      <div class="video-overlay"></div>
     </div>
     
     <!-- 内容区域 -->
@@ -62,26 +46,13 @@ export default {
   },
   methods: {
     setupVideo() {
-      const video1 = this.$refs.backgroundVideo1;
-      const video2 = this.$refs.backgroundVideo2;
-      
-      // 设置第一个视频
-      if (video1) {
-        video1.muted = true;
-        video1.loop = true;
-        video1.playsInline = true;
-        video1.play().catch(error => {
-          console.log('视频1自动播放被阻止:', error);
-        });
-      }
-      
-      // 设置第二个视频
-      if (video2) {
-        video2.muted = true;
-        video2.loop = true;
-        video2.playsInline = true;
-        video2.play().catch(error => {
-          console.log('视频2自动播放被阻止:', error);
+      const video = this.$refs.backgroundVideo;
+      if (video) {
+        video.muted = true;
+        video.loop = true;
+        video.playsInline = true;
+        video.play().catch(error => {
+          console.log('视频自动播放被阻止:', error);
         });
       }
     }
@@ -109,39 +80,14 @@ export default {
   height: 100%;
   z-index: 0;
   pointer-events: none;
-  display: flex;
-  flex-direction: row; /* 默认横屏左右布局 */
-  overflow: hidden;
-}
-
-/* 横屏PC端和宽屏：左右布局 */
-.video-container {
-  position: relative;
-  width: 50%; /* 各占50%宽度 */
-  height: 100%; /* 完整高度 */
-  flex-shrink: 0;
   overflow: hidden;
 }
 
 .background-video {
   width: 100%;
   height: 100%;
-  min-width: 100%; /* 确保最小宽度 */
-  min-height: 100%; /* 确保最小高度 */
   object-fit: cover; /* 确保视频覆盖整个容器 */
   object-position: center;
-}
-
-.video-left {
-  object-position: right center;
-  transform: rotate(90deg);
-  transform-origin: center center;
-}
-
-.video-right {
-  object-position: left center;
-  transform: rotate(270deg);
-  transform-origin: center center;
 }
 
 /* 视频遮罩层，用于降低视频亮度，确保文字可读性 */
@@ -224,16 +170,6 @@ export default {
     width: calc(100% + 30px); /* 突破左右padding */
   }
   
-  /* 移动端竖屏：上下布局 */
-  .video-background {
-    flex-direction: column; /* 改为上下布局 */
-  }
-  
-  .video-container {
-    width: 100%; /* 各占100%宽度 */
-    height: 50%; /* 各占50%高度 */
-  }
-  
   .section-content {
     padding: 30px 20px;
   }
@@ -248,10 +184,14 @@ export default {
     margin-bottom: 1.5rem;
   }
   
+  .about-content {
+    padding: 0 1.5rem; /* 添加左右内边距 */
+  }
+  
   .about-text p {
     font-size: 1.1rem;
     max-width: 100%;
-    padding: 0 0.5rem;
+    padding: 0;
     line-height: 1.6;
   }
   
@@ -279,16 +219,6 @@ export default {
     width: calc(100% + 20px); /* 突破左右padding */
   }
   
-  /* 小屏幕竖屏：上下布局 */
-  .video-background {
-    flex-direction: column; /* 保持上下布局 */
-  }
-  
-  .video-container {
-    width: 100%; /* 各占100%宽度 */
-    height: 50%; /* 各占50%高度 */
-  }
-  
   .section-content {
     padding: 20px 15px;
   }
@@ -301,6 +231,10 @@ export default {
   .section-content h2 {
     font-size: 1.8rem;
     margin-bottom: 1rem;
+  }
+  
+  .about-content {
+    padding: 0 1.2rem; /* 添加左右内边距 */
   }
   
   .about-text p {
@@ -325,15 +259,4 @@ export default {
   }
 }
 
-/* 横屏（landscape）时保持左右布局 */
-@media screen and (max-height: 500px) {
-  .video-background {
-    flex-direction: row !important; /* 横屏时强制左右布局 */
-  }
-  
-  .video-container {
-    width: 50% !important; /* 各占50%宽度 */
-    height: 100% !important; /* 完整高度 */
-  }
-}
 </style>
