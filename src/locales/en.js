@@ -73,7 +73,7 @@ export default {
     },
     value1: {
       title: 'Simplicity',
-      description: 'Lower the barrier, demystify crypto and navigate volatility through quantative methods.'
+      description: 'Lower the barrier, demystify crypto and navigate volatility through quantitative methods.'
     },
     value2: {
       title: 'Professionalism',
@@ -84,7 +84,7 @@ export default {
       description: 'Open and real historical data for clients to gain a clear understanding of investment logics, team, and performances.'
     },
     product1: {
-      title: 'Leading Crypto Quantative Strategies',
+      title: 'Leading Crypto Quantitative Strategies',
       description: 'Comprehensive trading strategies across multiple crypto markets',
       feature1: 'Multi-strategy support',
       feature2: 'Unparalleled yields',
@@ -225,7 +225,7 @@ export default {
 
   // 加密货币策略页面
   cryptoStrategies: {
-    title: 'Leading Crypto Quantative Strategies',
+    title: 'Leading Crypto Quantitative Strategies',
     yield2024: '2024 yield',
     yield2025: '2025 YTD yield',
     maxDrawdown: 'Max drawdown',
@@ -246,8 +246,8 @@ export default {
       fees: 'no management fee, 30% performance fee'
     },
     strategy3: {
-      title: 'HFT Long Short Strategy',
-      yield: '152.6%',
+      title: 'Market LS Long Short Strategy',
+      yield: '146.69%',
       maxDrawdown: '7.7%',
       minInvestment: 'USD 300k',
       fees: 'no management fee, 40% performance fee'

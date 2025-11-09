@@ -246,8 +246,8 @@ export default {
       fees: '无管理费，30%业绩费'
     },
     strategy3: {
-      title: 'HFT多空策略',
-      yield: '152.6%',
+      title: 'Market LS多空策略',
+      yield: '146.69%',
       maxDrawdown: '7.7%',
       minInvestment: '30万美元',
       fees: '无管理费，40%业绩费'
