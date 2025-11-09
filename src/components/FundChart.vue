@@ -65,6 +65,15 @@ export default {
         ];
       });
       
+      // 根据数据点数量计算动画参数
+      const dataCount = this.chartData.length;
+      const delayPerItem = 30; // 每个蜡烛图间隔30ms
+      const baseDuration = 2000; // 基础动画时长2秒
+      // 总动画时长 = 基础时长 + 最后一个元素的延迟时间
+      this.totalAnimationDuration = baseDuration + (dataCount * delayPerItem);
+      // 循环间隔 = 总动画时长 + 1秒缓冲时间
+      this.loopInterval = this.totalAnimationDuration + 1000;
+      
       this.loading = false;
     },
     
@@ -95,43 +104,78 @@ export default {
           show: false // 屏蔽鼠标hover时的数据弹窗
         },
         grid: {
-          left: '3%',
-          right: '3%',
-          bottom: '3%',
-          top: '3%',
+          left: '10%',
+          right: '5%',
+          bottom: '12%',
+          top: '5%',
           containLabel: true
         },
         xAxis: {
           type: 'time',
-          show: false,
+          show: true,
           axisLine: {
-            show: false
+            show: true,
+            lineStyle: {
+              color: 'rgba(255, 192, 0, 0.6)',
+              width: 1
+            }
           },
           axisLabel: {
-            show: false
+            show: true,
+            color: 'rgba(255, 192, 0, 0.8)',
+            fontSize: 11,
+            formatter: function(value) {
+              const date = new Date(value);
+              const month = date.getMonth() + 1;
+              const day = date.getDate();
+              return `${month}/${day}`;
+            }
           },
           axisTick: {
-            show: false
+            show: true,
+            lineStyle: {
+              color: 'rgba(255, 192, 0, 0.6)'
+            }
           },
           splitLine: {
-            show: false
+            show: true,
+            lineStyle: {
+              color: 'rgba(255, 192, 0, 0.15)',
+              type: 'dashed'
+            }
           }
         },
         yAxis: {
           type: 'value',
           scale: true,
-          show: false,
+          show: true,
           axisLine: {
-            show: false
+            show: true,
+            lineStyle: {
+              color: 'rgba(255, 192, 0, 0.6)',
+              width: 1
+            }
           },
           axisLabel: {
-            show: false
+            show: true,
+            color: 'rgba(255, 192, 0, 0.8)',
+            fontSize: 11,
+            formatter: function(value) {
+              return value.toFixed(2);
+            }
           },
           axisTick: {
-            show: false
+            show: true,
+            lineStyle: {
+              color: 'rgba(255, 192, 0, 0.6)'
+            }
           },
           splitLine: {
-            show: false
+            show: true,
+            lineStyle: {
+              color: 'rgba(255, 192, 0, 0.15)',
+              type: 'dashed'
+            }
           }
         },
         series: [
@@ -154,7 +198,7 @@ export default {
               }
             },
             animation: true,
-            animationDuration: 3000,
+            animationDuration: this.totalAnimationDuration || 3000,
             animationEasing: 'cubicOut',
             animationDelay: function (idx) {
               return idx * 30; // 每个蜡烛图依次出现，间隔30ms
@@ -162,7 +206,7 @@ export default {
           }
         ],
         animation: true,
-        animationDuration: 3000,
+        animationDuration: this.totalAnimationDuration || 3000,
         animationEasing: 'cubicOut'
       };
       
@@ -201,7 +245,7 @@ export default {
           series: [{
             data: this.chartData,
             animation: true,
-            animationDuration: 3000,
+            animationDuration: this.totalAnimationDuration || 3000,
             animationEasing: 'cubicOut',
             animationDelay: function (idx) {
               return idx * 30; // 每个蜡烛图间隔30ms出现
@@ -212,7 +256,9 @@ export default {
     },
     
     startLoopAnimation() {
-      // 每6秒重新播放一次动画
+      // 根据数据量动态计算循环间隔，确保动画完成后再开始下一轮
+      const loopInterval = this.loopInterval || 6000;
+      
       this.animationTimer = setInterval(() => {
         if (this.chart) {
           // 先清空数据
@@ -228,7 +274,7 @@ export default {
               series: [{
                 data: this.chartData,
                 animation: true,
-                animationDuration: 3000,
+                animationDuration: this.totalAnimationDuration || 3000,
                 animationEasing: 'cubicOut',
                 animationDelay: function (idx) {
                   return idx * 30; // 每个蜡烛图间隔30ms出现
@@ -237,7 +283,7 @@ export default {
             });
           }, 100);
         }
-      }, 6000);
+      }, loopInterval);
     }
   }
 };

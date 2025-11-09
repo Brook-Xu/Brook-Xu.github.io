@@ -495,9 +495,9 @@ export default {
   }
   
   .value-icon {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
   }
-  
+
   .dropdown-arrow {
     font-size: 1.3rem;
   }
@@ -568,7 +568,7 @@ export default {
   }
   
   .value-icon {
-    font-size: 1.3rem;
+    font-size: 1rem;
   }
   
   .dropdown-arrow {
@@ -634,7 +634,7 @@ export default {
   }
   
   .value-icon {
-    font-size: 1.4rem;
+    font-size: 1.1rem;
   }
 }
 </style>
