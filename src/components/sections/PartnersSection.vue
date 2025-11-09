@@ -281,8 +281,8 @@ export default {
 }
 
 .logo-ticker .partner-logo {
-  width: 240px;
-  height: 180px;
+  width: 180px;
+  height: 135px;
   display: block;
   object-fit: contain;
   background: #ffffff;
@@ -346,8 +346,8 @@ export default {
   }
   
   .logo-ticker .partner-logo {
-    width: 120px;
-    height: 70px;
+    width: 90px;
+    height: 52px;
   }
   
   /* 移动端增加遮罩层透明度，确保文字可读性 */
@@ -388,8 +388,8 @@ export default {
   }
   
   .logo-ticker .partner-logo {
-    width: 90px;
-    height: 60px;
+    width: 68px;
+    height: 45px;
   }
   
   /* 小屏幕进一步增加遮罩层透明度 */

@@ -187,7 +187,7 @@ export default {
 }
 
 .risk-item {
-  background: rgba(255, 255, 255, 0.05);
+  background: linear-gradient(135deg, rgba(255, 192, 0, 0.15), rgba(255, 192, 0, 0.05));
   padding: 1.5rem;
   border-radius: 15px;
   border: 1px solid rgba(255, 192, 0, 0.2);
