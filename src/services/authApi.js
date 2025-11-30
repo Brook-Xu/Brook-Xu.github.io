@@ -26,7 +26,22 @@ async function request(url, options = {}) {
   
   try {
     const response = await fetch(`${API_BASE_URL}${url}`, config);
-    const data = await response.json();
+    
+    // 尝试解析 JSON，如果失败则使用文本
+    let data;
+    const contentType = response.headers.get('content-type');
+    if (contentType && contentType.includes('application/json')) {
+      try {
+        data = await response.json();
+      } catch (jsonError) {
+        // 如果 JSON 解析失败，尝试获取文本
+        const text = await response.text();
+        throw new Error(text || `HTTP error! status: ${response.status}`);
+      }
+    } else {
+      const text = await response.text();
+      data = text ? { error: text } : {};
+    }
     
     if (!response.ok) {
       throw new Error(data.error || `HTTP error! status: ${response.status}`);
@@ -34,6 +49,10 @@ async function request(url, options = {}) {
     
     return data;
   } catch (error) {
+    // 如果是网络错误，提供更友好的错误信息
+    if (error.name === 'TypeError' && error.message.includes('fetch')) {
+      throw new Error('Network error: Unable to connect to server. Please check if the backend service is running.');
+    }
     throw error;
   }
 }

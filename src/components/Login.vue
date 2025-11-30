@@ -61,7 +61,6 @@
 
 <script>
 import { login } from '../services/authApi';
-import { setToken } from '../utils/auth';
 
 export default {
   name: 'Login',
@@ -99,8 +98,8 @@ export default {
       try {
         const response = await login(this.form.email, this.form.password);
         
+        // login 函数已经自动保存 token 到 localStorage，这里只需要检查响应
         if (response.token) {
-          setToken(response.token);
           this.successMessage = this.$t('auth.login.success');
           
           // 延迟跳转，让用户看到成功消息
