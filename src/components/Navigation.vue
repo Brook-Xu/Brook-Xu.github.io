@@ -35,14 +35,14 @@
     
     <!-- 右侧按钮区域 -->
     <div class="nav-actions">
-      <!-- 未登录时显示登录按钮 -->
-      <button v-if="!isAuthenticated" class="action-btn login-btn" @click="handleLogin">
+      <!-- 未登录时显示登录按钮（暂时隐藏） -->
+      <!-- <button v-if="!isAuthenticated" class="action-btn login-btn" @click="handleLogin">
         <i class="icon-user"></i>
         {{ $t('navigation.login') }}
-      </button>
+      </button> -->
       
       <!-- 已登录时显示用户菜单 -->
-      <div v-else class="user-dropdown" :class="{ 'dropdown-open': showUserDropdown }">
+      <div v-if="isAuthenticated" class="user-dropdown" :class="{ 'dropdown-open': showUserDropdown }">
         <button class="action-btn user-btn" @click="toggleUserDropdown">
           <i class="icon-user"></i>
           {{ userEmail || $t('navigation.login') }}
@@ -376,7 +376,7 @@ nav {
 }
 
 .login-btn {
-  display: flex; /* 显示登录按钮 */
+  display: none !important; /* 暂时隐藏登录按钮 */
   border-color: #FFC000;
   color: #FFC000;
 }
