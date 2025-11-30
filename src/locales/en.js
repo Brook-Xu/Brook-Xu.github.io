@@ -259,5 +259,77 @@ export default {
       minInvestment: 'USD 300k',
       fees: 'no management fee, 40% performance fee'
     }
+  },
+
+  // 认证相关
+  auth: {
+    login: {
+      title: 'Login',
+      email: 'Email',
+      password: 'Password',
+      submit: 'Login',
+      forgotPassword: 'Forgot Password?',
+      noAccount: "Don't have an account?",
+      register: 'Register',
+      success: 'Login successful',
+      error: 'Login failed',
+      emailRequired: 'Email is required',
+      passwordRequired: 'Password is required',
+      invalidCredentials: 'Invalid email or password',
+      emailNotVerified: 'Email not verified. Please verify your email first.'
+    },
+    register: {
+      title: 'Register',
+      email: 'Email',
+      password: 'Password',
+      confirmPassword: 'Confirm Password',
+      verificationCode: 'Verification Code',
+      step1: 'Step 1: Enter your information',
+      step2: 'Step 2: Verify your email',
+      requestCode: 'Send Verification Code',
+      submit: 'Register',
+      verify: 'Verify',
+      backToLogin: 'Back to Login',
+      success: 'Registration successful! Please login.',
+      error: 'Registration failed',
+      emailRequired: 'Email is required',
+      passwordRequired: 'Password is required',
+      passwordMismatch: 'Passwords do not match',
+      codeRequired: 'Verification code is required',
+      codeSent: 'Verification code sent to your email',
+      codeExpired: 'Verification code expired or invalid',
+      emailExists: 'Email already registered',
+      invalidEmail: 'Invalid email format'
+    },
+    forgotPassword: {
+      title: 'Forgot Password',
+      email: 'Email',
+      code: 'Verification Code',
+      newPassword: 'New Password',
+      confirmPassword: 'Confirm New Password',
+      step1: 'Step 1: Request reset code',
+      step2: 'Step 2: Reset password',
+      requestCode: 'Send Reset Code',
+      reset: 'Reset Password',
+      backToLogin: 'Back to Login',
+      success: 'Password reset successful! Please login.',
+      error: 'Password reset failed',
+      emailRequired: 'Email is required',
+      codeRequired: 'Verification code is required',
+      passwordRequired: 'New password is required',
+      passwordMismatch: 'Passwords do not match',
+      codeSent: 'Reset code sent to your email',
+      codeExpired: 'Reset code expired or invalid',
+      emailNotFound: 'Email not found'
+    },
+    logout: {
+      title: 'Logout',
+      success: 'Logged out successfully',
+      error: 'Logout failed'
+    },
+    userMenu: {
+      profile: 'Profile',
+      logout: 'Logout'
+    }
   }
 }

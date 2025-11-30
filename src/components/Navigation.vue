@@ -35,10 +35,32 @@
     
     <!-- 右侧按钮区域 -->
     <div class="nav-actions">
-      <button class="action-btn login-btn" @click="handleLogin">
+      <!-- 未登录时显示登录按钮 -->
+      <button v-if="!isAuthenticated" class="action-btn login-btn" @click="handleLogin">
         <i class="icon-user"></i>
         {{ $t('navigation.login') }}
       </button>
+      
+      <!-- 已登录时显示用户菜单 -->
+      <div v-else class="user-dropdown" :class="{ 'dropdown-open': showUserDropdown }">
+        <button class="action-btn user-btn" @click="toggleUserDropdown">
+          <i class="icon-user"></i>
+          {{ userEmail || $t('navigation.login') }}
+        </button>
+        <transition name="dropdown" appear>
+          <div class="user-dropdown-menu" v-show="showUserDropdown">
+            <div class="user-info">
+              <div class="user-email">{{ userEmail }}</div>
+            </div>
+            <div class="dropdown-divider"></div>
+            <div class="user-option" @click="handleLogout">
+              <i class="icon-logout"></i>
+              <span>{{ $t('auth.userMenu.logout') }}</span>
+            </div>
+          </div>
+        </transition>
+      </div>
+      
       <div class="language-dropdown" :class="{ 'dropdown-open': showLanguageDropdown }">
         <button class="action-btn language-btn" @click="toggleLanguageDropdown">
           <i class="icon-globe"></i>
@@ -72,6 +94,8 @@
 <script>
 import logoImage from '../assets/starnet-logo.png';
 import { setLanguage, getCurrentLanguage, getAvailableLanguages } from '../i18n';
+import { isAuthenticated, getUserFromToken } from '../utils/auth';
+import { logout } from '../services/authApi';
 
 export default {
   name: 'Navigation',
@@ -79,17 +103,38 @@ export default {
     return {
       logoUrl: logoImage,
       showLanguageDropdown: false,
+      showUserDropdown: false,
       currentLanguage: getCurrentLanguage(),
-      activeSection: 'home'
+      activeSection: 'home',
+      isAuthenticated: false,
+      userEmail: ''
     };
   },
   mounted() {
+    this.checkAuthStatus();
+    // 监听存储变化，以便在登录/登出时更新状态
+    window.addEventListener('storage', this.handleStorageChange);
+    // 定期检查认证状态（处理token过期）
+    this.authCheckInterval = setInterval(() => {
+      this.checkAuthStatus();
+    }, 60000); // 每分钟检查一次
     // 监听来自Home组件的section变化事件
     this.$parent.$on('section-change', this.updateActiveSection);
+    // 监听点击事件，点击外部时关闭下拉框
+    document.addEventListener('click', this.handleClickOutside);
+    // 监听窗口大小变化
+    window.addEventListener('resize', this.handleResize);
   },
   beforeDestroy() {
+    window.removeEventListener('storage', this.handleStorageChange);
+    if (this.authCheckInterval) {
+      clearInterval(this.authCheckInterval);
+    }
     // 清理事件监听
     this.$parent.$off('section-change', this.updateActiveSection);
+    // 清理事件监听器
+    document.removeEventListener('click', this.handleClickOutside);
+    window.removeEventListener('resize', this.handleResize);
   },
   computed: {
     currentLanguageDisplay() {
@@ -102,18 +147,31 @@ export default {
       return this.$route.path === '/' && window.innerWidth > 1450;
     }
   },
-  mounted() {
-    // 监听点击事件，点击外部时关闭下拉框
-    document.addEventListener('click', this.handleClickOutside);
-    // 监听窗口大小变化
-    window.addEventListener('resize', this.handleResize);
-  },
-  beforeDestroy() {
-    // 清理事件监听器
-    document.removeEventListener('click', this.handleClickOutside);
-    window.removeEventListener('resize', this.handleResize);
+  watch: {
+    // 监听路由变化，更新认证状态
+    '$route'() {
+      this.checkAuthStatus();
+    }
   },
   methods: {
+    // 检查认证状态
+    checkAuthStatus() {
+      this.isAuthenticated = isAuthenticated();
+      if (this.isAuthenticated) {
+        const user = getUserFromToken();
+        this.userEmail = user ? user.email : '';
+      } else {
+        this.userEmail = '';
+      }
+    },
+    
+    // 处理存储变化（跨标签页同步）
+    handleStorageChange(event) {
+      if (event.key === 'token' || event.key === null) {
+        this.checkAuthStatus();
+      }
+    },
+    
     // 滚动到指定section
     scrollToSection(anchor) {
       // 通过事件总线通知Home组件滚动到指定section
@@ -126,8 +184,32 @@ export default {
     },
 
     handleLogin() {
-      // TODO: 实现登录功能
-      console.log('Login button clicked');
+      this.$router.push('/login');
+    },
+    
+    toggleUserDropdown() {
+      this.showUserDropdown = !this.showUserDropdown;
+      // 关闭时也关闭语言下拉框
+      if (this.showUserDropdown) {
+        this.showLanguageDropdown = false;
+      }
+    },
+    
+    async handleLogout() {
+      try {
+        await logout();
+        this.checkAuthStatus();
+        this.showUserDropdown = false;
+        // 如果当前在需要认证的页面，跳转到首页
+        if (this.$route.meta.requiresAuth) {
+          this.$router.push('/');
+        }
+      } catch (error) {
+        console.error('Logout error:', error);
+        // 即使API调用失败，也清除本地状态
+        this.checkAuthStatus();
+        this.showUserDropdown = false;
+      }
     },
     toggleLanguageDropdown() {
       this.showLanguageDropdown = !this.showLanguageDropdown;
@@ -147,11 +229,14 @@ export default {
         }
       }
       this.showLanguageDropdown = false;
+      // 关闭时也关闭用户下拉框
+      this.showUserDropdown = false;
     },
     handleClickOutside(event) {
-      // 如果点击的不是语言下拉框区域，则关闭下拉框
+      // 如果点击的不是下拉框区域，则关闭下拉框
       if (!this.$el.contains(event.target)) {
         this.showLanguageDropdown = false;
+        this.showUserDropdown = false;
       }
     },
     handleResize() {
@@ -291,7 +376,7 @@ nav {
 }
 
 .login-btn {
-  display: none; /* 暂时隐藏登录按钮 */
+  display: flex; /* 显示登录按钮 */
   border-color: #FFC000;
   color: #FFC000;
 }
@@ -302,6 +387,20 @@ nav {
 }
 
 .login-btn:hover .icon-user::before {
+  color: #222222;
+}
+
+.user-btn {
+  border-color: #FFC000;
+  color: #FFC000;
+}
+
+.user-btn:hover {
+  background: #FFC000;
+  color: #222222;
+}
+
+.user-btn:hover .icon-user::before {
   color: #222222;
 }
 
@@ -332,6 +431,69 @@ nav {
   content: "🌐";
   color: #FFC000;
   font-size: 18px;
+}
+
+.icon-logout::before {
+  content: "🚪";
+  margin-right: 8px;
+  font-size: 16px;
+}
+
+/* 用户下拉框样式 */
+.user-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.user-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: #333;
+  border: 1px solid #555;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  min-width: 200px;
+  margin-top: 2px;
+  overflow: hidden;
+}
+
+.user-info {
+  padding: 12px 15px;
+  border-bottom: 1px solid #444;
+}
+
+.user-email {
+  color: #FFC000;
+  font-size: 14px;
+  font-weight: 500;
+  word-break: break-all;
+}
+
+.dropdown-divider {
+  height: 1px;
+  background: #444;
+  margin: 4px 0;
+}
+
+.user-option {
+  display: flex;
+  align-items: center;
+  padding: 10px 15px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #eee;
+  font-size: 14px;
+}
+
+.user-option:hover {
+  background: #444;
+  color: #FFC000;
+}
+
+.user-option i {
+  font-style: normal;
 }
 
 /* 语言下拉框样式 */

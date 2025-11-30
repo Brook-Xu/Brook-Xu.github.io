@@ -259,5 +259,77 @@ export default {
       minInvestment: '30万美元',
       fees: '无管理费，40%业绩费'
     }
+  },
+
+  // 认证相关
+  auth: {
+    login: {
+      title: '登录',
+      email: '邮箱',
+      password: '密码',
+      submit: '登录',
+      forgotPassword: '忘记密码？',
+      noAccount: '还没有账号？',
+      register: '注册',
+      success: '登录成功',
+      error: '登录失败',
+      emailRequired: '请输入邮箱',
+      passwordRequired: '请输入密码',
+      invalidCredentials: '邮箱或密码错误',
+      emailNotVerified: '邮箱未验证，请先验证您的邮箱。'
+    },
+    register: {
+      title: '注册',
+      email: '邮箱',
+      password: '密码',
+      confirmPassword: '确认密码',
+      verificationCode: '验证码',
+      step1: '第一步：填写信息',
+      step2: '第二步：验证邮箱',
+      requestCode: '发送验证码',
+      submit: '注册',
+      verify: '验证',
+      backToLogin: '返回登录',
+      success: '注册成功！请登录。',
+      error: '注册失败',
+      emailRequired: '请输入邮箱',
+      passwordRequired: '请输入密码',
+      passwordMismatch: '两次输入的密码不一致',
+      codeRequired: '请输入验证码',
+      codeSent: '验证码已发送到您的邮箱',
+      codeExpired: '验证码已过期或无效',
+      emailExists: '该邮箱已被注册',
+      invalidEmail: '邮箱格式不正确'
+    },
+    forgotPassword: {
+      title: '忘记密码',
+      email: '邮箱',
+      code: '验证码',
+      newPassword: '新密码',
+      confirmPassword: '确认新密码',
+      step1: '第一步：请求重置码',
+      step2: '第二步：重置密码',
+      requestCode: '发送重置码',
+      reset: '重置密码',
+      backToLogin: '返回登录',
+      success: '密码重置成功！请登录。',
+      error: '密码重置失败',
+      emailRequired: '请输入邮箱',
+      codeRequired: '请输入验证码',
+      passwordRequired: '请输入新密码',
+      passwordMismatch: '两次输入的密码不一致',
+      codeSent: '重置码已发送到您的邮箱',
+      codeExpired: '重置码已过期或无效',
+      emailNotFound: '邮箱不存在'
+    },
+    logout: {
+      title: '登出',
+      success: '已成功登出',
+      error: '登出失败'
+    },
+    userMenu: {
+      profile: '个人资料',
+      logout: '登出'
+    }
   }
 }

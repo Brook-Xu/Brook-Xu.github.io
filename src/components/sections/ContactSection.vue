@@ -21,13 +21,6 @@
         <div class="contact-grid">
           <div class="contact-info">
             <div class="contact-item">
-              <div class="contact-icon">💬</div>
-              <div class="contact-details">
-                <h4>Telegram</h4>
-                <p>starnetcapitalDan</p>
-              </div>
-            </div>
-            <div class="contact-item">
               <div class="contact-icon">📧</div>
               <div class="contact-details">
                 <h4>Email</h4>
