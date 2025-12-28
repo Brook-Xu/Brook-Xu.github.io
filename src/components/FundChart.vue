@@ -114,28 +114,13 @@ export default {
           type: 'time',
           show: true,
           axisLine: {
-            show: true,
-            lineStyle: {
-              color: 'rgba(255, 192, 0, 0.6)',
-              width: 1
-            }
+            show: false
           },
           axisLabel: {
-            show: true,
-            color: 'rgba(255, 192, 0, 0.8)',
-            fontSize: 11,
-            formatter: function(value) {
-              const date = new Date(value);
-              const month = date.getMonth() + 1;
-              const day = date.getDate();
-              return `${month}/${day}`;
-            }
+            show: false
           },
           axisTick: {
-            show: true,
-            lineStyle: {
-              color: 'rgba(255, 192, 0, 0.6)'
-            }
+            show: false
           },
           splitLine: {
             show: true,
@@ -150,25 +135,13 @@ export default {
           scale: true,
           show: true,
           axisLine: {
-            show: true,
-            lineStyle: {
-              color: 'rgba(255, 192, 0, 0.6)',
-              width: 1
-            }
+            show: false
           },
           axisLabel: {
-            show: true,
-            color: 'rgba(255, 192, 0, 0.8)',
-            fontSize: 11,
-            formatter: function(value) {
-              return value.toFixed(2);
-            }
+            show: false
           },
           axisTick: {
-            show: true,
-            lineStyle: {
-              color: 'rgba(255, 192, 0, 0.6)'
-            }
+            show: false
           },
           splitLine: {
             show: true,
