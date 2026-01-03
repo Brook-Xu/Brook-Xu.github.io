@@ -81,11 +81,9 @@ class PolygonApiService {
 
     const { from, to } = this.getDateRange();
     
-    // 定义要获取的数据类型
+    // 定义要获取的数据类型（仅股票/ETF，加密货币由 CoinGecko 提供）
     const tickers = {
       sp500: 'SPY',           // 标普500 ETF
-      btc: 'C:BTCUSD',        // 比特币
-      eth: 'C:ETHUSD',        // 以太坊
       nasdaq: 'QQQ'           // 纳斯达克100 ETF
     };
 
@@ -134,8 +132,6 @@ class PolygonApiService {
   getDataTitle(key) {
     const titles = {
       sp500: 'S&P 500 Index (SPY)',
-      btc: 'Bitcoin (BTC/USD)',
-      eth: 'Ethereum (ETH/USD)',
       nasdaq: 'NASDAQ 100 (QQQ)'
     };
     return titles[key] || key.toUpperCase();
