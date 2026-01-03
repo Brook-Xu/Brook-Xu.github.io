@@ -202,6 +202,11 @@ export default {
     metrics: {
       metric: '指标',
       value: '数值',
+      uploadedData: '上传数据',
+      sp500: '标普500 (SPY)',
+      nasdaq: '纳斯达克 (QQQ)',
+      btc: '比特币 (BTC)',
+      eth: '以太坊 (ETH)',
       startDate: '起始日期',
       endDate: '结束日期',
       cumulativeReturn: '累计收益 [%]',

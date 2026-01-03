@@ -202,6 +202,11 @@ export default {
     metrics: {
       metric: 'Metric',
       value: 'Value',
+      uploadedData: 'Uploaded Data',
+      sp500: 'S&P 500 (SPY)',
+      nasdaq: 'NASDAQ (QQQ)',
+      btc: 'Bitcoin (BTC)',
+      eth: 'Ethereum (ETH)',
       startDate: 'Start Date',
       endDate: 'End Date',
       cumulativeReturn: 'Cumulative Return [%]',
