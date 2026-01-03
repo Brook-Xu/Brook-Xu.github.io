@@ -57,6 +57,16 @@
             </tr>
           </thead>
           <tbody>
+            <!-- 基本信息 -->
+            <tr>
+              <td>{{ $t('charts.metrics.startDate') }}</td>
+              <td>{{ metrics.startDate || 'N/A' }}</td>
+            </tr>
+            <tr>
+              <td>{{ $t('charts.metrics.endDate') }}</td>
+              <td>{{ metrics.endDate || 'N/A' }}</td>
+            </tr>
+            <!-- Main Metrics -->
             <tr>
               <td>{{ $t('charts.metrics.cumulativeReturn') }}</td>
               <td>{{ formatPercentage(metrics.cumulativeReturn) }}</td>
@@ -82,24 +92,136 @@
               <td>{{ formatPercentage(metrics.maxDrawdown) }}</td>
             </tr>
             <tr>
+              <td>{{ $t('charts.metrics.durationOfMD') }}</td>
+              <td>{{ metrics.durationOfMD }} {{ $t('charts.metrics.days') }}</td>
+            </tr>
+            <tr>
+              <td>{{ $t('charts.metrics.maxDrawdownDuration') }}</td>
+              <td>{{ metrics.maxDrawdownDuration }} {{ $t('charts.metrics.days') }}</td>
+            </tr>
+            <tr>
+              <td>{{ $t('charts.metrics.drawdownOfMDD') }}</td>
+              <td>{{ formatPercentage(metrics.drawdownOfMDD) }}</td>
+            </tr>
+            <tr>
               <td>{{ $t('charts.metrics.calmarRatio') }}</td>
               <td>{{ formatNumber(metrics.calmarRatio, 3) }}</td>
             </tr>
+            <!-- Returns Metrics -->
             <tr>
               <td>{{ $t('charts.metrics.var95') }}</td>
               <td>{{ formatPercentage(metrics.var95) }}</td>
+            </tr>
+            <tr>
+              <td>{{ $t('charts.metrics.var99Monthly') }}</td>
+              <td>{{ formatPercentage(metrics.var99Monthly) }}</td>
             </tr>
             <tr>
               <td>{{ $t('charts.metrics.cvar95') }}</td>
               <td>{{ formatPercentage(metrics.cvar95) }}</td>
             </tr>
             <tr>
+              <td>{{ $t('charts.metrics.cvar99') }}</td>
+              <td>{{ formatPercentage(metrics.cvar99) }}</td>
+            </tr>
+            <tr>
+              <td>{{ $t('charts.metrics.giniCoefficient') }}</td>
+              <td>{{ formatNumber(metrics.giniCoefficient, 3) }}</td>
+            </tr>
+            <tr>
               <td>{{ $t('charts.metrics.omegaRatio') }}</td>
               <td>{{ formatNumber(metrics.omegaRatio, 3) }}</td>
             </tr>
             <tr>
+              <td>{{ $t('charts.metrics.gainPainRatio') }}</td>
+              <td>{{ formatNumber(metrics.gainPainRatio, 3) }}</td>
+            </tr>
+            <tr>
               <td>{{ $t('charts.metrics.tailRatio') }}</td>
               <td>{{ formatNumber(metrics.tailRatio, 3) }}</td>
+            </tr>
+            <tr>
+              <td>{{ $t('charts.metrics.outlierWinRatio') }}</td>
+              <td>{{ formatPercentage(metrics.outlierWinRatio) }}</td>
+            </tr>
+            <tr>
+              <td>{{ $t('charts.metrics.outlierLossRatio') }}</td>
+              <td>{{ formatPercentage(metrics.outlierLossRatio) }}</td>
+            </tr>
+            <!-- Rolling Metrics -->
+            <tr>
+              <td>{{ $t('charts.metrics.rollingSharpe90dMean') }}</td>
+              <td>{{ formatNumber(metrics.rollingSharpe90dMean, 3) }}</td>
+            </tr>
+            <tr>
+              <td>{{ $t('charts.metrics.rollingSharpe90dMedian') }}</td>
+              <td>{{ formatNumber(metrics.rollingSharpe90dMedian, 3) }}</td>
+            </tr>
+            <tr>
+              <td>{{ $t('charts.metrics.rollingSharpe90dLast') }}</td>
+              <td>{{ formatNumber(metrics.rollingSharpe90dLast, 3) }}</td>
+            </tr>
+            <tr>
+              <td>{{ $t('charts.metrics.rollingSharpe365dMean') }}</td>
+              <td>{{ formatNumber(metrics.rollingSharpe365dMean, 3) }}</td>
+            </tr>
+            <tr>
+              <td>{{ $t('charts.metrics.rollingSharpe365dMedian') }}</td>
+              <td>{{ formatNumber(metrics.rollingSharpe365dMedian, 3) }}</td>
+            </tr>
+            <tr>
+              <td>{{ $t('charts.metrics.rollingSharpe365dLast') }}</td>
+              <td>{{ formatNumber(metrics.rollingSharpe365dLast, 3) }}</td>
+            </tr>
+            <!-- Cumulative Return Metrics -->
+            <tr>
+              <td>{{ $t('charts.metrics.mtd') }}</td>
+              <td>{{ formatPercentage(metrics.mtd) }}</td>
+            </tr>
+            <tr>
+              <td>{{ $t('charts.metrics.return3M') }}</td>
+              <td>{{ formatPercentage(metrics.return3M) }}</td>
+            </tr>
+            <tr>
+              <td>{{ $t('charts.metrics.return6M') }}</td>
+              <td>{{ formatPercentage(metrics.return6M) }}</td>
+            </tr>
+            <tr>
+              <td>{{ $t('charts.metrics.ytd') }}</td>
+              <td>{{ formatPercentage(metrics.ytd) }}</td>
+            </tr>
+            <tr>
+              <td>{{ $t('charts.metrics.bestDay') }}</td>
+              <td>{{ formatPercentage(metrics.bestDay) }}</td>
+            </tr>
+            <tr>
+              <td>{{ $t('charts.metrics.worstDay') }}</td>
+              <td>{{ formatPercentage(metrics.worstDay) }}</td>
+            </tr>
+            <tr>
+              <td>{{ $t('charts.metrics.bestMonth') }}</td>
+              <td>{{ formatPercentage(metrics.bestMonth) }}</td>
+            </tr>
+            <tr>
+              <td>{{ $t('charts.metrics.worstMonth') }}</td>
+              <td>{{ formatPercentage(metrics.worstMonth) }}</td>
+            </tr>
+            <tr>
+              <td>{{ $t('charts.metrics.bestYear') }}</td>
+              <td>{{ formatPercentage(metrics.bestYear) }}</td>
+            </tr>
+            <tr>
+              <td>{{ $t('charts.metrics.worstYear') }}</td>
+              <td>{{ formatPercentage(metrics.worstYear) }}</td>
+            </tr>
+            <!-- Distribution Metrics -->
+            <tr>
+              <td>{{ $t('charts.metrics.skew') }}</td>
+              <td>{{ formatNumber(metrics.skew, 3) }}</td>
+            </tr>
+            <tr>
+              <td>{{ $t('charts.metrics.kurtosis') }}</td>
+              <td>{{ formatNumber(metrics.kurtosis, 3) }}</td>
             </tr>
           </tbody>
         </table>
@@ -840,9 +962,9 @@ export default {
           type: 'scroll'
         },
         grid: {
-          left: '8%',
-          right: '8%',
-          bottom: '8%',
+          left: '10%',
+          right: '10%',
+          bottom: '10%',
           top: '15%',
           containLabel: true
         },
@@ -1224,8 +1346,21 @@ export default {
       const totalDays = Math.max(1, Math.floor((lastDate - firstDate) / (1000 * 60 * 60 * 24)));
       const years = totalDays / 365.25;
 
+      // 格式化日期
+      const formatDate = (date) => {
+        if (!date || isNaN(date.getTime())) return 'N/A';
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+      };
+
       // 计算所有指标
       const metrics = {
+        // 基本信息
+        startDate: formatDate(firstDate),
+        endDate: formatDate(lastDate),
+        
         // 1. 累计收益
         cumulativeReturn: this.calculateCumulativeReturn(dailyReturns),
         
@@ -1244,20 +1379,85 @@ export default {
         // 6. 最大回撤
         maxDrawdown: this.calculateMaxDrawdown(dailyReturns),
         
-        // 7. Calmar Ratio
+        // 7. Duration of MD (最大回撤的持续时间)
+        durationOfMD: this.calculateDurationOfMD(dailyReturns, this.dates),
+        
+        // 8. 最大回撤持续时间 (MDD)
+        maxDrawdownDuration: this.calculateMaxDrawdownDuration(dailyReturns, this.dates),
+        
+        // 9. Drawdown of MDD (最长持续时间回撤的幅度)
+        drawdownOfMDD: this.calculateDrawdownOfMDD(dailyReturns, this.dates),
+        
+        // 10. Calmar Ratio
         calmarRatio: this.calculateCalmarRatio(dailyReturns, years),
         
-        // 8. VaR (95%)
+        // 11. VaR (95%)
         var95: this.calculateVaR(dailyReturns, 0.95),
         
-        // 9. CVaR (95%)
+        // 12. 1-month VaR (99%)
+        var99Monthly: this.calculateMonthlyVaR(dailyReturns, this.dates, 0.99),
+        
+        // 13. CVaR (95%)
         cvar95: this.calculateCVaR(dailyReturns, 0.95),
         
-        // 10. Omega Ratio
+        // 14. CVaR (99%)
+        cvar99: this.calculateCVaR(dailyReturns, 0.99),
+        
+        // 15. Gini Coefficient
+        giniCoefficient: this.calculateGiniCoefficient(dailyReturns),
+        
+        // 16. Omega Ratio
         omegaRatio: this.calculateOmegaRatio(dailyReturns),
         
-        // 11. Tail Ratio
+        // 17. Gain/Pain Ratio (1M)
+        gainPainRatio: this.calculateGainPainRatio(dailyReturns, this.dates),
+        
+        // 18. Tail Ratio
         tailRatio: this.calculateTailRatio(dailyReturns),
+        
+        // 19. Outlier Win Ratio
+        outlierWinRatio: this.calculateOutlierWinRatio(dailyReturns),
+        
+        // 20. Outlier Loss Ratio
+        outlierLossRatio: this.calculateOutlierLossRatio(dailyReturns),
+        
+        // 13. 最佳/最差单日收益
+        bestDay: this.calculateBestDay(dailyReturns),
+        worstDay: this.calculateWorstDay(dailyReturns),
+        
+        // 21. Rolling Sharpe 90d Mean/Median/Last
+        rollingSharpe90dMean: this.calculateRollingSharpeStats(dailyReturns, 90).mean,
+        rollingSharpe90dMedian: this.calculateRollingSharpeStats(dailyReturns, 90).median,
+        rollingSharpe90dLast: this.calculateRollingSharpeStats(dailyReturns, 90).last,
+        
+        // 22. Rolling Sharpe 365d Mean/Median/Last
+        rollingSharpe365dMean: this.calculateRollingSharpeStats(dailyReturns, 365).mean,
+        rollingSharpe365dMedian: this.calculateRollingSharpeStats(dailyReturns, 365).median,
+        rollingSharpe365dLast: this.calculateRollingSharpeStats(dailyReturns, 365).last,
+        
+        // 23. MTD / 3M / 6M / YTD
+        mtd: this.calculateMTD(dailyReturns, this.dates),
+        return3M: this.calculatePeriodReturn(dailyReturns, this.dates, 90),
+        return6M: this.calculatePeriodReturn(dailyReturns, this.dates, 180),
+        ytd: this.calculateYTD(dailyReturns, this.dates),
+        
+        // 24. 最佳/最差单日收益
+        bestDay: this.calculateBestDay(dailyReturns),
+        worstDay: this.calculateWorstDay(dailyReturns),
+        
+        // 25. 最佳/最差单月收益
+        bestMonth: this.calculateBestMonth(dailyReturns, this.dates),
+        worstMonth: this.calculateWorstMonth(dailyReturns, this.dates),
+        
+        // 26. 最佳/最差年度收益
+        bestYear: this.calculateBestYear(dailyReturns, this.dates),
+        worstYear: this.calculateWorstYear(dailyReturns, this.dates),
+        
+        // 27. 偏度
+        skew: this.calculateSkew(dailyReturns),
+        
+        // 28. 峰度
+        kurtosis: this.calculateKurtosis(dailyReturns),
         
         // 额外信息
         totalDays: totalDays,
@@ -1309,12 +1509,27 @@ export default {
       const totalDays = Math.max(1, Math.floor((lastDate - firstDate) / (1000 * 60 * 60 * 24)));
       const years = totalDays / 365.25;
 
+      // 格式化日期
+      const formatDate = (date) => {
+        if (!date || isNaN(date.getTime())) return 'N/A';
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+      };
+
       // 计算累计收益（从第一个值到最后一个值）
       const initialValue = values[0];
       const finalValue = values[values.length - 1];
       const cumulativeReturn = initialValue > 0 ? (finalValue / initialValue) - 1 : 0;
 
+      // 确保 dates 和 dailyReturns 长度一致（dates 比 dailyReturns 多一个元素）
+      // dailyReturns 从第二个值开始，所以 dates 也需要从第二个开始
+      const alignedDates = dates.slice(1);
+
       return {
+        startDate: formatDate(firstDate),
+        endDate: formatDate(lastDate),
         cumulativeReturn: cumulativeReturn,
         cagr: this.calculateCAGR(dailyReturns, years),
         volatility: this.calculateVolatility(dailyReturns),
@@ -1326,6 +1541,33 @@ export default {
         cvar95: this.calculateCVaR(dailyReturns, 0.95),
         omegaRatio: this.calculateOmegaRatio(dailyReturns),
         tailRatio: this.calculateTailRatio(dailyReturns),
+        maxDrawdownDuration: this.calculateMaxDrawdownDuration(dailyReturns, alignedDates),
+        durationOfMD: this.calculateDurationOfMD(dailyReturns, alignedDates),
+        drawdownOfMDD: this.calculateDrawdownOfMDD(dailyReturns, alignedDates),
+        var99Monthly: this.calculateMonthlyVaR(dailyReturns, alignedDates, 0.99),
+        cvar99: this.calculateCVaR(dailyReturns, 0.99),
+        giniCoefficient: this.calculateGiniCoefficient(dailyReturns),
+        gainPainRatio: this.calculateGainPainRatio(dailyReturns, alignedDates),
+        outlierWinRatio: this.calculateOutlierWinRatio(dailyReturns),
+        outlierLossRatio: this.calculateOutlierLossRatio(dailyReturns),
+        rollingSharpe90dMean: this.calculateRollingSharpeStats(dailyReturns, 90).mean,
+        rollingSharpe90dMedian: this.calculateRollingSharpeStats(dailyReturns, 90).median,
+        rollingSharpe90dLast: this.calculateRollingSharpeStats(dailyReturns, 90).last,
+        rollingSharpe365dMean: this.calculateRollingSharpeStats(dailyReturns, 365).mean,
+        rollingSharpe365dMedian: this.calculateRollingSharpeStats(dailyReturns, 365).median,
+        rollingSharpe365dLast: this.calculateRollingSharpeStats(dailyReturns, 365).last,
+        mtd: this.calculateMTD(dailyReturns, alignedDates),
+        return3M: this.calculatePeriodReturn(dailyReturns, alignedDates, 90),
+        return6M: this.calculatePeriodReturn(dailyReturns, alignedDates, 180),
+        ytd: this.calculateYTD(dailyReturns, alignedDates),
+        bestDay: this.calculateBestDay(dailyReturns),
+        worstDay: this.calculateWorstDay(dailyReturns),
+        bestMonth: this.calculateBestMonth(dailyReturns, alignedDates),
+        worstMonth: this.calculateWorstMonth(dailyReturns, alignedDates),
+        bestYear: this.calculateBestYear(dailyReturns, alignedDates),
+        worstYear: this.calculateWorstYear(dailyReturns, alignedDates),
+        skew: this.calculateSkew(dailyReturns),
+        kurtosis: this.calculateKurtosis(dailyReturns),
         totalDays: totalDays,
         years: years,
         dataPoints: dailyReturns.length
@@ -1452,6 +1694,570 @@ export default {
       const p5 = sorted[Math.floor(0.05 * sorted.length)];
       if (p5 === 0) return Infinity;
       return Math.abs(p95 / p5);
+    },
+
+    // 12. 最大回撤持续时间
+    calculateMaxDrawdownDuration(dailyReturns, dates) {
+      if (dailyReturns.length === 0 || !dates || dates.length === 0) return 0;
+      
+      let cumulative = 1;
+      let maxCumulative = 1;
+      let maxCumulativeIndex = 0;
+      let drawdownStartIndex = -1;
+      let maxDrawdownDuration = 0;
+      
+      for (let i = 0; i < dailyReturns.length; i++) {
+        cumulative *= (1 + dailyReturns[i]);
+        
+        if (cumulative > maxCumulative) {
+          // 创新高，结束当前回撤
+          if (drawdownStartIndex >= 0) {
+            const duration = i - drawdownStartIndex;
+            if (duration > maxDrawdownDuration) {
+              maxDrawdownDuration = duration;
+            }
+            drawdownStartIndex = -1;
+          }
+          maxCumulative = cumulative;
+          maxCumulativeIndex = i;
+        } else if (drawdownStartIndex < 0 && cumulative < maxCumulative) {
+          // 开始新的回撤
+          drawdownStartIndex = maxCumulativeIndex;
+        }
+      }
+      
+      // 处理最后一个回撤（如果还在回撤中）
+      if (drawdownStartIndex >= 0) {
+        const duration = dailyReturns.length - 1 - drawdownStartIndex;
+        if (duration > maxDrawdownDuration) {
+          maxDrawdownDuration = duration;
+        }
+      }
+      
+      return maxDrawdownDuration;
+    },
+
+    // 13. 最佳单日收益
+    calculateBestDay(dailyReturns) {
+      if (dailyReturns.length === 0) return 0;
+      return Math.max(...dailyReturns);
+    },
+
+    // 14. 最差单日收益
+    calculateWorstDay(dailyReturns) {
+      if (dailyReturns.length === 0) return 0;
+      return Math.min(...dailyReturns);
+    },
+
+    // 15. 最佳单月收益
+    calculateBestMonth(dailyReturns, dates) {
+      if (dailyReturns.length === 0 || !dates || dates.length === 0) return 0;
+      
+      const monthlyReturns = this.calculateMonthlyReturns(dailyReturns, dates);
+      if (monthlyReturns.length === 0) return 0;
+      return Math.max(...monthlyReturns);
+    },
+
+    // 16. 最差单月收益
+    calculateWorstMonth(dailyReturns, dates) {
+      if (dailyReturns.length === 0 || !dates || dates.length === 0) return 0;
+      
+      const monthlyReturns = this.calculateMonthlyReturns(dailyReturns, dates);
+      if (monthlyReturns.length === 0) return 0;
+      return Math.min(...monthlyReturns);
+    },
+
+    // 辅助方法：计算每月收益
+    calculateMonthlyReturns(dailyReturns, dates) {
+      const monthlyData = {};
+      
+      for (let i = 0; i < dates.length && i < dailyReturns.length; i++) {
+        let date;
+        try {
+          date = new Date(dates[i]);
+          if (isNaN(date.getTime())) {
+            const dateStr = dates[i];
+            if (dateStr && dateStr.includes('-')) {
+              const parts = dateStr.split('-');
+              if (parts.length >= 2) {
+                date = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2] || 1));
+              } else {
+                continue;
+              }
+            } else {
+              continue;
+            }
+          }
+        } catch (e) {
+          continue;
+        }
+        
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const monthKey = `${year}-${month}`;
+        
+        if (!monthlyData[monthKey]) {
+          monthlyData[monthKey] = [];
+        }
+        monthlyData[monthKey].push(dailyReturns[i]);
+      }
+      
+      // 计算每月收益
+      const monthlyReturns = [];
+      Object.keys(monthlyData).forEach(monthKey => {
+        const returns = monthlyData[monthKey];
+        if (returns.length > 0) {
+          let monthlyReturn = 1;
+          for (const dr of returns) {
+            monthlyReturn *= (1 + dr);
+          }
+          monthlyReturns.push(monthlyReturn - 1);
+        }
+      });
+      
+      return monthlyReturns;
+    },
+
+    // 17. 偏度
+    calculateSkew(dailyReturns) {
+      if (dailyReturns.length < 3) return 0;
+      
+      const mean = dailyReturns.reduce((a, b) => a + b, 0) / dailyReturns.length;
+      const variance = dailyReturns.reduce((sum, dr) => sum + Math.pow(dr - mean, 2), 0) / dailyReturns.length;
+      const stdDev = Math.sqrt(variance);
+      
+      if (stdDev === 0) return 0;
+      
+      // 三阶矩（偏度）
+      const n = dailyReturns.length;
+      const skewness = dailyReturns.reduce((sum, dr) => {
+        return sum + Math.pow((dr - mean) / stdDev, 3);
+      }, 0) / n;
+      
+      return skewness;
+    },
+
+    // 18. 峰度
+    calculateKurtosis(dailyReturns) {
+      if (dailyReturns.length < 4) return 0;
+      
+      const mean = dailyReturns.reduce((a, b) => a + b, 0) / dailyReturns.length;
+      const variance = dailyReturns.reduce((sum, dr) => sum + Math.pow(dr - mean, 2), 0) / dailyReturns.length;
+      const stdDev = Math.sqrt(variance);
+      
+      if (stdDev === 0) return 0;
+      
+      // 四阶矩（峰度），减去3得到超额峰度
+      const n = dailyReturns.length;
+      const kurtosis = dailyReturns.reduce((sum, dr) => {
+        return sum + Math.pow((dr - mean) / stdDev, 4);
+      }, 0) / n - 3; // 减去3得到超额峰度（正态分布的峰度为3）
+      
+      return kurtosis;
+    },
+
+    // 19. Duration of MD (最大回撤的持续时间)
+    calculateDurationOfMD(dailyReturns, dates) {
+      if (dailyReturns.length === 0 || !dates || dates.length === 0) return 0;
+      
+      let cumulative = 1;
+      let maxCumulative = 1;
+      let maxCumulativeIndex = 0;
+      let maxDrawdown = 0;
+      let maxDrawdownStartIndex = -1;
+      let maxDrawdownEndIndex = -1;
+      
+      // 找到最大回撤的起点和终点
+      for (let i = 0; i < dailyReturns.length; i++) {
+        cumulative *= (1 + dailyReturns[i]);
+        
+        if (cumulative > maxCumulative) {
+          maxCumulative = cumulative;
+          maxCumulativeIndex = i;
+        }
+        
+        const drawdown = (cumulative / maxCumulative) - 1;
+        if (drawdown < maxDrawdown) {
+          maxDrawdown = drawdown;
+          if (maxDrawdownStartIndex < 0) {
+            maxDrawdownStartIndex = maxCumulativeIndex;
+          }
+          maxDrawdownEndIndex = i;
+        }
+      }
+      
+      // 找到恢复点（净值重新超过起点）
+      if (maxDrawdownStartIndex >= 0 && maxDrawdownEndIndex >= 0) {
+        let recoveryIndex = -1;
+        const startCumulative = maxCumulative;
+        for (let i = maxDrawdownEndIndex + 1; i < dailyReturns.length; i++) {
+          let testCumulative = 1;
+          for (let j = 0; j <= i; j++) {
+            testCumulative *= (1 + dailyReturns[j]);
+          }
+          if (testCumulative >= startCumulative) {
+            recoveryIndex = i;
+            break;
+          }
+        }
+        
+        if (recoveryIndex >= 0) {
+          return recoveryIndex - maxDrawdownStartIndex;
+        }
+        // 如果还没恢复，返回到当前的天数
+        return dailyReturns.length - 1 - maxDrawdownStartIndex;
+      }
+      
+      return 0;
+    },
+
+    // 20. Drawdown of MDD (最长持续时间回撤的幅度)
+    calculateDrawdownOfMDD(dailyReturns, dates) {
+      if (dailyReturns.length === 0 || !dates || dates.length === 0) return 0;
+      
+      let cumulative = 1;
+      let maxCumulative = 1;
+      let maxCumulativeIndex = 0;
+      let drawdownStartIndex = -1;
+      let maxDrawdownDuration = 0;
+      let maxDrawdownDurationStartIndex = -1;
+      let maxDrawdownDurationEndIndex = -1;
+      
+      // 找到最长持续时间的回撤
+      for (let i = 0; i < dailyReturns.length; i++) {
+        cumulative *= (1 + dailyReturns[i]);
+        
+        if (cumulative > maxCumulative) {
+          if (drawdownStartIndex >= 0) {
+            const duration = i - drawdownStartIndex;
+            if (duration > maxDrawdownDuration) {
+              maxDrawdownDuration = duration;
+              maxDrawdownDurationStartIndex = drawdownStartIndex;
+              maxDrawdownDurationEndIndex = i;
+            }
+            drawdownStartIndex = -1;
+          }
+          maxCumulative = cumulative;
+          maxCumulativeIndex = i;
+        } else if (drawdownStartIndex < 0 && cumulative < maxCumulative) {
+          drawdownStartIndex = maxCumulativeIndex;
+        }
+      }
+      
+      // 处理最后一个回撤
+      if (drawdownStartIndex >= 0) {
+        const duration = dailyReturns.length - 1 - drawdownStartIndex;
+        if (duration > maxDrawdownDuration) {
+          maxDrawdownDuration = duration;
+          maxDrawdownDurationStartIndex = drawdownStartIndex;
+          maxDrawdownDurationEndIndex = dailyReturns.length - 1;
+        }
+      }
+      
+      // 计算最长持续时间回撤的幅度
+      if (maxDrawdownDurationStartIndex >= 0 && maxDrawdownDurationEndIndex >= 0) {
+        let startCumulative = 1;
+        for (let i = 0; i <= maxDrawdownDurationStartIndex; i++) {
+          startCumulative *= (1 + dailyReturns[i]);
+        }
+        
+        let minCumulative = startCumulative;
+        let currentCumulative = startCumulative;
+        for (let i = maxDrawdownDurationStartIndex + 1; i <= maxDrawdownDurationEndIndex; i++) {
+          currentCumulative *= (1 + dailyReturns[i]);
+          if (currentCumulative < minCumulative) {
+            minCumulative = currentCumulative;
+          }
+        }
+        
+        if (startCumulative === 0) return 0;
+        return (minCumulative / startCumulative) - 1;
+      }
+      
+      return 0;
+    },
+
+    // 21. 1-month VaR (99%)
+    calculateMonthlyVaR(dailyReturns, dates, confidence) {
+      const monthlyReturns = this.calculateMonthlyReturns(dailyReturns, dates);
+      if (monthlyReturns.length === 0) return 0;
+      const sorted = [...monthlyReturns].sort((a, b) => a - b);
+      const index = Math.floor((1 - confidence) * sorted.length);
+      return sorted[Math.max(0, index)];
+    },
+
+    // 22. Gini Coefficient
+    calculateGiniCoefficient(dailyReturns) {
+      if (dailyReturns.length === 0) return 0;
+      
+      // 使用收益绝对值
+      const absReturns = dailyReturns.map(r => Math.abs(r));
+      const sorted = [...absReturns].sort((a, b) => a - b);
+      const n = sorted.length;
+      const sum = sorted.reduce((a, b) => a + b, 0);
+      
+      if (sum === 0) return 0;
+      
+      // 计算洛伦兹曲线下面积
+      let lorenzArea = 0;
+      let cumulativeSum = 0;
+      for (let i = 0; i < n; i++) {
+        cumulativeSum += sorted[i];
+        lorenzArea += (cumulativeSum / sum) / n;
+      }
+      
+      // Gini = 1 - 2 * 洛伦兹曲线下面积
+      return 1 - 2 * lorenzArea;
+    },
+
+    // 23. Gain/Pain Ratio (1M)
+    calculateGainPainRatio(dailyReturns, dates) {
+      const monthlyReturns = this.calculateMonthlyReturns(dailyReturns, dates);
+      if (monthlyReturns.length === 0) return 0;
+      
+      let positiveSum = 0;
+      let negativeSum = 0;
+      
+      for (const mr of monthlyReturns) {
+        if (mr > 0) {
+          positiveSum += mr;
+        } else {
+          negativeSum += Math.abs(mr);
+        }
+      }
+      
+      if (negativeSum === 0) return positiveSum > 0 ? Infinity : 0;
+      return positiveSum / negativeSum;
+    },
+
+    // 24. Outlier Win Ratio
+    calculateOutlierWinRatio(dailyReturns) {
+      if (dailyReturns.length === 0) return 0;
+      const sorted = [...dailyReturns].sort((a, b) => a - b);
+      const p99 = sorted[Math.floor(0.99 * sorted.length)];
+      const positiveOutliers = dailyReturns.filter(r => r > p99 && r > 0);
+      return positiveOutliers.length / dailyReturns.length;
+    },
+
+    // 25. Outlier Loss Ratio
+    calculateOutlierLossRatio(dailyReturns) {
+      if (dailyReturns.length === 0) return 0;
+      const sorted = [...dailyReturns].sort((a, b) => a - b);
+      const p1 = sorted[Math.floor(0.01 * sorted.length)];
+      const negativeOutliers = dailyReturns.filter(r => r < p1 && r < 0);
+      return negativeOutliers.length / dailyReturns.length;
+    },
+
+    // 26. Rolling Sharpe Stats
+    calculateRollingSharpeStats(dailyReturns, windowSize) {
+      if (dailyReturns.length < windowSize) {
+        return { mean: 0, median: 0, last: 0 };
+      }
+      
+      const rollingSharpe = [];
+      
+      for (let i = windowSize - 1; i < dailyReturns.length; i++) {
+        const window = dailyReturns.slice(i - windowSize + 1, i + 1);
+        const mean = window.reduce((a, b) => a + b, 0) / window.length;
+        const variance = window.reduce((sum, dr) => sum + Math.pow(dr - mean, 2), 0) / window.length;
+        const stdDev = Math.sqrt(variance);
+        
+        if (stdDev === 0) {
+          rollingSharpe.push(0);
+        } else {
+          rollingSharpe.push((mean / stdDev) * Math.sqrt(252));
+        }
+      }
+      
+      if (rollingSharpe.length === 0) {
+        return { mean: 0, median: 0, last: 0 };
+      }
+      
+      const sorted = [...rollingSharpe].sort((a, b) => a - b);
+      const mean = rollingSharpe.reduce((a, b) => a + b, 0) / rollingSharpe.length;
+      const median = sorted[Math.floor(sorted.length / 2)];
+      const last = rollingSharpe[rollingSharpe.length - 1];
+      
+      return { mean, median, last };
+    },
+
+    // 27. MTD (Month to Date)
+    calculateMTD(dailyReturns, dates) {
+      if (dailyReturns.length === 0 || !dates || dates.length === 0) return 0;
+      
+      const now = new Date();
+      const currentMonth = now.getMonth();
+      const currentYear = now.getFullYear();
+      
+      let startIndex = -1;
+      for (let i = dates.length - 1; i >= 0; i--) {
+        let date;
+        try {
+          date = new Date(dates[i]);
+          if (isNaN(date.getTime())) continue;
+          if (date.getMonth() === currentMonth && date.getFullYear() === currentYear) {
+            startIndex = i;
+          } else if (startIndex >= 0) {
+            break;
+          }
+        } catch (e) {
+          continue;
+        }
+      }
+      
+      if (startIndex < 0) return 0;
+      
+      let cumulative = 1;
+      for (let i = startIndex; i < dailyReturns.length; i++) {
+        cumulative *= (1 + dailyReturns[i]);
+      }
+      
+      return cumulative - 1;
+    },
+
+    // 28. Period Return (3M, 6M)
+    calculatePeriodReturn(dailyReturns, dates, days) {
+      if (dailyReturns.length === 0) return 0;
+      
+      const startIndex = Math.max(0, dailyReturns.length - days);
+      let cumulative = 1;
+      for (let i = startIndex; i < dailyReturns.length; i++) {
+        cumulative *= (1 + dailyReturns[i]);
+      }
+      
+      return cumulative - 1;
+    },
+
+    // 29. YTD (Year to Date)
+    calculateYTD(dailyReturns, dates) {
+      if (dailyReturns.length === 0 || !dates || dates.length === 0) return 0;
+      
+      const now = new Date();
+      const currentYear = now.getFullYear();
+      
+      let startIndex = -1;
+      for (let i = 0; i < dates.length; i++) {
+        let date;
+        try {
+          date = new Date(dates[i]);
+          if (isNaN(date.getTime())) continue;
+          if (date.getFullYear() === currentYear) {
+            startIndex = i;
+            break;
+          }
+        } catch (e) {
+          continue;
+        }
+      }
+      
+      if (startIndex < 0) return 0;
+      
+      let cumulative = 1;
+      for (let i = startIndex; i < dailyReturns.length; i++) {
+        cumulative *= (1 + dailyReturns[i]);
+      }
+      
+      return cumulative - 1;
+    },
+
+    // 30. Best Year
+    calculateBestYear(dailyReturns, dates) {
+      if (dailyReturns.length === 0 || !dates || dates.length === 0) return 0;
+      
+      const yearlyData = {};
+      
+      for (let i = 0; i < dates.length && i < dailyReturns.length; i++) {
+        let date;
+        try {
+          date = new Date(dates[i]);
+          if (isNaN(date.getTime())) {
+            const dateStr = dates[i];
+            if (dateStr && dateStr.includes('-')) {
+              const parts = dateStr.split('-');
+              if (parts.length >= 1) {
+                date = new Date(parseInt(parts[0]), 0, 1);
+              } else {
+                continue;
+              }
+            } else {
+              continue;
+            }
+          }
+        } catch (e) {
+          continue;
+        }
+        
+        const year = date.getFullYear();
+        if (!yearlyData[year]) {
+          yearlyData[year] = [];
+        }
+        yearlyData[year].push(dailyReturns[i]);
+      }
+      
+      const yearlyReturns = [];
+      Object.keys(yearlyData).forEach(year => {
+        const returns = yearlyData[year];
+        if (returns.length > 0) {
+          let yearlyReturn = 1;
+          for (const dr of returns) {
+            yearlyReturn *= (1 + dr);
+          }
+          yearlyReturns.push(yearlyReturn - 1);
+        }
+      });
+      
+      if (yearlyReturns.length === 0) return 0;
+      return Math.max(...yearlyReturns);
+    },
+
+    // 31. Worst Year
+    calculateWorstYear(dailyReturns, dates) {
+      if (dailyReturns.length === 0 || !dates || dates.length === 0) return 0;
+      
+      const yearlyData = {};
+      
+      for (let i = 0; i < dates.length && i < dailyReturns.length; i++) {
+        let date;
+        try {
+          date = new Date(dates[i]);
+          if (isNaN(date.getTime())) {
+            const dateStr = dates[i];
+            if (dateStr && dateStr.includes('-')) {
+              const parts = dateStr.split('-');
+              if (parts.length >= 1) {
+                date = new Date(parseInt(parts[0]), 0, 1);
+              } else {
+                continue;
+              }
+            } else {
+              continue;
+            }
+          }
+        } catch (e) {
+          continue;
+        }
+        
+        const year = date.getFullYear();
+        if (!yearlyData[year]) {
+          yearlyData[year] = [];
+        }
+        yearlyData[year].push(dailyReturns[i]);
+      }
+      
+      const yearlyReturns = [];
+      Object.keys(yearlyData).forEach(year => {
+        const returns = yearlyData[year];
+        if (returns.length > 0) {
+          let yearlyReturn = 1;
+          for (const dr of returns) {
+            yearlyReturn *= (1 + dr);
+          }
+          yearlyReturns.push(yearlyReturn - 1);
+        }
+      });
+      
+      if (yearlyReturns.length === 0) return 0;
+      return Math.min(...yearlyReturns);
     },
 
     // 格式化百分比
@@ -2289,6 +3095,9 @@ export default {
   grid-template-columns: 1fr;
   gap: 30px;
   margin-top: 20px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .chart-item {
@@ -2297,6 +3106,9 @@ export default {
   border-radius: 12px;
   border: 1px solid #444;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .chart-item h4 {
@@ -2312,6 +3124,16 @@ export default {
   background: linear-gradient(135deg, #0d1b2a 0%, #1b263b 100%);
   border-radius: 8px;
   padding: 15px;
+  width: 100%;
+  height: 500px;
+  box-sizing: border-box;
+  overflow: hidden;
+  position: relative;
+}
+
+.chart-item .chart-container canvas {
+  max-width: 100% !important;
+  height: auto !important;
 }
 
 /* Upload Section Styles */
