@@ -1,36 +1,21 @@
 <template>
   <div class="charts-container">
-    <!-- Upload Section -->
-    <section class="upload-section" data-aos="fade-up">
-      <h2>{{ $t('charts.uploadSection') }}</h2>
-      <div class="upload-area">
-        <input type="file" @change="handleFileUpload" accept=".csv,.xls,.xlsx" />
-        <p class="upload-hint">{{ $t('charts.uploadHint') }}</p>
-        <div class="file-requirements">
-          <h4>{{ $t('charts.fileRequirements') }}</h4>
-          <ul>
-            <li>{{ $t('charts.csvOnly') }}</li>
-            <li>{{ $t('charts.firstColumnDate') }}</li>
-            <li>{{ $t('charts.secondColumnValue') }}</li>
-            <li>{{ $t('charts.autoDetect') }}</li>
-          </ul>
-          <h5>{{ $t('charts.supportedFormats') }}</h5>
-          <ul>
-            <li v-for="format in $t('charts.dateFormats')" :key="format">{{ format }}</li>
-          </ul>
-          <h5>{{ $t('charts.supportedColumns') }}</h5>
-          <ul>
-            <li>{{ $t('charts.columnNames.date') }}</li>
-            <li>{{ $t('charts.columnNames.value') }}</li>
-          </ul>
-        </div>
-      </div>
-      <div v-if="errorMessage" class="error-message">
-        <h3>{{ $t('common.error') }}</h3>
-        <p>{{ errorMessage }}</p>
-      </div>
-    </section>
+    <!-- Loading Section -->
+    <div v-if="isLoading" class="loading-section">
+      <div class="loading-spinner"></div>
+      <p>{{ $t('charts.analyzingData') }}</p>
+    </div>
 
+    <!-- Analysis Results Section -->
+    <div v-else>
+    <!-- Download PDF Button -->
+    <div class="pdf-download-section">
+      <button @click="downloadPDF" class="download-pdf-btn" :disabled="isGeneratingPDF">
+        <span v-if="!isGeneratingPDF">{{ $t('charts.downloadPDF') }}</span>
+        <span v-else>{{ $t('charts.generatingPDF') }}</span>
+      </button>
+    </div>
+    
     <section class="charts" data-aos="fade-up">
       <h2>{{ $t('charts.title') }}</h2>
       <div v-if="!chartData || chartData.length === 0" class="no-data">
@@ -46,7 +31,7 @@
     </section>
 
     <!-- Metrics Table Section -->
-    <section v-if="metrics" class="metrics-section" data-aos="fade-up">
+    <section v-if="metrics" ref="metricsSection" class="metrics-section" data-aos="fade-up">
       <h2>{{ $t('charts.metricsTitle') }}</h2>
       <div class="metrics-table-container">
         <table class="metrics-table">
@@ -89,13 +74,7 @@
         <div ref="cumulativeReturnsChart" class="analysis-chart-container"></div>
       </div>
 
-      <!-- Chart 2: Drawdown -->
-      <div class="analysis-chart-item">
-        <h3>{{ $t('charts.analysisCharts.drawdown') }}</h3>
-        <div ref="drawdownChart" class="analysis-chart-container"></div>
-      </div>
-
-      <!-- Chart 3: Rolling Sharpe -->
+      <!-- Chart 2: Rolling Sharpe -->
       <div class="analysis-chart-item">
         <h3>{{ $t('charts.analysisCharts.rollingSharpe') }}</h3>
         <div ref="rollingSharpeChart" class="analysis-chart-container"></div>
@@ -141,6 +120,7 @@
         </div>
       </div>
     </div>
+    </div>
   </div>
 </template>
 
@@ -150,6 +130,8 @@ import polygonApi from '../services/polygonApi';
 import { fetchAllCryptoData, getCryptoDataTitle } from '../services/cryptoApi';
 import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 export default {
   name: 'Charts',
@@ -162,14 +144,16 @@ export default {
       parsedData: null,
       errorMessage: null,
       rawData: null, // 保存原始数据，用于指标计算
+      dataType: 'price', // 数据类型：'price' 表示价格值，'return_ratio' 表示涨跌比例
       metrics: null, // 保存计算后的指标
       marketMetrics: {}, // 保存市场数据的指标 { sp500: {...}, nasdaq: {...}, btc: {...}, eth: {...} }
       dailyReturns: [], // 保存日收益率数组
       dates: [], // 保存日期数组（与 dailyReturns 一一对应）
       originalDates: [], // 保存原始日期数组（用于 startDate/endDate，特别是从 cumulative_return 反推时）
+      isLoading: false, // 加载状态
+      isGeneratingPDF: false, // PDF 生成状态
       analysisCharts: {
         cumulativeReturns: null,
-        drawdown: null,
         rollingSharpe: null,
         monthlyReturns: null,
         yearlyReturns: null,
@@ -230,107 +214,196 @@ export default {
       ];
     }
   },
-  mounted() {
-    // 从路由参数获取数据
-    this.chartData = this.$route.params.data;
-    this.marketData = this.$route.params.marketData;
-    this.apiError = this.$route.params.apiError;
+  async mounted() {
+    // 从 sessionStorage 获取数据
+    const chartDataStr = sessionStorage.getItem('chartData');
+    const rawDataStr = sessionStorage.getItem('rawData');
+    const dataTypeStr = sessionStorage.getItem('dataType');
     
-    if (this.chartData && this.chartData.length > 0) {
-      this.$nextTick(() => {
-        this.initChart();
-      });
-    }
-    
-    // 渲染API数据图表
-    if (this.marketData) {
-      this.$nextTick(() => {
-        this.renderMarketCharts();
-      });
+    if (chartDataStr && rawDataStr) {
+      try {
+        const routeData = JSON.parse(chartDataStr);
+        const routeRawData = JSON.parse(rawDataStr);
+        const dataType = dataTypeStr || 'price'; // 如果没有保存数据类型，默认为 price
+        
+        if (routeData && routeData.length > 0) {
+          // 开始分析过程
+          this.isLoading = true;
+          this.chartData = routeData;
+          this.parsedData = routeData;
+          this.rawData = routeRawData;
+          this.dataType = dataType; // 设置数据类型
+          
+          // 等待 DOM 更新
+          await this.$nextTick();
+          
+          try {
+            // 检测数据类型和日期列
+            const dateColumn = this.detectDateColumn(routeRawData);
+            
+            // 计算指标
+            this.calculateMetrics(routeRawData, dateColumn);
+            
+            // 确保 dailyReturns 和 dates 已设置
+            if (!this.dailyReturns || this.dailyReturns.length === 0) {
+              console.warn('dailyReturns is empty after calculateMetrics, attempting to calculate from parsedData');
+              // 如果 dailyReturns 为空，尝试从 parsedData 计算
+              if (this.parsedData && this.parsedData.length > 1) {
+                const values = this.parsedData.map(item => item.value);
+                this.dailyReturns = [];
+                this.dates = [];
+                for (let i = 1; i < values.length; i++) {
+                  if (values[i - 1] > 0) {
+                    const dailyReturn = (values[i] - values[i - 1]) / values[i - 1];
+                    this.dailyReturns.push(dailyReturn);
+                    this.dates.push(this.parsedData[i].date);
+                  }
+                }
+                // 确保 dates 和 dailyReturns 长度一致
+                const minLength = Math.min(this.dates.length, this.dailyReturns.length);
+                this.dates = this.dates.slice(0, minLength);
+                this.dailyReturns = this.dailyReturns.slice(0, minLength);
+              }
+            }
+            
+            // 获取市场数据并更新图表
+            await this.fetchMarketDataAndUpdateCharts(routeData);
+            
+            // 渲染所有图表 - 确保 DOM 已准备好
+            await this.$nextTick();
+            await this.$nextTick(); // 双重 nextTick 确保 DOM 完全渲染
+            
+            // 再次检查并确保 dailyReturns 已设置
+            if (!this.dailyReturns || this.dailyReturns.length === 0) {
+              console.warn('dailyReturns is still empty after calculateMetrics, attempting final calculation');
+              if (this.parsedData && this.parsedData.length > 1) {
+                const values = this.parsedData.map(item => item.value);
+                this.dailyReturns = [];
+                this.dates = [];
+                for (let i = 1; i < values.length; i++) {
+                  if (values[i - 1] > 0) {
+                    const dailyReturn = (values[i] - values[i - 1]) / values[i - 1];
+                    this.dailyReturns.push(dailyReturn);
+                    this.dates.push(this.parsedData[i].date);
+                  }
+                }
+                const minLength = Math.min(this.dates.length, this.dailyReturns.length);
+                this.dates = this.dates.slice(0, minLength);
+                this.dailyReturns = this.dailyReturns.slice(0, minLength);
+                console.log('Final calculation of dailyReturns:', {
+                  dailyReturnsLength: this.dailyReturns.length,
+                  datesLength: this.dates.length
+                });
+              }
+            }
+            
+            // 渲染主图表 - 使用 setTimeout 确保 DOM 完全准备好
+            if (this.chartData && this.chartData.length > 0) {
+              setTimeout(() => {
+                if (this.$refs.chart) {
+                  this.initChart();
+                } else {
+                  console.warn('Chart ref not found after timeout, retrying...');
+                  setTimeout(() => {
+                    if (this.$refs.chart) {
+                      this.initChart();
+                    }
+                  }, 200);
+                }
+              }, 150);
+            } else {
+              console.warn('Cannot render main chart: chartData is empty', {
+                chartDataLength: this.chartData ? this.chartData.length : 0
+              });
+            }
+            
+            // 渲染分析图表
+            if (this.dailyReturns && this.dailyReturns.length > 0 && this.dates && this.dates.length > 0) {
+              console.log('Rendering analysis charts with:', {
+                dailyReturnsLength: this.dailyReturns.length,
+                datesLength: this.dates.length
+              });
+              // 再次等待 DOM 更新，确保所有 refs 都已准备好
+              await this.$nextTick();
+              this.renderAnalysisCharts();
+            } else {
+              console.error('Cannot render analysis charts: dailyReturns or dates is empty', {
+                dailyReturnsLength: this.dailyReturns ? this.dailyReturns.length : 0,
+                datesLength: this.dates ? this.dates.length : 0,
+                parsedDataLength: this.parsedData ? this.parsedData.length : 0,
+                dataType: this.dataType,
+                hasMetrics: !!this.metrics
+              });
+            }
+            
+            // 分析完成
+            this.isLoading = false;
+          } catch (error) {
+            console.error('Error during analysis:', error);
+            this.errorMessage = error.message || '分析过程中出现错误';
+            this.isLoading = false;
+          }
+        } else {
+          // 如果没有数据，显示提示
+          this.isLoading = false;
+        }
+      } catch (error) {
+        console.error('Error parsing stored data:', error);
+        this.isLoading = false;
+        // 清除无效数据
+        sessionStorage.removeItem('chartData');
+        sessionStorage.removeItem('rawData');
+        sessionStorage.removeItem('dataType');
+      }
+    } else {
+      // 如果没有数据，显示提示
+      this.isLoading = false;
     }
   },
   methods: {
-    handleFileUpload(event) {
-      const file = event.target.files[0];
-      if (!file) {
-        this.parsedData = null;
-        this.errorMessage = null;
-        return;
+    detectDateColumn(data) {
+      if (!data || data.length === 0) {
+        return null;
       }
 
-      const fileName = file.name.toLowerCase();
-      this.errorMessage = null;
-
-      // 检查文件类型
-      if (fileName.endsWith('.csv')) {
-        // 处理 CSV 文件
-        Papa.parse(file, {
-          header: true,
-          skipEmptyLines: true,
-          complete: (results) => {
-            try {
-              this.parseCSVData(results.data);
-            } catch (error) {
-              this.errorMessage = this.$t('charts.errorParsingCsv') + ': ' + error.message;
-              this.parsedData = null;
-            }
-          },
-          error: (error) => {
-            this.errorMessage = this.$t('charts.errorReadingCsv') + ': ' + error.message;
-            this.parsedData = null;
-          }
-        });
-      } else if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls')) {
-        // 处理 Excel 文件
-        this.parseExcelFile(file);
-      } else {
-        this.errorMessage = this.$t('charts.selectSupportedFile');
-        this.parsedData = null;
-        return;
-      }
-    },
-
-    parseExcelFile(file) {
-      const reader = new FileReader();
+      const firstRow = data[0];
+      const columnNames = Object.keys(firstRow).filter(name => name && name.trim() !== '');
       
-      reader.onload = (evt) => {
-        try {
-          const data = new Uint8Array(evt.target.result);
-          const workbook = XLSX.read(data, { type: 'array' });
-          
-          // 检查是否有工作表
-          if (!workbook.SheetNames || workbook.SheetNames.length === 0) {
-            throw new Error(this.$t('charts.excelNoSheets'));
-          }
-          
-          // 使用第一个工作表
-          const sheetName = workbook.SheetNames[0];
-          const worksheet = workbook.Sheets[sheetName];
-          
-          // 将工作表转换为 JSON 对象数组
-          const jsonData = XLSX.utils.sheet_to_json(worksheet, {
-            defval: '', // 空单元格的默认值
-            raw: false  // 将数字和日期转换为字符串
-          });
-          
-          if (!jsonData || jsonData.length === 0) {
-            throw new Error(this.$t('charts.excelEmpty'));
-          }
-          
-          // 使用与 CSV 相同的解析逻辑
-          this.parseCSVData(jsonData);
-        } catch (error) {
-          this.errorMessage = this.$t('charts.errorParsingExcel') + ': ' + error.message;
-          this.parsedData = null;
+      if (columnNames.length < 2) {
+        return null;
+      }
+
+      // 优先检测 daily_returns.csv 格式的字段
+      const hasDailyReturnFields = columnNames.some(name => 
+        name === 'date' || name === 'daily_return' || name === 'cumulative_return'
+      );
+
+      if (hasDailyReturnFields) {
+        if (columnNames.includes('date')) {
+          return 'date';
+        } else if (columnNames.includes('candle_begin_time')) {
+          return 'candle_begin_time';
         }
-      };
-      
-      reader.onerror = () => {
-        this.errorMessage = this.$t('charts.errorReadingExcel');
-        this.parsedData = null;
-      };
-      
-      reader.readAsArrayBuffer(file);
+      } else {
+        // 原有的智能检测逻辑
+        const firstColumnName = columnNames[0];
+        const firstColumnValue = firstRow[firstColumnName];
+        if (this.isDateColumn(firstColumnValue) || this.isDateColumnSlashFormat(firstColumnValue)) {
+          return firstColumnName;
+        } else {
+          // 如果第一列不是日期，尝试查找包含日期关键词的列
+          for (const colName of columnNames) {
+            if (this.isDateColumnName(colName)) {
+              return colName;
+            }
+          }
+          
+          // 如果没找到明确的列名，使用第一列作为日期
+          return columnNames[0];
+        }
+      }
+
+      return columnNames[0] || null;
     },
 
     parseCSVData(data) {
@@ -412,7 +485,7 @@ export default {
       }
 
       // 解析数据
-      const parsedData = data.map((row, index) => {
+      let parsedData = data.map((row, index) => {
         const dateStr = row[dateColumn];
         const valueStr = row[valueColumn];
 
@@ -435,6 +508,39 @@ export default {
         };
       });
 
+      // 根据列名判断数据类型
+      // 如果列名包含 '_return'，则是变化率（daily_return 或 cumulative_return）
+      // 否则是价格值
+      const isReturnType = valueColumn.toLowerCase().includes('_return');
+      
+      if (isReturnType) {
+        // 判断是 daily_return 还是 cumulative_return
+        const isDailyReturn = valueColumn.toLowerCase().includes('daily_return');
+        const isCumulativeReturn = valueColumn.toLowerCase().includes('cumulative_return');
+        
+        if (isDailyReturn) {
+          // daily_return: 每天的涨跌变化值（初始值为0）
+          // 转换为价格序列：price[0] = 1, price[i] = price[i-1] * (1 + daily_return[i])
+          console.log('Detected daily_return data, converting to price series...');
+          parsedData = this.convertDailyReturnToPriceSeries(parsedData);
+          this.dataType = 'daily_return';
+        } else if (isCumulativeReturn) {
+          // cumulative_return: 累计的涨跌变化值（初始值为0）
+          // 转换为价格序列：price[i] = 1 + cumulative_return[i]
+          console.log('Detected cumulative_return data, converting to price series...');
+          parsedData = this.convertCumulativeReturnToPriceSeries(parsedData);
+          this.dataType = 'cumulative_return';
+        } else {
+          // 其他 _return 类型，默认按 cumulative_return 处理
+          console.log('Detected return type data, converting to price series...');
+          parsedData = this.convertCumulativeReturnToPriceSeries(parsedData);
+          this.dataType = 'return';
+        }
+      } else {
+        // 价格值，直接使用
+        this.dataType = 'price';
+      }
+
       this.parsedData = parsedData;
       this.chartData = parsedData;
       
@@ -448,12 +554,133 @@ export default {
       this.fetchMarketDataAndUpdateCharts(parsedData);
     },
 
+    /**
+     * 将 daily_return（每天的涨跌变化值）转换为价格序列
+     * daily_return: 每天的涨跌变化值，初始值为0
+     * 转换公式：price[0] = 1, price[i] = price[i-1] * (1 + daily_return[i])
+     * 
+     * 例如：
+     * - daily_return[0] = 0.01 → 价格[0] = 1 * (1 + 0.01) = 1.01
+     * - daily_return[1] = 0.02 → 价格[1] = 1.01 * (1 + 0.02) = 1.0302
+     * - daily_return[2] = -0.01 → 价格[2] = 1.0302 * (1 - 0.01) = 1.019898
+     * 
+     * @param {Array} parsedData - 解析后的数据数组，每个元素包含 {date, value}，value是daily_return
+     * @returns {Array} 转换后的价格序列，每个元素包含 {date, value}，value是价格
+     */
+    convertDailyReturnToPriceSeries(parsedData) {
+      if (!parsedData || parsedData.length === 0) {
+        return parsedData;
+      }
+
+      const priceSeries = [];
+      let currentPrice = 1; // 初始价格为1
+
+      for (const item of parsedData) {
+        // price[i] = price[i-1] * (1 + daily_return[i])
+        currentPrice = currentPrice * (1 + item.value);
+        priceSeries.push({
+          date: item.date,
+          value: currentPrice
+        });
+      }
+
+      return priceSeries;
+    },
+
+    /**
+     * 将 cumulative_return（累计的涨跌变化值）转换为价格序列
+     * cumulative_return: 是 daily_return 的累加值
+     * 转换公式：price[i] = 1 + cumulative_return[i]
+     * 
+     * 例如：
+     * - 2024-01-01: cumulative_return = 0.01 → 价格 = 1 + 0.01 = 1.01
+     * - 2024-01-02: cumulative_return = 0.03 → 价格 = 1 + 0.03 = 1.03
+     * 
+     * 注意：cumulative_return 是累加值，所以可以直接用 1 + cumulative_return 得到价格
+     * 
+     * @param {Array} parsedData - 解析后的数据数组，每个元素包含 {date, value}，value是cumulative_return
+     * @returns {Array} 转换后的价格序列，每个元素包含 {date, value}，value是价格
+     */
+    convertCumulativeReturnToPriceSeries(parsedData) {
+      if (!parsedData || parsedData.length === 0) {
+        return parsedData;
+      }
+
+      // 初始价格为1，之后每天的价格 = 1 + cumulative_return（累加值）
+      return parsedData.map(item => ({
+        date: item.date,
+        value: 1 + item.value  // 初始价格1 + 累计涨跌变化值（累加值）
+      }));
+    },
+
+    /**
+     * 从CSV数据中提取日期范围
+     * @param {Array} csvData - 解析后的CSV数据数组，每个元素包含 {date, value}
+     * @returns {Object} 包含 fromDate 和 toDate 的对象，格式为 YYYY-MM-DD
+     */
+    extractDateRangeFromCSV(csvData) {
+      if (!csvData || csvData.length === 0) {
+        return null;
+      }
+
+      // 提取所有日期（parsedData中的日期已经通过normalizeDate标准化为YYYY-MM-DD格式）
+      const dates = csvData
+        .map(item => item.date)
+        .filter(date => date) // 过滤掉空值
+        .map(date => {
+          // 处理字符串格式（应该是YYYY-MM-DD）
+          if (typeof date === 'string') {
+            // 如果已经是 YYYY-MM-DD 格式，直接返回
+            if (/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+              return date;
+            }
+            // 如果是 YYYY/M/D 格式，转换为 YYYY-MM-DD（以防万一）
+            if (/^\d{4}\/\d{1,2}\/\d{1,2}$/.test(date)) {
+              const parts = date.split('/');
+              const year = parts[0];
+              const month = parts[1].padStart(2, '0');
+              const day = parts[2].padStart(2, '0');
+              return `${year}-${month}-${day}`;
+            }
+          }
+          // 如果是 Date 对象，转换为 YYYY-MM-DD
+          if (date instanceof Date) {
+            return date.toISOString().split('T')[0];
+          }
+          return null;
+        })
+        .filter(date => date !== null)
+        .sort(); // 排序以便找到最早和最晚的日期
+
+      if (dates.length === 0) {
+        return null;
+      }
+
+      return {
+        fromDate: dates[0],
+        toDate: dates[dates.length - 1]
+      };
+    },
+
     async fetchMarketDataAndUpdateCharts(csvData) {
       try {
+        // 从CSV数据中提取日期范围
+        const dateRange = this.extractDateRangeFromCSV(csvData);
+        let fromDate = null;
+        let toDate = null;
+
+        if (dateRange) {
+          fromDate = dateRange.fromDate;
+          toDate = dateRange.toDate;
+          console.log('Extracted date range from CSV:', { fromDate, toDate });
+        } else {
+          console.warn('Could not extract date range from CSV, using default (last 30 days)');
+        }
+
         // 并行获取股票数据（Polygon）和加密货币数据（CoinGecko）
         const [stockResult, cryptoResult] = await Promise.allSettled([
-          polygonApi.fetchAllMarketData(),
-          fetchAllCryptoData(30)
+          polygonApi.fetchAllMarketData(fromDate, toDate),
+          fetchAllCryptoData(30, fromDate, toDate)
         ]);
 
         // 合并数据：股票数据来自 Polygon，加密货币数据来自 CoinGecko
@@ -632,13 +859,60 @@ export default {
     },
 
     initChart() {
-      if (!this.$refs.chart) return;
+      if (!this.$refs.chart) {
+        console.warn('initChart: chart ref not found');
+        return;
+      }
+      
+      if (!this.chartData || this.chartData.length === 0) {
+        console.warn('initChart: chartData is empty');
+        return;
+      }
+      
+      console.log('Initializing main chart with data:', {
+        chartDataLength: this.chartData.length
+      });
+      
+      // 如果图表已经初始化，先销毁
+      if (this.chart) {
+        this.chart.dispose();
+        this.chart = null;
+      }
+      
+      // 确保容器有尺寸
+      const chartElement = this.$refs.chart;
+      if (chartElement.offsetWidth === 0 || chartElement.offsetHeight === 0) {
+        console.warn('Chart container has no size, waiting...', {
+          width: chartElement.offsetWidth,
+          height: chartElement.offsetHeight,
+          clientWidth: chartElement.clientWidth,
+          clientHeight: chartElement.clientHeight
+        });
+        setTimeout(() => {
+          this.initChart();
+        }, 100);
+        return;
+      }
+      
+      console.log('Chart container size:', {
+        width: chartElement.offsetWidth,
+        height: chartElement.offsetHeight
+      });
       
       this.chart = echarts.init(this.$refs.chart);
       
       // 准备数据
       const dates = this.chartData.map(item => item.date);
       const values = this.chartData.map(item => item.value);
+      
+      console.log('Chart data prepared:', {
+        datesLength: dates.length,
+        valuesLength: values.length,
+        firstDate: dates[0],
+        lastDate: dates[dates.length - 1],
+        firstValue: values[0],
+        lastValue: values[values.length - 1]
+      });
       
       const option = {
         title: {
@@ -720,14 +994,30 @@ export default {
         }]
       };
       
-      this.chart.setOption(option);
+      try {
+        this.chart.setOption(option);
+        console.log('Main chart option set successfully');
+        
+        // 确保图表正确渲染
+        this.$nextTick(() => {
+          if (this.chart) {
+            this.chart.resize();
+          }
+        });
+      } catch (error) {
+        console.error('Error setting chart option:', error);
+      }
       
       // 响应式调整
-      window.addEventListener('resize', () => {
+      const resizeHandler = () => {
         if (this.chart) {
           this.chart.resize();
         }
-      });
+      };
+      
+      // 移除旧的监听器（如果存在）
+      window.removeEventListener('resize', resizeHandler);
+      window.addEventListener('resize', resizeHandler);
     },
 
     // 渲染API市场数据图表
@@ -1114,7 +1404,55 @@ export default {
         return;
       }
 
-      // 检查是否有 daily_return 字段
+      // 如果数据已经被转换为价格序列（从 daily_return 或 cumulative_return 转换），
+      // 应该从转换后的价格序列计算日收益率，而不是使用原始数据
+      if (this.dataType !== 'price' && this.parsedData && this.parsedData.length > 1) {
+        // 数据已经被转换为价格序列，从价格序列计算日收益率
+        const result = this.calculateMetricsFromValue(this.parsedData, 'date');
+        if (result) {
+          this.metrics = result;
+          // 从 parsedData 反推 dailyReturns 和 dates
+          // 注意：dailyReturns 的长度比 parsedData 少1（因为从第二个值开始计算）
+          const values = this.parsedData.map(item => item.value);
+          this.dailyReturns = [];
+          this.dates = [];
+          
+          // 从第二个值开始计算日收益率
+          for (let i = 1; i < values.length; i++) {
+            if (values[i - 1] > 0) {
+              const dailyReturn = (values[i] - values[i - 1]) / values[i - 1];
+              this.dailyReturns.push(dailyReturn);
+              // dates 对应 dailyReturns，所以使用第 i 个日期（因为 dailyReturn 是从 i-1 到 i 的变化）
+              this.dates.push(this.parsedData[i].date);
+            }
+          }
+          
+          // 确保 dates 和 dailyReturns 长度一致
+          const minLength = Math.min(this.dates.length, this.dailyReturns.length);
+          this.dates = this.dates.slice(0, minLength);
+          this.dailyReturns = this.dailyReturns.slice(0, minLength);
+          
+          // 保存原始日期数组（用于 startDate/endDate）
+          if (!this.originalDates || this.originalDates.length === 0) {
+            this.originalDates = this.parsedData.map(item => item.date);
+          }
+          
+          console.log('Calculated dailyReturns and dates from parsedData:', {
+            dailyReturnsLength: this.dailyReturns.length,
+            datesLength: this.dates.length,
+            parsedDataLength: this.parsedData.length
+          });
+          
+          // 不在这里渲染，让调用者统一处理
+          return;
+        } else {
+          console.error('Failed to calculate metrics from value');
+          this.metrics = null;
+          return;
+        }
+      }
+
+      // 检查是否有 daily_return 字段（仅当数据是原始价格数据时）
       const firstRow = rawData[0];
       const hasDailyReturn = 'daily_return' in firstRow && 
                             firstRow.daily_return !== '' && 
@@ -1154,26 +1492,57 @@ export default {
           if (result) {
             this.metrics = result;
             // 从 parsedData 反推 dailyReturns 和 dates
+            // 注意：dailyReturns 的长度比 parsedData 少1（因为从第二个值开始计算）
             const values = this.parsedData.map(item => item.value);
             this.dailyReturns = [];
             this.dates = [];
+            
+            // 从第二个值开始计算日收益率
             for (let i = 1; i < values.length; i++) {
               if (values[i - 1] > 0) {
                 const dailyReturn = (values[i] - values[i - 1]) / values[i - 1];
                 this.dailyReturns.push(dailyReturn);
+                // dates 对应 dailyReturns，所以使用第 i 个日期（因为 dailyReturn 是从 i-1 到 i 的变化）
                 this.dates.push(this.parsedData[i].date);
               }
             }
-            // 渲染分析图表
-            this.$nextTick(() => {
-              this.renderAnalysisCharts();
+            
+            // 确保 dates 和 dailyReturns 长度一致
+            const minLength = Math.min(this.dates.length, this.dailyReturns.length);
+            this.dates = this.dates.slice(0, minLength);
+            this.dailyReturns = this.dailyReturns.slice(0, minLength);
+            
+            // 保存原始日期数组（用于 startDate/endDate）
+            if (!this.originalDates || this.originalDates.length === 0) {
+              this.originalDates = this.parsedData.map(item => item.date);
+            }
+            
+            console.log('Calculated dailyReturns and dates from parsedData (price type):', {
+              dailyReturnsLength: this.dailyReturns.length,
+              datesLength: this.dates.length,
+              parsedDataLength: this.parsedData.length
             });
+            
+            // 不在这里渲染，让调用者统一处理
+            return;
+          } else {
+            console.error('Failed to calculate metrics from parsedData');
+            this.metrics = null;
+            return;
           }
-          return;
         } else if ('cumulative_return' in firstRow) {
           // 从 cumulative_return 反推 daily_return
-          // cumulative_return[i] = (1 + r1) * (1 + r2) * ... * (1 + ri) - 1
-          // 所以 daily_return[i] = (cumulative_return[i] + 1) / (cumulative_return[i-1] + 1) - 1
+          // 根据用户说明：
+          // 1. cumulative_return 是 daily_return 的累加值：cumulative_return[i] = sum(daily_return[0..i])
+          // 2. 价格计算：price[i] = 1 + cumulative_return[i]
+          // 
+          // 但是，daily_return 表示当天增长的比例，所以：
+          // price[i] = price[i-1] * (1 + daily_return[i])
+          // 
+          // 因此：1 + cumulative_return[i] = price[i] = price[i-1] * (1 + daily_return[i])
+          //      = (1 + cumulative_return[i-1]) * (1 + daily_return[i])
+          // 
+          // 所以：daily_return[i] = (1 + cumulative_return[i]) / (1 + cumulative_return[i-1]) - 1
           const cumulativeReturns = rawData
             .map(row => {
               const cr = parseFloat(row.cumulative_return);
@@ -1199,10 +1568,14 @@ export default {
               const prevCumulative = cumulativeReturns[i - 1];
               const currCumulative = cumulativeReturns[i];
               if (prevCumulative !== null && currCumulative !== null) {
-                const prevValue = 1 + prevCumulative;
-                const currValue = 1 + currCumulative;
-                if (prevValue > 0) {
-                  const dailyReturn = (currValue / prevValue) - 1;
+                // 价格：price[i] = 1 + cumulative_return[i]
+                const prevPrice = 1 + prevCumulative;
+                const currPrice = 1 + currCumulative;
+                if (prevPrice > 0) {
+                  // daily_return[i] = (price[i] - price[i-1]) / price[i-1]
+                  //                 = (currPrice - prevPrice) / prevPrice
+                  //                 = (currPrice / prevPrice) - 1
+                  const dailyReturn = (currPrice / prevPrice) - 1;
                   dailyReturns.push(dailyReturn);
                   // dates 对应 dailyReturns，所以使用第 i 个日期（因为 dailyReturn 是从 i-1 到 i 的变化）
                   if (i < rawDates.length) {
@@ -1475,10 +1848,13 @@ export default {
       this.dailyReturns = dailyReturns;
       // dates 已经在前面保存了
       
-      // 渲染分析图表
-      this.$nextTick(() => {
-        this.renderAnalysisCharts();
+      console.log('calculateMetrics completed (price type):', {
+        dailyReturnsLength: this.dailyReturns.length,
+        datesLength: this.dates ? this.dates.length : 0,
+        metricsDataPoints: this.metrics.dataPoints
       });
+      
+      // 不在这里渲染，让调用者统一处理
     },
 
     // 从 value 字段计算指标（如果没有 daily_return）
@@ -2540,22 +2916,200 @@ export default {
       }
     },
 
+    // 下载 PDF
+    async downloadPDF() {
+      if (this.isGeneratingPDF) return;
+      
+      this.isGeneratingPDF = true;
+      
+      try {
+        // 创建 PDF 实例 (A4 尺寸)
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = pdf.internal.pageSize.getHeight();
+        const margin = 10;
+        const contentWidth = pdfWidth - 2 * margin;
+        const contentHeight = pdfHeight - 2 * margin;
+        
+        let yPosition = margin;
+        
+        // 1. 添加标题
+        pdf.setFontSize(20);
+        pdf.setTextColor(255, 192, 0);
+        pdf.text(this.$t('charts.title'), pdfWidth / 2, yPosition, { align: 'center' });
+        yPosition += 15;
+        
+        // 2. 添加主图表（Data Visualization Chart）
+        if (this.chart && this.$refs.chart) {
+          try {
+            const chartImg = this.chart.getDataURL({
+              type: 'png',
+              pixelRatio: 2,
+              backgroundColor: '#0d1b2a'
+            });
+            
+            const imgWidth = contentWidth;
+            const imgHeight = (this.$refs.chart.offsetHeight / this.$refs.chart.offsetWidth) * imgWidth;
+            
+            // 如果图片太高，需要分页
+            if (yPosition + imgHeight > pdfHeight - margin) {
+              pdf.addPage();
+              yPosition = margin;
+            }
+            
+            pdf.addImage(chartImg, 'PNG', margin, yPosition, imgWidth, imgHeight);
+            yPosition += imgHeight + 10;
+          } catch (error) {
+            console.error('Error capturing main chart:', error);
+          }
+        }
+        
+        // 3. 添加指标表格
+        if (this.metrics && this.$refs.metricsSection) {
+          try {
+            // 检查是否需要新页面
+            if (yPosition > pdfHeight - 50) {
+              pdf.addPage();
+              yPosition = margin;
+            }
+            
+            // 添加表格标题
+            pdf.setFontSize(16);
+            pdf.setTextColor(255, 192, 0);
+            pdf.text(this.$t('charts.metricsTitle'), pdfWidth / 2, yPosition, { align: 'center' });
+            yPosition += 10;
+            
+            // 使用 html2canvas 捕获表格
+            const canvas = await html2canvas(this.$refs.metricsSection, {
+              backgroundColor: '#0d1b2a',
+              scale: 2,
+              useCORS: true
+            });
+            
+            const tableImg = canvas.toDataURL('image/png');
+            const imgWidth = contentWidth;
+            const imgHeight = (canvas.height / canvas.width) * imgWidth;
+            
+            // 如果表格太高，需要分页
+            if (yPosition + imgHeight > pdfHeight - margin) {
+              pdf.addPage();
+              yPosition = margin;
+            }
+            
+            pdf.addImage(tableImg, 'PNG', margin, yPosition, imgWidth, imgHeight);
+            yPosition += imgHeight + 10;
+          } catch (error) {
+            console.error('Error capturing metrics table:', error);
+          }
+        }
+        
+        // 4. 添加分析图表
+        const chartRefs = [
+          { ref: 'cumulativeReturnsChart', title: 'charts.analysisCharts.cumulativeReturns' },
+          { ref: 'rollingSharpeChart', title: 'charts.analysisCharts.rollingSharpe' },
+          { ref: 'monthlyReturnsChart', title: 'charts.analysisCharts.monthlyReturns' },
+          { ref: 'yearlyReturnsChart', title: 'charts.analysisCharts.yearlyReturns' },
+          { ref: 'returnDistributionChart', title: 'charts.analysisCharts.returnDistribution' },
+          { ref: 'rollingVolatilityChart', title: 'charts.analysisCharts.rollingVolatility' }
+        ];
+        
+        for (const chartInfo of chartRefs) {
+          const chartRef = this.$refs[chartInfo.ref];
+          if (!chartRef) continue;
+          
+          try {
+            // 获取 ECharts 实例
+            const chartInstance = echarts.getInstanceByDom(chartRef);
+            if (!chartInstance) continue;
+            
+            // 检查是否需要新页面
+            if (yPosition > pdfHeight - 100) {
+              pdf.addPage();
+              yPosition = margin;
+            }
+            
+            // 添加图表标题
+            pdf.setFontSize(14);
+            pdf.setTextColor(255, 192, 0);
+            pdf.text(this.$t(chartInfo.title), pdfWidth / 2, yPosition, { align: 'center' });
+            yPosition += 8;
+            
+            // 获取图表图片
+            const chartImg = chartInstance.getDataURL({
+              type: 'png',
+              pixelRatio: 2,
+              backgroundColor: '#0d1b2a'
+            });
+            
+            const imgWidth = contentWidth;
+            const imgHeight = (chartRef.offsetHeight / chartRef.offsetWidth) * imgWidth;
+            
+            // 如果图片太高，需要分页
+            if (yPosition + imgHeight > pdfHeight - margin) {
+              pdf.addPage();
+              yPosition = margin;
+            }
+            
+            pdf.addImage(chartImg, 'PNG', margin, yPosition, imgWidth, imgHeight);
+            yPosition += imgHeight + 10;
+          } catch (error) {
+            console.error(`Error capturing ${chartInfo.ref}:`, error);
+          }
+        }
+        
+        // 5. 保存 PDF
+        const fileName = `数据分析报告_${new Date().toISOString().split('T')[0]}.pdf`;
+        pdf.save(fileName);
+        
+        console.log('PDF generated successfully');
+      } catch (error) {
+        console.error('Error generating PDF:', error);
+        alert(this.$t('charts.pdfGenerationError') || 'PDF 生成失败，请重试');
+      } finally {
+        this.isGeneratingPDF = false;
+      }
+    },
+
     // 渲染所有分析图表
     renderAnalysisCharts() {
-      if (!this.dailyReturns || this.dailyReturns.length === 0) return;
+      if (!this.dailyReturns || this.dailyReturns.length === 0) {
+        console.warn('renderAnalysisCharts: dailyReturns is empty', {
+          dailyReturnsLength: this.dailyReturns ? this.dailyReturns.length : 0,
+          datesLength: this.dates ? this.dates.length : 0
+        });
+        return;
+      }
       
-      this.renderCumulativeReturnsChart();
-      this.renderDrawdownChart();
-      this.renderRollingSharpeChart();
-      this.renderMonthlyReturnsChart();
-      this.renderYearlyReturnsChart();
-      this.renderReturnDistributionChart();
-      this.renderRollingVolatilityChart();
+      if (!this.dates || this.dates.length === 0) {
+        console.warn('renderAnalysisCharts: dates is empty');
+        return;
+      }
+      
+      console.log('Starting to render analysis charts...');
+      
+      // 使用 setTimeout 确保 DOM 完全准备好
+      setTimeout(() => {
+        this.renderCumulativeReturnsChart();
+        this.renderRollingSharpeChart();
+        this.renderMonthlyReturnsChart();
+        this.renderYearlyReturnsChart();
+        this.renderReturnDistributionChart();
+        this.renderRollingVolatilityChart();
+        console.log('All analysis charts rendered');
+      }, 100);
     },
 
     // 1. 累计收益曲线
     renderCumulativeReturnsChart() {
-      if (!this.$refs.cumulativeReturnsChart) return;
+      if (!this.$refs.cumulativeReturnsChart) {
+        console.warn('cumulativeReturnsChart ref not found');
+        return;
+      }
+      
+      if (!this.dailyReturns || this.dailyReturns.length === 0) {
+        console.warn('renderCumulativeReturnsChart: dailyReturns is empty');
+        return;
+      }
       
       const chart = echarts.init(this.$refs.cumulativeReturnsChart);
       
@@ -2627,87 +3181,7 @@ export default {
       window.addEventListener('resize', () => chart.resize());
     },
 
-    // 2. 回撤曲线
-    renderDrawdownChart() {
-      if (!this.$refs.drawdownChart) return;
-      
-      const chart = echarts.init(this.$refs.drawdownChart);
-      
-      // 计算回撤
-      const drawdowns = [];
-      let cumulative = 1;
-      let maxCumulative = 1;
-      
-      for (const dr of this.dailyReturns) {
-        cumulative *= (1 + dr);
-        if (cumulative > maxCumulative) {
-          maxCumulative = cumulative;
-        }
-        const drawdown = (cumulative / maxCumulative) - 1;
-        drawdowns.push(drawdown);
-      }
-      
-      const option = {
-        title: {
-          text: this.$t('charts.analysisCharts.drawdown'),
-          left: 'center',
-          textStyle: { color: '#FFC000', fontSize: 16 }
-        },
-        tooltip: {
-          trigger: 'axis',
-          formatter: (params) => {
-            const data = params[0];
-            return `${this.$t('tooltips.date', { date: data.axisValue })}<br/>${this.$t('charts.analysisCharts.drawdown')}: ${(data.value * 100).toFixed(2)}%`;
-          }
-        },
-        grid: {
-          left: '8%',
-          right: '8%',
-          bottom: '10%',
-          top: '15%'
-        },
-        xAxis: {
-          type: 'category',
-          data: this.dates,
-          axisLabel: { color: '#ccc', rotate: 45, fontSize: 10 },
-          axisLine: { lineStyle: { color: '#666' } }
-        },
-        yAxis: {
-          type: 'value',
-          axisLabel: { 
-            color: '#ccc',
-            formatter: (value) => (value * 100).toFixed(1) + '%'
-          },
-          axisLine: { lineStyle: { color: '#666' } },
-          splitLine: { lineStyle: { color: '#333' } }
-        },
-        series: [{
-          name: this.$t('charts.analysisCharts.drawdown'),
-          type: 'line',
-          data: drawdowns,
-          smooth: true,
-          lineStyle: { color: '#ef5350', width: 2 },
-          itemStyle: { color: '#ef5350' },
-          areaStyle: {
-            color: {
-              type: 'linear',
-              x: 0, y: 0, x2: 0, y2: 1,
-              colorStops: [
-                { offset: 0, color: 'rgba(239, 83, 80, 0.3)' },
-                { offset: 1, color: 'rgba(239, 83, 80, 0.1)' }
-              ]
-            }
-          }
-        }]
-      };
-      
-      chart.setOption(option);
-      this.analysisCharts.drawdown = chart;
-      
-      window.addEventListener('resize', () => chart.resize());
-    },
-
-    // 3. 滚动夏普比率
+    // 2. 滚动夏普比率
     renderRollingSharpeChart() {
       if (!this.$refs.rollingSharpeChart) return;
       
@@ -2873,13 +3347,20 @@ export default {
       }
       
       // 计算 visualMap 的范围
+      // 需求：以0%为中心，白色对应0%，红色和绿色对应最大下跌和上涨的绝对值
       const values = Object.values(monthlyReturns);
-      const minValue = Math.min(...values);
-      const maxValue = Math.max(...values);
+      const minValue = Math.min(...values);  // 最大下跌值（负数）
+      const maxValue = Math.max(...values);  // 最大上涨值（正数）
       
-      // 确保范围有效
-      const visualMin = isNaN(minValue) ? -0.1 : minValue;
-      const visualMax = isNaN(maxValue) ? 0.1 : maxValue;
+      // 计算最大下跌的绝对值和最大上涨值，取较大者作为对称范围
+      const maxAbsNegative = Math.abs(minValue);  // 最大下跌的绝对值
+      const maxAbsPositive = maxValue;            // 最大上涨值
+      const maxAbs = Math.max(maxAbsNegative, maxAbsPositive);  // 取两者中的较大值
+      
+      // 设置对称范围：[-maxAbs, maxAbs]，这样0%就在中间，对应白色
+      // 如果数据为空或无效，使用默认值
+      const visualMin = isNaN(maxAbs) ? -0.1 : -maxAbs;
+      const visualMax = isNaN(maxAbs) ? 0.1 : maxAbs;
       
       const option = {
         title: {
@@ -2983,36 +3464,70 @@ export default {
       
       const chart = echarts.init(this.$refs.yearlyReturnsChart);
       
-      // 按年份分组计算收益
-      const yearlyData = {};
-      let currentYear = null;
-      let yearReturns = [];
+      // 根据数据类型选择计算方式
+      let yearlyData = {};
       
-      for (let i = 0; i < this.dates.length; i++) {
-        const date = new Date(this.dates[i]);
-        const year = date.getFullYear().toString();
+      if (this.dataType === 'cumulative_return' && this.parsedData && this.parsedData.length > 0) {
+        // 如果数据是 cumulative_return，直接从价格序列计算年度收益
+        // 价格序列已经通过 convertCumulativeReturnToPriceSeries 转换，price[i] = 1 + cumulative_return[i]
+        const yearlyPrices = {};
+        let currentYear = null;
+        let yearStartPrice = null;
+        let yearEndPrice = null;
         
-        if (currentYear !== year) {
-          if (currentYear !== null && yearReturns.length > 0) {
-            let yearlyReturn = 1;
-            for (const dr of yearReturns) {
-              yearlyReturn *= (1 + dr);
+        for (let i = 0; i < this.parsedData.length; i++) {
+          const date = new Date(this.parsedData[i].date);
+          const year = date.getFullYear().toString();
+          const price = this.parsedData[i].value;
+          
+          if (currentYear !== year) {
+            if (currentYear !== null && yearStartPrice !== null && yearEndPrice !== null) {
+              // 计算年度收益率：(年末价格 - 年初价格) / 年初价格
+              yearlyData[currentYear] = (yearEndPrice - yearStartPrice) / yearStartPrice;
             }
-            yearlyData[currentYear] = yearlyReturn - 1;
+            currentYear = year;
+            yearStartPrice = price;  // 年初价格
+            yearEndPrice = price;     // 年末价格（初始值）
+          } else {
+            yearEndPrice = price;  // 更新年末价格
           }
-          currentYear = year;
-          yearReturns = [];
         }
-        yearReturns.push(this.dailyReturns[i]);
-      }
-      
-      // 处理最后一年
-      if (yearReturns.length > 0) {
-        let yearlyReturn = 1;
-        for (const dr of yearReturns) {
-          yearlyReturn *= (1 + dr);
+        
+        // 处理最后一年
+        if (currentYear !== null && yearStartPrice !== null && yearEndPrice !== null) {
+          yearlyData[currentYear] = (yearEndPrice - yearStartPrice) / yearStartPrice;
         }
-        yearlyData[currentYear] = yearlyReturn - 1;
+      } else {
+        // 如果数据是 daily_return 或 price，使用日收益率计算年度收益（复利）
+        let currentYear = null;
+        let yearReturns = [];
+        
+        for (let i = 0; i < this.dates.length; i++) {
+          const date = new Date(this.dates[i]);
+          const year = date.getFullYear().toString();
+          
+          if (currentYear !== year) {
+            if (currentYear !== null && yearReturns.length > 0) {
+              let yearlyReturn = 1;
+              for (const dr of yearReturns) {
+                yearlyReturn *= (1 + dr);
+              }
+              yearlyData[currentYear] = yearlyReturn - 1;
+            }
+            currentYear = year;
+            yearReturns = [];
+          }
+          yearReturns.push(this.dailyReturns[i]);
+        }
+        
+        // 处理最后一年
+        if (yearReturns.length > 0) {
+          let yearlyReturn = 1;
+          for (const dr of yearReturns) {
+            yearlyReturn *= (1 + dr);
+          }
+          yearlyData[currentYear] = yearlyReturn - 1;
+        }
       }
       
       const years = Object.keys(yearlyData).sort();
@@ -3079,78 +3594,346 @@ export default {
       window.addEventListener('resize', () => chart.resize());
     },
 
-    // 6. 收益分布图
+    /**
+     * 计算数组的分位数和统计量
+     * @param {Array} data - 数据数组
+     * @returns {Object} 包含 min, Q1, median, Q3, max, mean, outliers 的对象
+     */
+    calculateBoxplotStats(data) {
+      if (!data || data.length === 0) {
+        return null;
+      }
+      
+      // 排序
+      const sorted = [...data].sort((a, b) => a - b);
+      const n = sorted.length;
+      
+      // 计算分位数
+      const getPercentile = (arr, p) => {
+        const index = (n - 1) * p;
+        const lower = Math.floor(index);
+        const upper = Math.ceil(index);
+        const weight = index - lower;
+        if (lower === upper) {
+          return arr[lower];
+        }
+        return arr[lower] * (1 - weight) + arr[upper] * weight;
+      };
+      
+      const min = sorted[0];
+      const max = sorted[n - 1];
+      const Q1 = getPercentile(sorted, 0.25);
+      const median = getPercentile(sorted, 0.5);
+      const Q3 = getPercentile(sorted, 0.75);
+      const mean = sorted.reduce((a, b) => a + b, 0) / n;
+      
+      // 计算 IQR 和异常值
+      const IQR = Q3 - Q1;
+      const lowerBound = Q1 - 1.5 * IQR;
+      const upperBound = Q3 + 1.5 * IQR;
+      const outliers = sorted.filter(v => v < lowerBound || v > upperBound);
+      
+      return { min, Q1, median, Q3, max, mean, outliers, IQR, lowerBound, upperBound };
+    },
+
+    /**
+     * 计算不同周期的收益
+     * @param {Array} dailyReturns - 日收益率数组
+     * @param {Array} dates - 日期数组
+     * @returns {Object} 包含 Daily, Weekly, Monthly, Quarterly, Yearly 的收益数组
+     */
+    calculatePeriodReturns(dailyReturns, dates) {
+      if (!dailyReturns || dailyReturns.length === 0 || !dates || dates.length === 0) {
+        return {
+          Daily: [],
+          Weekly: [],
+          Monthly: [],
+          Quarterly: [],
+          Yearly: []
+        };
+      }
+      
+      const periodReturns = {
+        Daily: [...dailyReturns],  // 日收益率直接使用
+        Weekly: [],
+        Monthly: [],
+        Quarterly: [],
+        Yearly: []
+      };
+      
+      // 解析日期
+      const parseDate = (dateStr) => {
+        if (dateStr instanceof Date) {
+          return isNaN(dateStr.getTime()) ? null : dateStr;
+        }
+        const date = new Date(dateStr);
+        return isNaN(date.getTime()) ? null : date;
+      };
+      
+      // 计算周收益（每周最后一个交易日）
+      const weeklyData = {};
+      for (let i = 0; i < dates.length; i++) {
+        const date = parseDate(dates[i]);
+        if (!date) continue;
+        
+        const year = date.getFullYear();
+        const week = this.getWeekNumber(date);
+        const weekKey = `${year}-W${week}`;
+        
+        if (!weeklyData[weekKey]) {
+          weeklyData[weekKey] = [];
+        }
+        weeklyData[weekKey].push(dailyReturns[i]);
+      }
+      
+      // 计算每周的累计收益
+      Object.keys(weeklyData).forEach(weekKey => {
+        const weekReturns = weeklyData[weekKey];
+        if (weekReturns.length > 0) {
+          let weeklyReturn = 1;
+          for (const dr of weekReturns) {
+            weeklyReturn *= (1 + dr);
+          }
+          periodReturns.Weekly.push(weeklyReturn - 1);
+        }
+      });
+      
+      // 计算月收益
+      const monthlyData = {};
+      for (let i = 0; i < dates.length; i++) {
+        const date = parseDate(dates[i]);
+        if (!date) continue;
+        
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const monthKey = `${year}-${month}`;
+        
+        if (!monthlyData[monthKey]) {
+          monthlyData[monthKey] = [];
+        }
+        monthlyData[monthKey].push(dailyReturns[i]);
+      }
+      
+      Object.keys(monthlyData).forEach(monthKey => {
+        const monthReturns = monthlyData[monthKey];
+        if (monthReturns.length > 0) {
+          let monthlyReturn = 1;
+          for (const dr of monthReturns) {
+            monthlyReturn *= (1 + dr);
+          }
+          periodReturns.Monthly.push(monthlyReturn - 1);
+        }
+      });
+      
+      // 计算季度收益
+      const quarterlyData = {};
+      for (let i = 0; i < dates.length; i++) {
+        const date = parseDate(dates[i]);
+        if (!date) continue;
+        
+        const year = date.getFullYear();
+        const quarter = Math.floor(date.getMonth() / 3) + 1;
+        const quarterKey = `${year}-Q${quarter}`;
+        
+        if (!quarterlyData[quarterKey]) {
+          quarterlyData[quarterKey] = [];
+        }
+        quarterlyData[quarterKey].push(dailyReturns[i]);
+      }
+      
+      Object.keys(quarterlyData).forEach(quarterKey => {
+        const quarterReturns = quarterlyData[quarterKey];
+        if (quarterReturns.length > 0) {
+          let quarterlyReturn = 1;
+          for (const dr of quarterReturns) {
+            quarterlyReturn *= (1 + dr);
+          }
+          periodReturns.Quarterly.push(quarterlyReturn - 1);
+        }
+      });
+      
+      // 计算年度收益
+      const yearlyData = {};
+      for (let i = 0; i < dates.length; i++) {
+        const date = parseDate(dates[i]);
+        if (!date) continue;
+        
+        const year = date.getFullYear().toString();
+        
+        if (!yearlyData[year]) {
+          yearlyData[year] = [];
+        }
+        yearlyData[year].push(dailyReturns[i]);
+      }
+      
+      Object.keys(yearlyData).forEach(year => {
+        const yearReturns = yearlyData[year];
+        if (yearReturns.length > 0) {
+          let yearlyReturn = 1;
+          for (const dr of yearReturns) {
+            yearlyReturn *= (1 + dr);
+          }
+          periodReturns.Yearly.push(yearlyReturn - 1);
+        }
+      });
+      
+      return periodReturns;
+    },
+
+    /**
+     * 获取日期的周数
+     * @param {Date} date - 日期对象
+     * @returns {Number} 周数（1-53）
+     */
+    getWeekNumber(date) {
+      const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+      const dayNum = d.getUTCDay() || 7;
+      d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+      const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+      return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+    },
+
+    // 6. 收益分位数箱线图 (Return Quantiles)
     renderReturnDistributionChart() {
       if (!this.$refs.returnDistributionChart) return;
       
       const chart = echarts.init(this.$refs.returnDistributionChart);
       
-      // 计算分布区间
-      const min = Math.min(...this.dailyReturns);
-      const max = Math.max(...this.dailyReturns);
-      const range = max - min;
-      const binCount = 30;
-      const binSize = range / binCount;
-      
-      const bins = new Array(binCount).fill(0);
-      const binLabels = [];
-      
-      for (let i = 0; i < binCount; i++) {
-        const binStart = min + i * binSize;
-        const binEnd = min + (i + 1) * binSize;
-        binLabels.push(((binStart + binEnd) / 2 * 100).toFixed(2) + '%');
+      if (!this.dailyReturns || this.dailyReturns.length === 0 || !this.dates || this.dates.length === 0) {
+        console.warn('No data available for return distribution chart');
+        return;
       }
       
-      this.dailyReturns.forEach(dr => {
-        const binIndex = Math.min(Math.floor((dr - min) / binSize), binCount - 1);
-        bins[binIndex]++;
+      // 计算不同周期的收益
+      const periodReturns = this.calculatePeriodReturns(this.dailyReturns, this.dates);
+      
+      // 计算每个周期的箱线图统计量
+      const periods = ['Daily', 'Weekly', 'Monthly', 'Quarterly', 'Yearly'];
+      const boxplotData = [];
+      const meanData = [];
+      
+      periods.forEach(period => {
+        const returns = periodReturns[period];
+        if (returns.length === 0) {
+          boxplotData.push([0, 0, 0, 0, 0]);  // 空数据
+          meanData.push(null);
+          return;
+        }
+        
+        const stats = this.calculateBoxplotStats(returns);
+        if (stats) {
+          // ECharts boxplot 数据格式: [min, Q1, median, Q3, max, ...outliers]
+          const boxData = [stats.min, stats.Q1, stats.median, stats.Q3, stats.max];
+          // 添加异常值
+          if (stats.outliers && stats.outliers.length > 0) {
+            boxData.push(...stats.outliers);
+          }
+          boxplotData.push(boxData);
+          meanData.push(stats.mean);
+        } else {
+          boxplotData.push([0, 0, 0, 0, 0]);
+          meanData.push(null);
+        }
       });
       
       const option = {
         title: {
-          text: this.$t('charts.analysisCharts.returnDistribution'),
+          text: 'Return Quantiles',
           left: 'center',
           textStyle: { color: '#FFC000', fontSize: 16 }
         },
         tooltip: {
-          trigger: 'axis',
+          trigger: 'item',
           formatter: (params) => {
-            const data = params[0];
-            return `${this.$t('charts.analysisCharts.returnRange')}: ${data.axisValue}<br/>${this.$t('charts.analysisCharts.frequency')}: ${data.value}`;
+            if (params.seriesType === 'boxplot') {
+              const data = params.data;
+              const period = periods[params.dataIndex];
+              const stats = this.calculateBoxplotStats(periodReturns[period]);
+              if (!stats) return '';
+              
+              return `${period}<br/>` +
+                     `Min: ${(stats.min * 100).toFixed(2)}%<br/>` +
+                     `Q1: ${(stats.Q1 * 100).toFixed(2)}%<br/>` +
+                     `Median: ${(stats.median * 100).toFixed(2)}%<br/>` +
+                     `Q3: ${(stats.Q3 * 100).toFixed(2)}%<br/>` +
+                     `Max: ${(stats.max * 100).toFixed(2)}%<br/>` +
+                     `Mean: ${(stats.mean * 100).toFixed(2)}%<br/>` +
+                     `Outliers: ${stats.outliers.length}`;
+            } else if (params.seriesType === 'line') {
+              const period = periods[params.dataIndex];
+              return `${period}<br/>Mean: ${(params.value * 100).toFixed(2)}%`;
+            }
+            return '';
           }
         },
         grid: {
-          left: '8%',
-          right: '8%',
+          left: '10%',
+          right: '10%',
           bottom: '15%',
           top: '15%'
         },
         xAxis: {
           type: 'category',
-          data: binLabels,
+          data: periods,
           axisLabel: { 
-            color: '#ccc', 
-            rotate: 45, 
-            fontSize: 9,
-            interval: Math.floor(binCount / 10)
+            color: '#ccc',
+            fontSize: 12
           },
           axisLine: { lineStyle: { color: '#666' } }
         },
         yAxis: {
           type: 'value',
-          name: this.$t('charts.analysisCharts.frequency'),
-          axisLabel: { color: '#ccc' },
+          name: 'Return (%)',
+          axisLabel: { 
+            color: '#ccc',
+            formatter: (value) => (value * 100).toFixed(1) + '%'
+          },
           axisLine: { lineStyle: { color: '#666' } },
-          splitLine: { lineStyle: { color: '#333' } }
-        },
-        series: [{
-          name: this.$t('charts.analysisCharts.frequency'),
-          type: 'bar',
-          data: bins,
-          itemStyle: {
-            color: '#42a5f5'
+          splitLine: { 
+            lineStyle: { color: '#333' },
+            show: true
           }
-        }]
+        },
+        series: [
+          {
+            name: 'Return Quantiles',
+            type: 'boxplot',
+            data: boxplotData,
+            itemStyle: {
+              color: '#888',  // 灰色箱体
+              borderColor: '#666'
+            },
+            emphasis: {
+              itemStyle: {
+                borderColor: '#FFC000',
+                borderWidth: 2
+              }
+            }
+          },
+          {
+            name: 'Mean',
+            type: 'line',
+            data: meanData,
+            lineStyle: {
+              color: '#FFC000',
+              type: 'dashed',
+              width: 2
+            },
+            symbol: 'circle',
+            symbolSize: 6,
+            itemStyle: {
+              color: '#FFC000'
+            },
+            tooltip: {
+              formatter: (params) => {
+                if (params.value !== null && params.value !== undefined) {
+                  return `${periods[params.dataIndex]}<br/>Mean: ${(params.value * 100).toFixed(2)}%`;
+                }
+                return '';
+              }
+            }
+          }
+        ]
       };
       
       chart.setOption(option);
@@ -3646,6 +4429,86 @@ export default {
   
   .analysis-chart-item {
     padding: 15px;
+  }
+}
+
+/* Loading Section Styles */
+.loading-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  padding: 40px;
+  background: linear-gradient(135deg, #0d1b2a 0%, #1b263b 100%);
+  border-radius: 10px;
+  margin: 40px 0;
+}
+
+.loading-spinner {
+  border: 4px solid rgba(255, 192, 0, 0.2);
+  border-top: 4px solid #FFC000;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-section p {
+  color: #FFC000;
+  font-size: 18px;
+  margin: 0;
+}
+
+/* PDF Download Section Styles */
+.pdf-download-section {
+  text-align: center;
+  margin: 20px 0 30px 0;
+  padding: 20px;
+}
+
+.download-pdf-btn {
+  background: linear-gradient(135deg, #FFC000 0%, #FFD700 100%);
+  color: #0d1b2a;
+  border: none;
+  padding: 12px 30px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(255, 192, 0, 0.3);
+  font-family: 'Montserrat', 'Arial', sans-serif;
+}
+
+.download-pdf-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #FFD700 0%, #FFC000 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 192, 0, 0.4);
+}
+
+.download-pdf-btn:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 10px rgba(255, 192, 0, 0.3);
+}
+
+.download-pdf-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: linear-gradient(135deg, #666 0%, #888 100%);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .download-pdf-btn {
+    padding: 10px 20px;
+    font-size: 14px;
   }
 }
 

@@ -198,6 +198,11 @@ export default {
     cannotIdentifyColumns: 'Could not identify date and value columns in file',
     invalidDateFormat: 'Invalid date format at row {row}: "{date}". Expected format: YYYY-MM-DD',
     invalidValue: 'Invalid value at row {row}: "{value}". Must be a number',
+    processingFile: 'Processing file...',
+    analyzingData: 'Analyzing data, please wait...',
+    downloadPDF: 'Download PDF Report',
+    generatingPDF: 'Generating PDF...',
+    pdfGenerationError: 'Failed to generate PDF, please try again',
     metricsTitle: 'Performance Metrics',
     metrics: {
       metric: 'Metric',

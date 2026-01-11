@@ -198,6 +198,11 @@ export default {
     cannotIdentifyColumns: '无法识别文件中的日期和数值列',
     invalidDateFormat: '第{row}行日期格式无效："{date}"。期望格式：YYYY-MM-DD',
     invalidValue: '第{row}行数值无效："{value}"。必须是数字',
+    processingFile: '正在处理文件...',
+    analyzingData: '正在分析数据，请稍候...',
+    downloadPDF: '下载 PDF 报告',
+    generatingPDF: '正在生成 PDF...',
+    pdfGenerationError: 'PDF 生成失败，请重试',
     metricsTitle: '业绩指标',
     metrics: {
       metric: '指标',

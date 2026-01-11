@@ -3,6 +3,8 @@
  * 用于获取市场数据
  */
 
+import cacheManager from './cacheManager.js';
+
 class PolygonApiService {
   constructor(apiKey) {
     this.apiKey = apiKey || 'W4SbxlOv3nWQv1EpM4EIK6gmuyiVYNhn';
@@ -41,10 +43,27 @@ class PolygonApiService {
    * @param {string} ticker - 股票代码
    * @param {string} fromDate - 开始日期 (YYYY-MM-DD)
    * @param {string} toDate - 结束日期 (YYYY-MM-DD)
+   * @param {boolean} useCache - 是否使用缓存，默认true
    */
-  async fetchTickerData(ticker, fromDate, toDate) {
+  async fetchTickerData(ticker, fromDate, toDate, useCache = true) {
     if (!this.isApiKeySet()) {
       throw new Error('Please set your Polygon.io API key');
+    }
+
+    // 生成缓存参数
+    const cacheParams = {
+      ticker: ticker,
+      fromDate: fromDate,
+      toDate: toDate
+    };
+
+    // 尝试从缓存获取
+    if (useCache) {
+      const cached = cacheManager.get('polygon_ticker', cacheParams);
+      if (cached !== null) {
+        console.log(`Cache hit for Polygon ticker: ${ticker} (${fromDate} to ${toDate})`);
+        return cached;
+      }
     }
 
     const url = `${this.baseUrl}/${ticker}/range/1/day/${fromDate}/${toDate}?adjusted=true&sort=asc&apikey=${this.apiKey}`;
@@ -63,6 +82,12 @@ class PolygonApiService {
         throw new Error(`API error: ${data.message || 'Unknown error'}`);
       }
       
+      // 缓存成功的结果
+      if (useCache) {
+        cacheManager.set('polygon_ticker', cacheParams, data);
+        console.log(`Cached Polygon ticker data: ${ticker} (${fromDate} to ${toDate})`);
+      }
+      
       return data;
     } catch (error) {
       console.error(`Error fetching data for ${ticker}:`, error);
@@ -72,14 +97,41 @@ class PolygonApiService {
 
   /**
    * 获取所有市场数据
+   * @param {string} fromDate - 开始日期 (YYYY-MM-DD)，可选，默认最近30天
+   * @param {string} toDate - 结束日期 (YYYY-MM-DD)，可选，默认昨天
+   * @param {boolean} useCache - 是否使用缓存，默认true
    * @returns {Object} 包含所有市场数据的对象
    */
-  async fetchAllMarketData() {
+  async fetchAllMarketData(fromDate = null, toDate = null, useCache = true) {
     if (!this.isApiKeySet()) {
       throw new Error('Please set your Polygon.io API key');
     }
 
-    const { from, to } = this.getDateRange();
+    // 如果提供了日期范围，使用提供的；否则使用默认的最近30天
+    let from, to;
+    if (fromDate && toDate) {
+      from = fromDate;
+      to = toDate;
+    } else {
+      const dateRange = this.getDateRange();
+      from = dateRange.from;
+      to = dateRange.to;
+    }
+
+    // 生成缓存参数
+    const cacheParams = {
+      fromDate: from,
+      toDate: to
+    };
+
+    // 尝试从缓存获取完整结果
+    if (useCache) {
+      const cached = cacheManager.get('polygon_all', cacheParams);
+      if (cached !== null) {
+        console.log(`Cache hit for Polygon all market data (${from} to ${to})`);
+        return cached;
+      }
+    }
     
     // 定义要获取的数据类型（仅股票/ETF，加密货币由 CoinGecko 提供）
     const tickers = {
@@ -88,10 +140,10 @@ class PolygonApiService {
     };
 
     try {
-      // 并行获取所有数据
+      // 并行获取所有数据（内部会使用缓存）
       const promises = Object.entries(tickers).map(async ([key, ticker]) => {
         try {
-          const data = await this.fetchTickerData(ticker, from, to);
+          const data = await this.fetchTickerData(ticker, from, to, useCache);
           return { key, data, success: true };
         } catch (error) {
           console.error(`Failed to fetch ${key}:`, error);
@@ -104,7 +156,7 @@ class PolygonApiService {
       // 组织返回数据
       const marketData = {};
       const errors = {};
-      
+
       results.forEach(({ key, data, error, success }) => {
         if (success) {
           marketData[key] = data;
@@ -113,11 +165,19 @@ class PolygonApiService {
         }
       });
 
-      return {
+      const result = {
         marketData,
         errors: Object.keys(errors).length > 0 ? errors : null,
         dateRange: { from, to }
       };
+
+      // 缓存完整结果
+      if (useCache) {
+        cacheManager.set('polygon_all', cacheParams, result);
+        console.log(`Cached Polygon all market data (${from} to ${to})`);
+      }
+
+      return result;
     } catch (error) {
       console.error('Error fetching market data:', error);
       throw error;

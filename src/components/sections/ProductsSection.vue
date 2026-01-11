@@ -108,8 +108,8 @@ export default {
         // 跳转到加密货币策略页面
         this.$router.push('/crypto-strategies');
       } else if (productType === 'product3') {
-        // 跳转到数据分析页面
-        this.$router.push('/charts');
+        // 跳转到文件上传页面
+        this.$router.push('/upload');
       } else {
         // TODO: 后续可以自定义其他产品的跳转链接
         console.log(`Clicked more button for ${productType}`);
