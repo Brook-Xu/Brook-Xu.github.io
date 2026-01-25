@@ -243,8 +243,8 @@ export default {
           throw new Error(this.$t('charts.invalidDateFormat', { row: index + 2, date: dateStr }));
         }
 
-        // 验证数值
-        const value = parseFloat(valueStr);
+        // 验证数值（支持百分比格式）
+        const value = this.parseNumericValue(valueStr);
         if (isNaN(value)) {
           throw new Error(this.$t('charts.invalidValue', { row: index + 2, value: valueStr }));
         }
@@ -370,6 +370,39 @@ export default {
       }
       
       return null;
+    },
+
+    /**
+     * 解析数值字符串，支持百分比格式
+     * 例如："0.12%" -> 0.0012, "12%" -> 0.12, "0.12" -> 0.12
+     * @param {string|number} valueStr - 要解析的数值字符串
+     * @returns {number} 解析后的数值（小数形式）
+     */
+    parseNumericValue(valueStr) {
+      if (valueStr === null || valueStr === undefined || valueStr === '') {
+        return NaN;
+      }
+      
+      // 如果已经是数字，直接返回
+      if (typeof valueStr === 'number') {
+        return valueStr;
+      }
+      
+      // 转换为字符串并去除空格
+      const str = String(valueStr).trim();
+      
+      // 如果字符串以 % 结尾，去掉 % 并除以 100
+      if (str.endsWith('%')) {
+        const numStr = str.slice(0, -1).trim();
+        const num = parseFloat(numStr);
+        if (isNaN(num)) {
+          return NaN;
+        }
+        return num / 100;
+      }
+      
+      // 否则直接使用 parseFloat
+      return parseFloat(str);
     },
 
     convertDateToStandardFormat(dateStr) {
