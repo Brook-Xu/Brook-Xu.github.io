@@ -42,6 +42,7 @@ src/
 ## 使用方法
 
 ### 1. 在组件中使用翻译
+{% raw %}
 ```vue
 <template>
   <div>
@@ -50,13 +51,16 @@ src/
   </div>
 </template>
 ```
+{% endraw %}
 
 ### 2. 带参数的翻译
+{% raw %}
 ```vue
 <template>
   <p>{{ $t('charts.invalidDateFormat', { row: 2, date: '2023-01-01' }) }}</p>
 </template>
 ```
+{% endraw %}
 
 ### 3. 编程式语言切换
 ```javascript
@@ -119,11 +123,13 @@ export default {
 ```
 
 ### 2. 在组件中使用
+{% raw %}
 ```vue
 <template>
   <p>{{ $t('newModule.newKey') }}</p>
 </template>
 ```
+{% endraw %}
 
 ## 注意事项
 

@@ -168,19 +168,42 @@ export default {
     fileRequirements: '文件要求：',
     supportedFormats: '支持的日期格式：',
     supportedColumns: '支持的列名：',
+    supportedValueFormats: '支持的数值格式：',
+    supportedDataTypes: '支持的数据类型：',
+    excelRequirements: 'Excel文件要求：',
     csvOnly: '支持的文件类型：CSV、XLS、XLSX',
     firstColumnDate: '第一列：日期（支持多种格式）',
     secondColumnValue: '第二列：数值',
     autoDetect: '列名自动检测',
+    mustHaveHeader: '文件必须包含表头（第一行为列名）',
+    minTwoColumns: '文件必须至少包含2列（日期列和数值列）',
     dateFormats: [
-      'YYYY-MM-DD, MM/DD/YYYY, MM-DD-YYYY',
-      'YYYY/MM/DD, MM/DD/YY',
-      'YYYY-MM-DD HH:MM:SS'
+      'YYYY-MM-DD（如：2024-01-15）',
+      'YYYY/M/D 或 YYYY/MM/DD（如：2024/1/15 或 2024/01/15）',
+      'MM/DD/YYYY（美式，如：01/15/2024）',
+      'DD/MM/YYYY（欧式，如：15/01/2024）',
+      'YYYY.MM.DD（如：2024.01.15）',
+      '其他常见的日期格式（系统会自动识别）'
     ],
     columnNames: {
-      date: '日期：date, time, timestamp, day, month, year, 日期, 时间等',
-      value: '数值：value, price, amount, quantity, count, number, 数值, 价格等'
+      date: '日期列：date、time、timestamp、day、month、year、日期、时间、candle_begin_time 等',
+      value: '数值列：value、price、amount、quantity、count、number、数值、价格 等',
+      special: '特殊列：daily_return（日收益率）、cumulative_return（累计收益率）'
     },
+    valueFormats: [
+      '普通数字（如：100、100.5、-10.2）',
+      '百分比格式（如：12% 或 0.12%，系统会自动转换为小数）'
+    ],
+    dataTypes: [
+      '价格数据（price）：直接的价格或净值数据',
+      '日收益率（daily_return）：每日收益率数据，系统会自动转换为价格序列',
+      '累计收益率（cumulative_return）：累计收益率数据，系统会自动转换为价格序列'
+    ],
+    excelNotes: [
+      'Excel文件将使用第一个工作表（Sheet）',
+      '第一行必须是表头（列名）',
+      '支持.xls和.xlsx格式'
+    ],
     noDataMessage: '暂无数据。请在上方上传CSV或Excel文件。',
     totalDataPoints: '总数据点',
     dataTrendChart: '数据趋势图表',

@@ -168,19 +168,42 @@ export default {
     fileRequirements: 'File Requirements:',
     supportedFormats: 'Supported Date Formats:',
     supportedColumns: 'Supported Column Names:',
+    supportedValueFormats: 'Supported Value Formats:',
+    supportedDataTypes: 'Supported Data Types:',
+    excelRequirements: 'Excel File Requirements:',
     csvOnly: 'Supported file types: CSV, XLS, XLSX',
     firstColumnDate: 'First column: date (various formats supported)',
     secondColumnValue: 'Second column: numeric value',
     autoDetect: 'Column names are automatically detected',
+    mustHaveHeader: 'File must contain a header row (first row with column names)',
+    minTwoColumns: 'File must have at least 2 columns (date column and value column)',
     dateFormats: [
-      'YYYY-MM-DD, MM/DD/YYYY, MM-DD-YYYY',
-      'YYYY/MM/DD, MM/DD/YY',
-      'YYYY-MM-DD HH:MM:SS'
+      'YYYY-MM-DD (e.g., 2024-01-15)',
+      'YYYY/M/D or YYYY/MM/DD (e.g., 2024/1/15 or 2024/01/15)',
+      'MM/DD/YYYY (US format, e.g., 01/15/2024)',
+      'DD/MM/YYYY (European format, e.g., 15/01/2024)',
+      'YYYY.MM.DD (e.g., 2024.01.15)',
+      'Other date formats that JavaScript Date can parse'
     ],
     columnNames: {
-      date: 'Date: date, time, timestamp, day, month, year, 日期, 时间, etc.',
-      value: 'Value: value, price, amount, quantity, count, number, 数值, 价格, etc.'
+      date: 'Date column: date, time, timestamp, day, month, year, candle_begin_time, etc.',
+      value: 'Value column: value, price, amount, quantity, count, number, etc.',
+      special: 'Special columns: daily_return (daily return), cumulative_return (cumulative return)'
     },
+    valueFormats: [
+      'Regular numbers (e.g., 100, 100.5, -10.2)',
+      'Percentage format (e.g., 12% or 0.12%, will be automatically converted to decimal)'
+    ],
+    dataTypes: [
+      'Price data (price): Direct price or net value data',
+      'Daily return (daily_return): Daily return data, will be automatically converted to price series',
+      'Cumulative return (cumulative_return): Cumulative return data, will be automatically converted to price series'
+    ],
+    excelNotes: [
+      'Excel files will use the first worksheet (Sheet)',
+      'First row must be a header row (column names)',
+      'Supports both .xls and .xlsx formats'
+    ],
     noDataMessage: 'No data available. Please upload a CSV or Excel file above.',
     totalDataPoints: 'Total data points',
     dataTrendChart: 'Data Trend Chart',

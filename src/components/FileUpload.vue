@@ -14,18 +14,38 @@
           <h4>{{ $t('charts.fileRequirements') }}</h4>
           <ul>
             <li>{{ $t('charts.csvOnly') }}</li>
+            <li>{{ $t('charts.mustHaveHeader') }}</li>
+            <li>{{ $t('charts.minTwoColumns') }}</li>
             <li>{{ $t('charts.firstColumnDate') }}</li>
             <li>{{ $t('charts.secondColumnValue') }}</li>
             <li>{{ $t('charts.autoDetect') }}</li>
           </ul>
+          
           <h5>{{ $t('charts.supportedFormats') }}</h5>
           <ul>
             <li v-for="format in $t('charts.dateFormats')" :key="format">{{ format }}</li>
           </ul>
+          
           <h5>{{ $t('charts.supportedColumns') }}</h5>
           <ul>
             <li>{{ $t('charts.columnNames.date') }}</li>
             <li>{{ $t('charts.columnNames.value') }}</li>
+            <li>{{ $t('charts.columnNames.special') }}</li>
+          </ul>
+          
+          <h5>{{ $t('charts.supportedValueFormats') }}</h5>
+          <ul>
+            <li v-for="format in $t('charts.valueFormats')" :key="format">{{ format }}</li>
+          </ul>
+          
+          <h5>{{ $t('charts.supportedDataTypes') }}</h5>
+          <ul>
+            <li v-for="type in $t('charts.dataTypes')" :key="type">{{ type }}</li>
+          </ul>
+          
+          <h5>{{ $t('charts.excelRequirements') }}</h5>
+          <ul>
+            <li v-for="note in $t('charts.excelNotes')" :key="note">{{ note }}</li>
           </ul>
         </div>
       </div>
