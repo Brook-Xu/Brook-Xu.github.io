@@ -1,9 +1,87 @@
 <template>
   <div class="charts-container">
-    <!-- Loading Section -->
+    <!-- Loading Section - Full Screen -->
     <div v-if="isLoading" class="loading-section">
-      <div class="loading-spinner"></div>
-      <p>{{ $t('charts.analyzingData') }}</p>
+      <!-- 全屏背景网格 -->
+      <div class="grid-background"></div>
+      
+      <!-- 扫描光效 -->
+      <div class="scan-line"></div>
+      
+      <!-- 角落装饰 -->
+      <div class="corner-decoration corner-tl"></div>
+      <div class="corner-decoration corner-tr"></div>
+      <div class="corner-decoration corner-bl"></div>
+      <div class="corner-decoration corner-br"></div>
+      
+      <!-- 中心加载区域 -->
+      <div class="tech-loading-container">
+        <!-- 外层旋转环 -->
+        <div class="outer-ring"></div>
+        
+        <!-- 中心旋转几何图形 -->
+        <div class="tech-loader">
+          <div class="hexagon-wrapper">
+            <div class="hexagon hexagon-1"></div>
+            <div class="hexagon hexagon-2"></div>
+            <div class="hexagon hexagon-3"></div>
+            <div class="hexagon hexagon-4"></div>
+            <div class="hexagon hexagon-5"></div>
+            <div class="hexagon hexagon-6"></div>
+          </div>
+          <!-- 中心光点 -->
+          <div class="center-glow"></div>
+          <!-- 内层旋转环 -->
+          <div class="inner-ring"></div>
+        </div>
+        
+        <!-- 多层粒子效果 -->
+        <div class="particles particles-layer-1">
+          <div class="particle" v-for="n in 16" :key="'p1-' + n" :style="{ '--delay': n * 0.08 + 's', '--radius': '100px' }"></div>
+        </div>
+        <div class="particles particles-layer-2">
+          <div class="particle" v-for="n in 20" :key="'p2-' + n" :style="{ '--delay': n * 0.06 + 's', '--radius': '140px' }"></div>
+        </div>
+        
+        <!-- 脉冲波纹 -->
+        <div class="pulse-rings">
+          <div class="pulse-ring ring-1"></div>
+          <div class="pulse-ring ring-2"></div>
+          <div class="pulse-ring ring-3"></div>
+          <div class="pulse-ring ring-4"></div>
+        </div>
+        
+        <!-- 数据流线条 -->
+        <div class="data-streams">
+          <div class="stream stream-1"></div>
+          <div class="stream stream-2"></div>
+          <div class="stream stream-3"></div>
+          <div class="stream stream-4"></div>
+          <div class="stream stream-5"></div>
+          <div class="stream stream-6"></div>
+        </div>
+        
+        <!-- 能量光束 -->
+        <div class="energy-beams">
+          <div class="beam beam-1"></div>
+          <div class="beam beam-2"></div>
+          <div class="beam beam-3"></div>
+          <div class="beam beam-4"></div>
+        </div>
+      </div>
+      
+      <!-- 加载文本 -->
+      <p class="loading-text">{{ $t('charts.analyzingData') }}</p>
+      
+      <!-- 进度条 -->
+      <div class="loading-progress">
+        <div class="progress-bar"></div>
+      </div>
+      
+      <!-- 百分比显示 -->
+      <div class="loading-percentage">
+        <span class="percentage-value">{{ loadingPercentage }}</span><span class="percentage-sign">%</span>
+      </div>
     </div>
 
     <!-- Analysis Results Section -->
@@ -117,6 +195,10 @@ export default {
       dates: [], // 保存日期数组（与 dailyReturns 一一对应）
       originalDates: [], // 保存原始日期数组（用于 startDate/endDate，特别是从 cumulative_return 反推时）
       isLoading: false, // 加载状态
+      loadingStartTime: null, // 记录 loading 开始时间
+      minLoadingDuration: 2500, // 最小 loading 显示时间（毫秒），2.5秒
+      loadingPercentage: 0, // loading 百分比
+      percentageInterval: null, // 百分比更新定时器
       isGeneratingPDF: false, // PDF 生成状态
       analysisCharts: {
         cumulativeReturns: null,
@@ -150,6 +232,9 @@ export default {
         if (routeData && routeData.length > 0) {
           // 开始分析过程
           this.isLoading = true;
+          this.loadingStartTime = Date.now(); // 记录开始时间
+          this.loadingPercentage = 0;
+          this.startPercentageAnimation(); // 开始百分比动画
           this.chartData = routeData;
           this.parsedData = routeData;
           this.rawData = routeRawData;
@@ -218,14 +303,22 @@ export default {
               }
             }
             
-            // 渲染分析图表
+            // 分析完成 - 先确保最小显示时间
+            await this.ensureMinLoadingTime();
+            
+            // 设置 loading 为 false，让 DOM 渲染图表容器
+            this.isLoading = false;
+            
+            // 等待 DOM 更新，确保所有 refs 都已准备好
+            await this.$nextTick();
+            await this.$nextTick(); // 双重 nextTick 确保 DOM 完全渲染
+            
+            // 渲染分析图表（此时 DOM 已经渲染，refs 已存在）
             if (this.dailyReturns && this.dailyReturns.length > 0 && this.dates && this.dates.length > 0) {
               console.log('Rendering analysis charts with:', {
                 dailyReturnsLength: this.dailyReturns.length,
                 datesLength: this.dates.length
               });
-              // 再次等待 DOM 更新，确保所有 refs 都已准备好
-              await this.$nextTick();
               this.renderAnalysisCharts();
             } else {
               console.error('Cannot render analysis charts: dailyReturns or dates is empty', {
@@ -237,19 +330,25 @@ export default {
               });
             }
             
-            // 分析完成
-            this.isLoading = false;
+            // 渲染市场数据图表（如果有市场数据）
+            if (this.marketData && Object.keys(this.marketData).length > 0) {
+              console.log('Rendering market charts after DOM update');
+              this.renderMarketCharts();
+            }
           } catch (error) {
             console.error('Error during analysis:', error);
             this.errorMessage = error.message || '分析过程中出现错误';
+            await this.ensureMinLoadingTime();
             this.isLoading = false;
           }
         } else {
           // 如果没有数据，显示提示
+          await this.ensureMinLoadingTime();
           this.isLoading = false;
         }
       } catch (error) {
         console.error('Error parsing stored data:', error);
+        await this.ensureMinLoadingTime();
         this.isLoading = false;
         // 清除无效数据
         sessionStorage.removeItem('chartData');
@@ -258,10 +357,51 @@ export default {
       }
     } else {
       // 如果没有数据，显示提示
+      // 注意：这里不需要最小显示时间，因为没有开始 loading
       this.isLoading = false;
     }
   },
   methods: {
+    // 开始百分比动画
+    startPercentageAnimation() {
+      this.loadingPercentage = 0;
+      const duration = this.minLoadingDuration;
+      const steps = 100;
+      const interval = duration / steps;
+      
+      this.percentageInterval = setInterval(() => {
+        if (this.loadingPercentage < 100) {
+          this.loadingPercentage = Math.min(100, this.loadingPercentage + 1);
+        } else {
+          this.stopPercentageAnimation();
+        }
+      }, interval);
+    },
+
+    // 停止百分比动画
+    stopPercentageAnimation() {
+      if (this.percentageInterval) {
+        clearInterval(this.percentageInterval);
+        this.percentageInterval = null;
+      }
+      this.loadingPercentage = 100;
+    },
+
+    // 确保 loading 至少显示最小时间
+    async ensureMinLoadingTime() {
+      if (this.loadingStartTime && this.isLoading) {
+        const elapsed = Date.now() - this.loadingStartTime;
+        const remaining = this.minLoadingDuration - elapsed;
+        
+        if (remaining > 0) {
+          // 如果还没到最小显示时间，等待剩余时间
+          await new Promise(resolve => setTimeout(resolve, remaining));
+        }
+      }
+      this.stopPercentageAnimation(); // 停止百分比动画
+      this.loadingStartTime = null; // 重置开始时间
+    },
+
     detectDateColumn(data) {
       return dataProcessor.detectDateColumn(data);
     },
@@ -485,10 +625,8 @@ export default {
         // 计算市场数据的指标
         this.calculateMarketMetrics();
 
-        // 更新图表
-        this.$nextTick(() => {
-          this.renderMarketCharts();
-        });
+        // 注意：图表渲染将在 isLoading = false 后，DOM 更新时进行
+        // 这里不立即渲染，因为此时 DOM 中的图表容器可能还不存在
 
       } catch (error) {
         console.error('Error fetching market data:', error);
@@ -3473,6 +3611,9 @@ export default {
     }
   },
   beforeDestroy() {
+    // 清理百分比动画定时器
+    this.stopPercentageAnimation();
+    
     // 销毁所有分析图表
     Object.values(this.analysisCharts).forEach(chart => {
       if (chart) {
@@ -3873,38 +4014,714 @@ export default {
   }
 }
 
-/* Loading Section Styles */
+/* Loading Section Styles - Full Screen */
 .loading-section {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 400px;
-  padding: 40px;
-  background: linear-gradient(135deg, #0d1b2a 0%, #1b263b 100%);
-  border-radius: 10px;
-  margin: 40px 0;
+  background: linear-gradient(135deg, #000000 0%, #0a0e27 25%, #1a1f3a 50%, #0d1b2a 75%, #000000 100%);
+  z-index: 9999;
+  overflow: hidden;
+  animation: backgroundPulse 10s ease-in-out infinite;
 }
 
-.loading-spinner {
-  border: 4px solid rgba(255, 192, 0, 0.2);
-  border-top: 4px solid #FFC000;
+@keyframes backgroundPulse {
+  0%, 100% { 
+    background: linear-gradient(135deg, #000000 0%, #0a0e27 25%, #1a1f3a 50%, #0d1b2a 75%, #000000 100%);
+  }
+  50% { 
+    background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 25%, #0d1b2a 50%, #1a1f3a 75%, #0a0e27 100%);
+  }
+}
+
+/* 全屏网格背景 */
+.grid-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    linear-gradient(rgba(255, 192, 0, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 192, 0, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+  animation: gridMove 20s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes gridMove {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(50px, 50px); }
+}
+
+/* 扫描光效 */
+.scan-line {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(255, 192, 0, 0.5) 50%, 
+    transparent 100%
+  );
+  box-shadow: 0 0 20px rgba(255, 192, 0, 0.8);
+  animation: scanMove 3s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes scanMove {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+/* 角落装饰 */
+.corner-decoration {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  border: 2px solid rgba(255, 192, 0, 0.3);
+  pointer-events: none;
+}
+
+.corner-tl {
+  top: 20px;
+  left: 20px;
+  border-right: none;
+  border-bottom: none;
+  animation: cornerGlow 2s ease-in-out infinite;
+}
+
+.corner-tr {
+  top: 20px;
+  right: 20px;
+  border-left: none;
+  border-bottom: none;
+  animation: cornerGlow 2s ease-in-out infinite 0.5s;
+}
+
+.corner-bl {
+  bottom: 20px;
+  left: 20px;
+  border-right: none;
+  border-top: none;
+  animation: cornerGlow 2s ease-in-out infinite 1s;
+}
+
+.corner-br {
+  bottom: 20px;
+  right: 20px;
+  border-left: none;
+  border-top: none;
+  animation: cornerGlow 2s ease-in-out infinite 1.5s;
+}
+
+@keyframes cornerGlow {
+  0%, 100% { 
+    border-color: rgba(255, 192, 0, 0.3);
+    box-shadow: 0 0 10px rgba(255, 192, 0, 0.3);
+  }
+  50% { 
+    border-color: rgba(255, 192, 0, 0.8);
+    box-shadow: 0 0 30px rgba(255, 192, 0, 0.8);
+  }
+}
+
+/* 科技感加载容器 */
+.tech-loading-container {
+  position: relative;
+  width: 300px;
+  height: 300px;
+  margin-bottom: 40px;
+}
+
+/* 外层旋转环 */
+.outer-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 280px;
+  height: 280px;
+  border: 2px solid rgba(255, 192, 0, 0.2);
   border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  animation: spin 1s linear infinite;
-  margin-bottom: 20px;
+  border-top-color: rgba(255, 192, 0, 0.8);
+  border-right-color: rgba(66, 165, 245, 0.8);
+  animation: ringRotate 4s linear infinite;
 }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+@keyframes ringRotate {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
-.loading-section p {
+/* 内层旋转环 */
+.inner-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60px;
+  height: 60px;
+  border: 2px solid rgba(255, 192, 0, 0.4);
+  border-radius: 50%;
+  border-top-color: transparent;
+  border-right-color: rgba(66, 165, 245, 0.6);
+  animation: innerRingRotate 2s linear infinite reverse;
+}
+
+@keyframes innerRingRotate {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* 中心加载器 */
+.tech-loader {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 180px;
+  height: 180px;
+}
+
+/* 六边形组合 */
+.hexagon-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  animation: rotate3d 8s linear infinite;
+}
+
+@keyframes rotate3d {
+  0% { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); }
+  100% { transform: rotateX(360deg) rotateY(360deg) rotateZ(360deg); }
+}
+
+.hexagon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 0;
+  height: 0;
+  border-left: 35px solid transparent;
+  border-right: 35px solid transparent;
+  border-bottom: 60px solid;
+  border-bottom-color: rgba(255, 192, 0, 0.6);
+  animation: hexagonPulse 2s ease-in-out infinite;
+  filter: drop-shadow(0 0 8px currentColor);
+}
+
+.hexagon::after {
+  content: '';
+  position: absolute;
+  top: 60px;
+  left: -35px;
+  width: 0;
+  height: 0;
+  border-left: 35px solid transparent;
+  border-right: 35px solid transparent;
+  border-top: 60px solid;
+  border-top-color: rgba(255, 192, 0, 0.6);
+}
+
+.hexagon-1 {
+  animation-delay: 0s;
+  border-bottom-color: rgba(255, 192, 0, 0.8);
+  color: rgba(255, 192, 0, 1);
+}
+
+.hexagon-1::after {
+  border-top-color: rgba(255, 192, 0, 0.8);
+}
+
+.hexagon-2 {
+  transform: translate(-50%, -50%) rotate(60deg);
+  animation-delay: 0.17s;
+  border-bottom-color: rgba(66, 165, 245, 0.8);
+  color: rgba(66, 165, 245, 1);
+}
+
+.hexagon-2::after {
+  border-top-color: rgba(66, 165, 245, 0.8);
+}
+
+.hexagon-3 {
+  transform: translate(-50%, -50%) rotate(120deg);
+  animation-delay: 0.34s;
+  border-bottom-color: rgba(255, 192, 0, 0.6);
+  color: rgba(255, 192, 0, 1);
+}
+
+.hexagon-3::after {
+  border-top-color: rgba(255, 192, 0, 0.6);
+}
+
+.hexagon-4 {
+  transform: translate(-50%, -50%) rotate(180deg);
+  animation-delay: 0.51s;
+  border-bottom-color: rgba(66, 165, 245, 0.6);
+  color: rgba(66, 165, 245, 1);
+}
+
+.hexagon-4::after {
+  border-top-color: rgba(66, 165, 245, 0.6);
+}
+
+.hexagon-5 {
+  transform: translate(-50%, -50%) rotate(240deg);
+  animation-delay: 0.68s;
+  border-bottom-color: rgba(255, 192, 0, 0.4);
+  color: rgba(255, 192, 0, 1);
+}
+
+.hexagon-5::after {
+  border-top-color: rgba(255, 192, 0, 0.4);
+}
+
+.hexagon-6 {
+  transform: translate(-50%, -50%) rotate(300deg);
+  animation-delay: 0.85s;
+  border-bottom-color: rgba(66, 165, 245, 0.4);
+  color: rgba(66, 165, 245, 1);
+}
+
+.hexagon-6::after {
+  border-top-color: rgba(66, 165, 245, 0.4);
+}
+
+@keyframes hexagonPulse {
+  0%, 100% { 
+    opacity: 0.6;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% { 
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+}
+
+/* 中心光点 */
+.center-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 20px;
+  background: radial-gradient(circle, #FFC000 0%, transparent 70%);
+  border-radius: 50%;
+  animation: centerPulse 1.5s ease-in-out infinite;
+  box-shadow: 
+    0 0 20px rgba(255, 192, 0, 0.8),
+    0 0 40px rgba(255, 192, 0, 0.6),
+    0 0 60px rgba(255, 192, 0, 0.4);
+}
+
+@keyframes centerPulse {
+  0%, 100% { 
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  50% { 
+    transform: translate(-50%, -50%) scale(1.5);
+    opacity: 0.7;
+  }
+}
+
+/* 粒子效果 */
+.particles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.particles-layer-1 .particle {
+  width: 3px;
+  height: 3px;
+  background: #FFC000;
+  box-shadow: 0 0 8px rgba(255, 192, 0, 0.8);
+}
+
+.particles-layer-2 .particle {
+  width: 2px;
+  height: 2px;
+  background: rgba(66, 165, 245, 1);
+  box-shadow: 0 0 6px rgba(66, 165, 245, 0.8);
+}
+
+.particle {
+  position: absolute;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  animation: particleOrbit 4s linear infinite;
+  animation-delay: var(--delay);
+}
+
+@keyframes particleOrbit {
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg) translateX(var(--radius, 100px)) rotate(0deg);
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(360deg) translateX(var(--radius, 100px)) rotate(-360deg);
+    opacity: 1;
+  }
+}
+
+/* 脉冲波纹 */
+.pulse-rings {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 300px;
+  height: 300px;
+}
+
+.pulse-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 120px;
+  height: 120px;
+  border: 2px solid rgba(255, 192, 0, 0.4);
+  border-radius: 50%;
+  animation: pulseRing 2.5s ease-out infinite;
+  box-shadow: 0 0 20px rgba(255, 192, 0, 0.3);
+}
+
+.ring-1 {
+  animation-delay: 0s;
+}
+
+.ring-2 {
+  animation-delay: 0.625s;
+  border-color: rgba(66, 165, 245, 0.4);
+  box-shadow: 0 0 20px rgba(66, 165, 245, 0.3);
+}
+
+.ring-3 {
+  animation-delay: 1.25s;
+  border-color: rgba(255, 192, 0, 0.3);
+}
+
+.ring-4 {
+  animation-delay: 1.875s;
+  border-color: rgba(66, 165, 245, 0.3);
+  box-shadow: 0 0 20px rgba(66, 165, 245, 0.2);
+}
+
+@keyframes pulseRing {
+  0% {
+    transform: translate(-50%, -50%) scale(0.6);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(2.5);
+    opacity: 0;
+  }
+}
+
+/* 数据流线条 */
+.data-streams {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.stream {
+  position: absolute;
+  width: 2px;
+  height: 40px;
+  background: linear-gradient(to bottom, transparent, #FFC000, transparent);
+  box-shadow: 0 0 10px rgba(255, 192, 0, 0.8);
+  animation: streamFlow 2s linear infinite;
+}
+
+.stream-1 {
+  top: 10%;
+  left: 20%;
+  animation-delay: 0s;
+}
+
+.stream-2 {
+  top: 30%;
+  right: 20%;
+  animation-delay: 0.5s;
+  background: linear-gradient(to bottom, transparent, rgba(66, 165, 245, 1), transparent);
+  box-shadow: 0 0 10px rgba(66, 165, 245, 0.8);
+}
+
+.stream-3 {
+  bottom: 30%;
+  left: 30%;
+  animation-delay: 1s;
+}
+
+.stream-4 {
+  bottom: 10%;
+  right: 30%;
+  animation-delay: 1.5s;
+  background: linear-gradient(to bottom, transparent, rgba(66, 165, 245, 1), transparent);
+  box-shadow: 0 0 10px rgba(66, 165, 245, 0.8);
+}
+
+.stream-5 {
+  top: 50%;
+  left: 10%;
+  animation-delay: 0.25s;
+  background: linear-gradient(to bottom, transparent, rgba(255, 192, 0, 0.8), transparent);
+  box-shadow: 0 0 8px rgba(255, 192, 0, 0.6);
+}
+
+.stream-6 {
+  top: 50%;
+  right: 10%;
+  animation-delay: 0.75s;
+  background: linear-gradient(to bottom, transparent, rgba(66, 165, 245, 0.8), transparent);
+  box-shadow: 0 0 8px rgba(66, 165, 245, 0.6);
+}
+
+@keyframes streamFlow {
+  0% {
+    transform: translateY(-150px);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(450px);
+    opacity: 0;
+  }
+}
+
+/* 能量光束 */
+.energy-beams {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.beam {
+  position: absolute;
+  width: 1px;
+  height: 200px;
+  background: linear-gradient(to bottom, 
+    transparent 0%, 
+    rgba(255, 192, 0, 0.6) 30%,
+    rgba(255, 192, 0, 1) 50%,
+    rgba(255, 192, 0, 0.6) 70%,
+    transparent 100%
+  );
+  box-shadow: 0 0 15px rgba(255, 192, 0, 0.8);
+  animation: beamRotate 4s linear infinite;
+  transform-origin: center center;
+}
+
+.beam-1 {
+  top: 50%;
+  left: 50%;
+  animation-delay: 0s;
+  transform: translate(-50%, -50%) rotate(0deg) translateY(-120px);
+}
+
+.beam-2 {
+  top: 50%;
+  left: 50%;
+  animation-delay: 1s;
+  transform: translate(-50%, -50%) rotate(90deg) translateY(-120px);
+  background: linear-gradient(to bottom, 
+    transparent 0%, 
+    rgba(66, 165, 245, 0.6) 30%,
+    rgba(66, 165, 245, 1) 50%,
+    rgba(66, 165, 245, 0.6) 70%,
+    transparent 100%
+  );
+  box-shadow: 0 0 15px rgba(66, 165, 245, 0.8);
+}
+
+.beam-3 {
+  top: 50%;
+  left: 50%;
+  animation-delay: 2s;
+  transform: translate(-50%, -50%) rotate(180deg) translateY(-120px);
+}
+
+.beam-4 {
+  top: 50%;
+  left: 50%;
+  animation-delay: 3s;
+  transform: translate(-50%, -50%) rotate(270deg) translateY(-120px);
+  background: linear-gradient(to bottom, 
+    transparent 0%, 
+    rgba(66, 165, 245, 0.6) 30%,
+    rgba(66, 165, 245, 1) 50%,
+    rgba(66, 165, 245, 0.6) 70%,
+    transparent 100%
+  );
+  box-shadow: 0 0 15px rgba(66, 165, 245, 0.8);
+}
+
+@keyframes beamRotate {
+  0% {
+    opacity: 0.3;
+    transform: translate(-50%, -50%) rotate(var(--rotation, 0deg)) translateY(-120px) scaleY(0.5);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) rotate(var(--rotation, 0deg)) translateY(-120px) scaleY(1);
+  }
+  100% {
+    opacity: 0.3;
+    transform: translate(-50%, -50%) rotate(var(--rotation, 0deg)) translateY(-120px) scaleY(0.5);
+  }
+}
+
+/* 加载文本 */
+.loading-text {
   color: #FFC000;
-  font-size: 18px;
-  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+  margin: 30px 0 20px 0;
+  text-align: center;
+  text-shadow: 
+    0 0 10px rgba(255, 192, 0, 0.8),
+    0 0 20px rgba(255, 192, 0, 0.5),
+    0 0 30px rgba(255, 192, 0, 0.3);
+  letter-spacing: 3px;
+  animation: textGlow 2s ease-in-out infinite;
+  position: relative;
+  z-index: 10;
+}
+
+@keyframes textGlow {
+  0%, 100% {
+    text-shadow: 
+      0 0 10px rgba(255, 192, 0, 0.8),
+      0 0 20px rgba(255, 192, 0, 0.5),
+      0 0 30px rgba(255, 192, 0, 0.3);
+  }
+  50% {
+    text-shadow: 
+      0 0 20px rgba(255, 192, 0, 1),
+      0 0 40px rgba(255, 192, 0, 0.8),
+      0 0 60px rgba(255, 192, 0, 0.6);
+  }
+}
+
+/* 进度条 */
+.loading-progress {
+  width: 400px;
+  height: 6px;
+  background: rgba(255, 192, 0, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 15px;
+  position: relative;
+  border: 1px solid rgba(255, 192, 0, 0.2);
+  box-shadow: 
+    inset 0 0 10px rgba(0, 0, 0, 0.5),
+    0 0 10px rgba(255, 192, 0, 0.3);
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(255, 192, 0, 0.8) 30%,
+    #FFC000 50%,
+    rgba(66, 165, 245, 0.8) 70%,
+    rgba(66, 165, 245, 1) 100%
+  );
+  border-radius: 3px;
+  width: 0%;
+  animation: progressFlow 2.5s ease-in-out infinite;
+  box-shadow: 
+    0 0 15px rgba(255, 192, 0, 0.8),
+    0 0 30px rgba(66, 165, 245, 0.6);
+}
+
+@keyframes progressFlow {
+  0% {
+    width: 0%;
+    transform: translateX(-100%);
+  }
+  50% {
+    width: 75%;
+    transform: translateX(0%);
+  }
+  100% {
+    width: 100%;
+    transform: translateX(100%);
+  }
+}
+
+/* 百分比显示 */
+.loading-percentage {
+  margin-top: 20px;
+  text-align: center;
+  position: relative;
+  z-index: 10;
+}
+
+.percentage-value {
+  color: #FFC000;
+  font-size: 48px;
+  font-weight: 700;
+  text-shadow: 
+    0 0 15px rgba(255, 192, 0, 0.8),
+    0 0 30px rgba(255, 192, 0, 0.5),
+    0 0 45px rgba(255, 192, 0, 0.3);
+  animation: percentageGlow 1.5s ease-in-out infinite;
+  font-family: 'Courier New', monospace;
+}
+
+.percentage-sign {
+  color: rgba(255, 192, 0, 0.8);
+  font-size: 32px;
+  font-weight: 600;
+  text-shadow: 0 0 10px rgba(255, 192, 0, 0.6);
+}
+
+@keyframes percentageGlow {
+  0%, 100% {
+    text-shadow: 
+      0 0 15px rgba(255, 192, 0, 0.8),
+      0 0 30px rgba(255, 192, 0, 0.5),
+      0 0 45px rgba(255, 192, 0, 0.3);
+  }
+  50% {
+    text-shadow: 
+      0 0 25px rgba(255, 192, 0, 1),
+      0 0 50px rgba(255, 192, 0, 0.8),
+      0 0 75px rgba(255, 192, 0, 0.6);
+  }
 }
 
 /* PDF Download Section Styles */
