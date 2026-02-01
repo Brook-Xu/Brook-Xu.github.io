@@ -31,38 +31,12 @@
     </section>
 
     <!-- Metrics Table Section -->
-    <section v-if="metrics" ref="metricsSection" class="metrics-section" data-aos="fade-up">
-      <h2>{{ $t('charts.metricsTitle') }}</h2>
-      <div class="metrics-table-container">
-        <table class="metrics-table">
-          <thead>
-            <tr>
-              <th>{{ $t('charts.metrics.metric') }}</th>
-              <th>{{ $t('charts.metrics.uploadedData') }}</th>
-              <th>{{ $t('charts.metrics.sp500') }}</th>
-              <th>{{ $t('charts.metrics.nasdaq') }}</th>
-              <th>{{ $t('charts.metrics.btc') }}</th>
-              <th>{{ $t('charts.metrics.eth') }}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="config in metricsConfig" :key="config.key">
-              <td>{{ $t(`charts.metrics.${config.key}`) }}</td>
-              <td>{{ getMetricValue(metrics, config.key, config.type, config.decimals) }}</td>
-              <td>{{ getMetricValue(marketMetrics.sp500, config.key, config.type, config.decimals) }}</td>
-              <td>{{ getMetricValue(marketMetrics.nasdaq, config.key, config.type, config.decimals) }}</td>
-              <td>{{ getMetricValue(marketMetrics.btc, config.key, config.type, config.decimals) }}</td>
-              <td>{{ getMetricValue(marketMetrics.eth, config.key, config.type, config.decimals) }}</td>
-            </tr>
-          </tbody>
-        </table>
-        <div class="metrics-info">
-          <p>{{ $t('charts.metrics.dataPoints') }}: {{ metrics.dataPoints }}</p>
-          <p>{{ $t('charts.metrics.totalDays') }}: {{ metrics.totalDays }}</p>
-          <p>{{ $t('charts.metrics.years') }}: {{ formatNumber(metrics.years, 2) }}</p>
-        </div>
-      </div>
-    </section>
+    <MetricsTable 
+      v-if="metrics" 
+      :metrics="metrics" 
+      :market-metrics="marketMetrics"
+      ref="metricsSection"
+    />
 
     <!-- Analysis Charts Section -->
     <section v-if="metrics && chartData" class="analysis-charts-section" data-aos="fade-up">
@@ -132,9 +106,16 @@ import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import MetricsTable from './charts/MetricsTable.vue';
+import * as metricsCalculator from '../utils/metricsCalculator';
+import * as dataProcessor from '../utils/dataProcessor';
+import { calculateAllMetrics, calculateMetricsFromValue } from '../utils/metricsHelper';
 
 export default {
   name: 'Charts',
+  components: {
+    MetricsTable
+  },
   data() {
     return {
       chartData: null,
@@ -168,51 +149,6 @@ export default {
       const dates = this.chartData.map(item => item.date).sort();
       return `${dates[0]} to ${dates[dates.length - 1]}`;
     },
-    // 指标配置数组，用于生成表格行
-    metricsConfig() {
-      return [
-        { key: 'startDate', type: 'date' },
-        { key: 'endDate', type: 'date' },
-        { key: 'cumulativeReturn', type: 'percentage' },
-        { key: 'cagr', type: 'percentage' },
-        { key: 'volatility', type: 'percentage' },
-        { key: 'sharpeRatio', type: 'number', decimals: 3 },
-        { key: 'sortinoRatio', type: 'number', decimals: 3 },
-        { key: 'maxDrawdown', type: 'percentage' },
-        { key: 'durationOfMD', type: 'days' },
-        { key: 'maxDrawdownDuration', type: 'days' },
-        { key: 'drawdownOfMDD', type: 'percentage' },
-        { key: 'calmarRatio', type: 'number', decimals: 3 },
-        { key: 'var95', type: 'percentage' },
-        { key: 'var99Monthly', type: 'percentage' },
-        { key: 'cvar95', type: 'percentage' },
-        { key: 'cvar99', type: 'percentage' },
-        { key: 'giniCoefficient', type: 'number', decimals: 3 },
-        { key: 'omegaRatio', type: 'number', decimals: 3 },
-        { key: 'gainPainRatio', type: 'number', decimals: 3 },
-        { key: 'tailRatio', type: 'number', decimals: 3 },
-        { key: 'outlierWinRatio', type: 'percentage' },
-        { key: 'outlierLossRatio', type: 'percentage' },
-        { key: 'rollingSharpe90dMean', type: 'number', decimals: 3 },
-        { key: 'rollingSharpe90dMedian', type: 'number', decimals: 3 },
-        { key: 'rollingSharpe90dLast', type: 'number', decimals: 3 },
-        { key: 'rollingSharpe365dMean', type: 'number', decimals: 3 },
-        { key: 'rollingSharpe365dMedian', type: 'number', decimals: 3 },
-        { key: 'rollingSharpe365dLast', type: 'number', decimals: 3 },
-        { key: 'mtd', type: 'percentage' },
-        { key: 'return3M', type: 'percentage' },
-        { key: 'return6M', type: 'percentage' },
-        { key: 'ytd', type: 'percentage' },
-        { key: 'bestDay', type: 'percentage' },
-        { key: 'worstDay', type: 'percentage' },
-        { key: 'bestMonth', type: 'percentage' },
-        { key: 'worstMonth', type: 'percentage' },
-        { key: 'bestYear', type: 'percentage' },
-        { key: 'worstYear', type: 'percentage' },
-        { key: 'skew', type: 'number', decimals: 3 },
-        { key: 'kurtosis', type: 'number', decimals: 3 }
-      ];
-    }
   },
   async mounted() {
     // 从 sessionStorage 获取数据
@@ -362,48 +298,7 @@ export default {
   },
   methods: {
     detectDateColumn(data) {
-      if (!data || data.length === 0) {
-        return null;
-      }
-
-      const firstRow = data[0];
-      const columnNames = Object.keys(firstRow).filter(name => name && name.trim() !== '');
-      
-      if (columnNames.length < 2) {
-        return null;
-      }
-
-      // 优先检测 daily_returns.csv 格式的字段
-      const hasDailyReturnFields = columnNames.some(name => 
-        name === 'date' || name === 'daily_return' || name === 'cumulative_return'
-      );
-
-      if (hasDailyReturnFields) {
-        if (columnNames.includes('date')) {
-          return 'date';
-        } else if (columnNames.includes('candle_begin_time')) {
-          return 'candle_begin_time';
-        }
-      } else {
-        // 原有的智能检测逻辑
-        const firstColumnName = columnNames[0];
-        const firstColumnValue = firstRow[firstColumnName];
-        if (this.isDateColumn(firstColumnValue) || this.isDateColumnSlashFormat(firstColumnValue)) {
-          return firstColumnName;
-        } else {
-          // 如果第一列不是日期，尝试查找包含日期关键词的列
-          for (const colName of columnNames) {
-            if (this.isDateColumnName(colName)) {
-              return colName;
-            }
-          }
-          
-          // 如果没找到明确的列名，使用第一列作为日期
-          return columnNames[0];
-        }
-      }
-
-      return columnNames[0] || null;
+      return dataProcessor.detectDateColumn(data);
     },
 
     parseCSVData(data) {
@@ -491,13 +386,13 @@ export default {
 
         // 验证并转换日期格式
         // 使用增强的日期标准化方法
-        let normalizedDate = this.normalizeDate(dateStr);
+        let normalizedDate = dataProcessor.normalizeDate(dateStr);
         if (!normalizedDate) {
           throw new Error(this.$t('charts.invalidDateFormat', { row: index + 2, date: dateStr }));
         }
 
         // 验证数值（支持百分比格式）
-        const value = this.parseNumericValue(valueStr);
+        const value = dataProcessor.parseNumericValue(valueStr);
         if (isNaN(value)) {
           throw new Error(this.$t('charts.invalidValue', { row: index + 2, value: valueStr }));
         }
@@ -522,18 +417,18 @@ export default {
           // daily_return: 每天的涨跌变化值（初始值为0）
           // 转换为价格序列：price[0] = 1, price[i] = price[i-1] * (1 + daily_return[i])
           console.log('Detected daily_return data, converting to price series...');
-          parsedData = this.convertDailyReturnToPriceSeries(parsedData);
+          parsedData = dataProcessor.convertDailyReturnToPriceSeries(parsedData);
           this.dataType = 'daily_return';
         } else if (isCumulativeReturn) {
           // cumulative_return: 累计的涨跌变化值（初始值为0）
           // 转换为价格序列：price[i] = 1 + cumulative_return[i]
           console.log('Detected cumulative_return data, converting to price series...');
-          parsedData = this.convertCumulativeReturnToPriceSeries(parsedData);
+          parsedData = dataProcessor.convertCumulativeReturnToPriceSeries(parsedData);
           this.dataType = 'cumulative_return';
         } else {
           // 其他 _return 类型，默认按 cumulative_return 处理
           console.log('Detected return type data, converting to price series...');
-          parsedData = this.convertCumulativeReturnToPriceSeries(parsedData);
+          parsedData = dataProcessor.convertCumulativeReturnToPriceSeries(parsedData);
           this.dataType = 'return';
         }
       } else {
@@ -554,112 +449,9 @@ export default {
       this.fetchMarketDataAndUpdateCharts(parsedData);
     },
 
-    /**
-     * 将 daily_return（每天的涨跌变化值）转换为价格序列
-     * daily_return: 每天的涨跌变化值，初始值为0
-     * 转换公式：price[0] = 1, price[i] = price[i-1] * (1 + daily_return[i])
-     * 
-     * 例如：
-     * - daily_return[0] = 0.01 → 价格[0] = 1 * (1 + 0.01) = 1.01
-     * - daily_return[1] = 0.02 → 价格[1] = 1.01 * (1 + 0.02) = 1.0302
-     * - daily_return[2] = -0.01 → 价格[2] = 1.0302 * (1 - 0.01) = 1.019898
-     * 
-     * @param {Array} parsedData - 解析后的数据数组，每个元素包含 {date, value}，value是daily_return
-     * @returns {Array} 转换后的价格序列，每个元素包含 {date, value}，value是价格
-     */
-    convertDailyReturnToPriceSeries(parsedData) {
-      if (!parsedData || parsedData.length === 0) {
-        return parsedData;
-      }
 
-      const priceSeries = [];
-      let currentPrice = 1; // 初始价格为1
-
-      for (const item of parsedData) {
-        // price[i] = price[i-1] * (1 + daily_return[i])
-        currentPrice = currentPrice * (1 + item.value);
-        priceSeries.push({
-          date: item.date,
-          value: currentPrice
-        });
-      }
-
-      return priceSeries;
-    },
-
-    /**
-     * 将 cumulative_return（累计的涨跌变化值）转换为价格序列
-     * cumulative_return: 是 daily_return 的累加值
-     * 转换公式：price[i] = 1 + cumulative_return[i]
-     * 
-     * 例如：
-     * - 2024-01-01: cumulative_return = 0.01 → 价格 = 1 + 0.01 = 1.01
-     * - 2024-01-02: cumulative_return = 0.03 → 价格 = 1 + 0.03 = 1.03
-     * 
-     * 注意：cumulative_return 是累加值，所以可以直接用 1 + cumulative_return 得到价格
-     * 
-     * @param {Array} parsedData - 解析后的数据数组，每个元素包含 {date, value}，value是cumulative_return
-     * @returns {Array} 转换后的价格序列，每个元素包含 {date, value}，value是价格
-     */
-    convertCumulativeReturnToPriceSeries(parsedData) {
-      if (!parsedData || parsedData.length === 0) {
-        return parsedData;
-      }
-
-      // 初始价格为1，之后每天的价格 = 1 + cumulative_return（累加值）
-      return parsedData.map(item => ({
-        date: item.date,
-        value: 1 + item.value  // 初始价格1 + 累计涨跌变化值（累加值）
-      }));
-    },
-
-    /**
-     * 从CSV数据中提取日期范围
-     * @param {Array} csvData - 解析后的CSV数据数组，每个元素包含 {date, value}
-     * @returns {Object} 包含 fromDate 和 toDate 的对象，格式为 YYYY-MM-DD
-     */
     extractDateRangeFromCSV(csvData) {
-      if (!csvData || csvData.length === 0) {
-        return null;
-      }
-
-      // 提取所有日期（parsedData中的日期已经通过normalizeDate标准化为YYYY-MM-DD格式）
-      const dates = csvData
-        .map(item => item.date)
-        .filter(date => date) // 过滤掉空值
-        .map(date => {
-          // 处理字符串格式（应该是YYYY-MM-DD）
-          if (typeof date === 'string') {
-            // 如果已经是 YYYY-MM-DD 格式，直接返回
-            if (/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-              return date;
-            }
-            // 如果是 YYYY/M/D 格式，转换为 YYYY-MM-DD（以防万一）
-            if (/^\d{4}\/\d{1,2}\/\d{1,2}$/.test(date)) {
-              const parts = date.split('/');
-              const year = parts[0];
-              const month = parts[1].padStart(2, '0');
-              const day = parts[2].padStart(2, '0');
-              return `${year}-${month}-${day}`;
-            }
-          }
-          // 如果是 Date 对象，转换为 YYYY-MM-DD
-          if (date instanceof Date) {
-            return date.toISOString().split('T')[0];
-          }
-          return null;
-        })
-        .filter(date => date !== null)
-        .sort(); // 排序以便找到最早和最晚的日期
-
-      if (dates.length === 0) {
-        return null;
-      }
-
-      return {
-        fromDate: dates[0],
-        toDate: dates[dates.length - 1]
-      };
+      return dataProcessor.extractDateRangeFromCSV(csvData);
     },
 
     async fetchMarketDataAndUpdateCharts(csvData) {
@@ -745,151 +537,14 @@ export default {
       }
     },
 
-    isDateColumn(value) {
-      if (!value || typeof value !== 'string') return false;
-      // 支持 YYYY-MM-DD 格式（标准格式）
-      const dashRegex = /^\d{4}-\d{1,2}-\d{1,2}$/;
-      return dashRegex.test(value.trim());
-    },
-
-    isDateColumnSlashFormat(value) {
-      if (!value || typeof value !== 'string') return false;
-      // 支持 YYYY/M/D 或 YYYY/MM/DD 格式
-      const dateRegex = /^\d{4}\/\d{1,2}\/\d{1,2}$/;
-      return dateRegex.test(value.trim());
-    },
-
-    // 增强的日期格式检测和转换
-    normalizeDate(dateStr) {
-      if (!dateStr || typeof dateStr !== 'string') {
-        return null;
-      }
-      
-      const trimmed = dateStr.trim();
-      
-      // 1. 尝试 YYYY/M/D 或 YYYY/MM/DD 格式
-      if (this.isDateColumnSlashFormat(trimmed)) {
-        return this.convertDateToStandardFormat(trimmed);
-      }
-      
-      // 2. 尝试 YYYY-MM-DD 格式
-      if (this.isDateColumn(trimmed)) {
-        // 确保月份和日期是两位数
-        const parts = trimmed.split('-');
-        if (parts.length === 3) {
-          const year = parts[0];
-          const month = parts[1].padStart(2, '0');
-          const day = parts[2].padStart(2, '0');
-          return `${year}-${month}-${day}`;
-        }
-        return trimmed;
-      }
-      
-      // 3. 尝试其他常见格式：MM/DD/YYYY, DD/MM/YYYY, YYYY.MM.DD 等
-      // MM/DD/YYYY 或 M/D/YYYY
-      const usDateRegex = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
-      const usMatch = trimmed.match(usDateRegex);
-      if (usMatch) {
-        const [, month, day, year] = usMatch;
-        return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-      }
-      
-      // DD/MM/YYYY 或 D/M/YYYY
-      const euDateRegex = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
-      // 注意：这个和上面的正则一样，但我们可以通过尝试解析来判断
-      // 如果月份 > 12，可能是 DD/MM/YYYY 格式
-      const euMatch = trimmed.match(euDateRegex);
-      if (euMatch) {
-        const [, part1, part2, year] = euMatch;
-        const num1 = parseInt(part1);
-        const num2 = parseInt(part2);
-        if (num1 > 12 && num2 <= 12) {
-          // 可能是 DD/MM/YYYY
-          return `${year}-${part2.padStart(2, '0')}-${part1.padStart(2, '0')}`;
-        } else if (num1 <= 12 && num2 <= 12) {
-          // 可能是 MM/DD/YYYY（默认）
-          return `${year}-${part1.padStart(2, '0')}-${part2.padStart(2, '0')}`;
-        }
-      }
-      
-      // YYYY.MM.DD 或 YYYY.M.D
-      const dotDateRegex = /^(\d{4})\.(\d{1,2})\.(\d{1,2})$/;
-      const dotMatch = trimmed.match(dotDateRegex);
-      if (dotMatch) {
-        const [, year, month, day] = dotMatch;
-        return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-      }
-      
-      // 4. 尝试使用 JavaScript Date 对象解析
-      const dateObj = new Date(trimmed);
-      if (!isNaN(dateObj.getTime())) {
-        const year = dateObj.getFullYear();
-        const month = String(dateObj.getMonth() + 1).padStart(2, '0');
-        const day = String(dateObj.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-      }
-      
-      return null;
-    },
-
-    /**
-     * 解析数值字符串，支持百分比格式
-     * 例如："0.12%" -> 0.0012, "12%" -> 0.12, "0.12" -> 0.12
-     * @param {string|number} valueStr - 要解析的数值字符串
-     * @returns {number} 解析后的数值（小数形式）
-     */
-    parseNumericValue(valueStr) {
-      if (valueStr === null || valueStr === undefined || valueStr === '') {
-        return NaN;
-      }
-      
-      // 如果已经是数字，直接返回
-      if (typeof valueStr === 'number') {
-        return valueStr;
-      }
-      
-      // 转换为字符串并去除空格
-      const str = String(valueStr).trim();
-      
-      // 如果字符串以 % 结尾，去掉 % 并除以 100
-      if (str.endsWith('%')) {
-        const numStr = str.slice(0, -1).trim();
-        const num = parseFloat(numStr);
-        if (isNaN(num)) {
-          return NaN;
-        }
-        return num / 100;
-      }
-      
-      // 否则直接使用 parseFloat
-      return parseFloat(str);
-    },
-
-    convertDateToStandardFormat(dateStr) {
-      // 将 YYYY/M/D 格式转换为 YYYY-MM-DD 格式
-      const parts = dateStr.split('/');
-      if (parts.length !== 3) {
-        return dateStr;
-      }
-      const year = parts[0];
-      const month = parts[1].padStart(2, '0');
-      const day = parts[2].padStart(2, '0');
-      return `${year}-${month}-${day}`;
-    },
-
-    isDateColumnName(columnName) {
-      if (!columnName) return false;
-      const dateKeywords = ['date', 'time', 'timestamp', 'day', 'month', 'year', '日期', '时间'];
-      const lowerName = columnName.toLowerCase();
-      return dateKeywords.some(keyword => lowerName.includes(keyword));
-    },
-
-    isValueColumnName(columnName) {
-      if (!columnName) return false;
-      const valueKeywords = ['value', 'price', 'amount', 'quantity', 'count', 'number', '数值', '价格'];
-      const lowerName = columnName.toLowerCase();
-      return valueKeywords.some(keyword => lowerName.includes(keyword));
-    },
+    // 使用工具函数
+    isDateColumn: dataProcessor.isDateColumn,
+    isDateColumnSlashFormat: dataProcessor.isDateColumnSlashFormat,
+    normalizeDate: dataProcessor.normalizeDate,
+    parseNumericValue: dataProcessor.parseNumericValue,
+    convertDateToStandardFormat: dataProcessor.convertDateToStandardFormat,
+    isDateColumnName: dataProcessor.isDateColumnName,
+    isValueColumnName: dataProcessor.isValueColumnName,
 
     initChart() {
       if (!this.$refs.chart) {
@@ -1437,53 +1092,54 @@ export default {
         return;
       }
 
-      // 如果数据已经被转换为价格序列（从 daily_return 或 cumulative_return 转换），
-      // 应该从转换后的价格序列计算日收益率，而不是使用原始数据
-      if (this.dataType !== 'price' && this.parsedData && this.parsedData.length > 1) {
-        // 数据已经被转换为价格序列，从价格序列计算日收益率
-        const result = this.calculateMetricsFromValue(this.parsedData, 'date');
-        if (result) {
-          this.metrics = result;
+      // 使用工具函数计算指标
+      const result = calculateAllMetrics(
+        rawData,
+        dateColumn,
+        this.parsedData,
+        this.dataType,
+        this.originalDates
+      );
+      
+      if (result.metrics) {
+        this.metrics = result.metrics;
+        this.dailyReturns = result.dailyReturns;
+        this.dates = result.dates;
+        this.originalDates = result.originalDates;
+        return;
+      }
+      
+      // 如果工具函数返回 null，尝试从 parsedData 计算
+      if (this.parsedData && this.parsedData.length > 1) {
+        const resultFromValue = calculateMetricsFromValue(this.parsedData, 'date');
+        if (resultFromValue) {
+          this.metrics = resultFromValue;
           // 从 parsedData 反推 dailyReturns 和 dates
-          // 注意：dailyReturns 的长度比 parsedData 少1（因为从第二个值开始计算）
           const values = this.parsedData.map(item => item.value);
           this.dailyReturns = [];
           this.dates = [];
           
-          // 从第二个值开始计算日收益率
           for (let i = 1; i < values.length; i++) {
             if (values[i - 1] > 0) {
               const dailyReturn = (values[i] - values[i - 1]) / values[i - 1];
               this.dailyReturns.push(dailyReturn);
-              // dates 对应 dailyReturns，所以使用第 i 个日期（因为 dailyReturn 是从 i-1 到 i 的变化）
               this.dates.push(this.parsedData[i].date);
             }
           }
           
-          // 确保 dates 和 dailyReturns 长度一致
           const minLength = Math.min(this.dates.length, this.dailyReturns.length);
           this.dates = this.dates.slice(0, minLength);
           this.dailyReturns = this.dailyReturns.slice(0, minLength);
           
-          // 保存原始日期数组（用于 startDate/endDate）
           if (!this.originalDates || this.originalDates.length === 0) {
             this.originalDates = this.parsedData.map(item => item.date);
           }
-          
-          console.log('Calculated dailyReturns and dates from parsedData:', {
-            dailyReturnsLength: this.dailyReturns.length,
-            datesLength: this.dates.length,
-            parsedDataLength: this.parsedData.length
-          });
-          
-          // 不在这里渲染，让调用者统一处理
-          return;
-        } else {
-          console.error('Failed to calculate metrics from value');
-          this.metrics = null;
           return;
         }
       }
+      
+      this.metrics = null;
+      return;
 
       // 检查是否有 daily_return 字段（仅当数据是原始价格数据时）
       const firstRow = rawData[0];
@@ -1890,135 +1546,46 @@ export default {
       // 不在这里渲染，让调用者统一处理
     },
 
-    // 从 value 字段计算指标（如果没有 daily_return）
+    // 使用工具函数，保留此方法作为兼容性接口
     calculateMetricsFromValue(parsedData, dateColumn) {
-      if (!parsedData || parsedData.length < 2) {
-        return null;
-      }
-
-      // 将累计收益转换为日收益率
-      const values = parsedData.map(item => item.value);
-
-      // 计算日收益率：从累计收益反推
-      const dailyReturns = [];
-      for (let i = 1; i < values.length; i++) {
-        if (values[i - 1] > 0) {
-          const dailyReturn = (values[i] - values[i - 1]) / values[i - 1];
-          dailyReturns.push(dailyReturn);
-        }
-      }
-
-      if (dailyReturns.length === 0) {
-        return null;
-      }
-
-      const dates = parsedData.map(item => item.date).filter(date => date);
-      if (dates.length < 2) {
-        return null;
-      }
-      
-      // 解析日期，支持字符串格式（如 "2021-01-01"）
-      const parseDate = (dateStr) => {
-        if (!dateStr) return null;
-        // 如果已经是 Date 对象
-        if (dateStr instanceof Date) {
-          return isNaN(dateStr.getTime()) ? null : dateStr;
-        }
-        // 尝试解析字符串日期
-        // 支持 "YYYY-MM-DD" 格式
-        if (typeof dateStr === 'string' && dateStr.includes('-')) {
-          const parts = dateStr.split('-');
-          if (parts.length === 3) {
-            const year = parseInt(parts[0], 10);
-            const month = parseInt(parts[1], 10) - 1; // 月份从0开始
-            const day = parseInt(parts[2], 10);
-            const date = new Date(year, month, day);
-            return isNaN(date.getTime()) ? null : date;
-          }
-        }
-        // 尝试直接解析
-        const date = new Date(dateStr);
-        return isNaN(date.getTime()) ? null : date;
-      };
-
-      const firstDate = parseDate(dates[0]);
-      const lastDate = parseDate(dates[dates.length - 1]);
-      
-      if (!firstDate || !lastDate) {
-        console.error('Failed to parse dates in calculateMetricsFromValue:', { dates });
-        return null;
-      }
-      
-      const totalDays = Math.max(1, Math.floor((lastDate - firstDate) / (1000 * 60 * 60 * 24)));
-      const years = totalDays / 365.25;
-
-      // 格式化日期（不允许返回 N/A，如果解析失败则抛出错误）
-      const formatDate = (date) => {
-        if (!date || isNaN(date.getTime())) {
-          console.error('Invalid date in calculateMetricsFromValue formatDate:', date);
-          throw new Error('Failed to format date');
-        }
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-      };
-
-      // 计算累计收益（从第一个值到最后一个值）
-      const initialValue = values[0];
-      const finalValue = values[values.length - 1];
-      const cumulativeReturn = initialValue > 0 ? (finalValue / initialValue) - 1 : 0;
-
-      // 确保 dates 和 dailyReturns 长度一致（dates 比 dailyReturns 多一个元素）
-      // dailyReturns 从第二个值开始，所以 dates 也需要从第二个开始
-      const alignedDates = dates.slice(1);
-
-      return {
-        startDate: formatDate(firstDate),
-        endDate: formatDate(lastDate),
-        cumulativeReturn: cumulativeReturn,
-        cagr: this.calculateCAGR(dailyReturns, years),
-        volatility: this.calculateVolatility(dailyReturns),
-        sharpeRatio: this.calculateSharpeRatio(dailyReturns),
-        sortinoRatio: this.calculateSortinoRatio(dailyReturns),
-        maxDrawdown: this.calculateMaxDrawdown(dailyReturns),
-        calmarRatio: this.calculateCalmarRatio(dailyReturns, years),
-        var95: this.calculateVaR(dailyReturns, 0.95),
-        cvar95: this.calculateCVaR(dailyReturns, 0.95),
-        omegaRatio: this.calculateOmegaRatio(dailyReturns),
-        tailRatio: this.calculateTailRatio(dailyReturns),
-        maxDrawdownDuration: this.calculateMaxDrawdownDuration(dailyReturns, alignedDates),
-        durationOfMD: this.calculateDurationOfMD(dailyReturns, alignedDates),
-        drawdownOfMDD: this.calculateDrawdownOfMDD(dailyReturns, alignedDates),
-        var99Monthly: this.calculateMonthlyVaR(dailyReturns, alignedDates, 0.99),
-        cvar99: this.calculateCVaR(dailyReturns, 0.99),
-        giniCoefficient: this.calculateGiniCoefficient(dailyReturns),
-        gainPainRatio: this.calculateGainPainRatio(dailyReturns, alignedDates),
-        outlierWinRatio: this.calculateOutlierWinRatio(dailyReturns),
-        outlierLossRatio: this.calculateOutlierLossRatio(dailyReturns),
-        rollingSharpe90dMean: this.calculateRollingSharpeStats(dailyReturns, 90).mean,
-        rollingSharpe90dMedian: this.calculateRollingSharpeStats(dailyReturns, 90).median,
-        rollingSharpe90dLast: this.calculateRollingSharpeStats(dailyReturns, 90).last,
-        rollingSharpe365dMean: this.calculateRollingSharpeStats(dailyReturns, 365).mean,
-        rollingSharpe365dMedian: this.calculateRollingSharpeStats(dailyReturns, 365).median,
-        rollingSharpe365dLast: this.calculateRollingSharpeStats(dailyReturns, 365).last,
-        mtd: this.calculateMTD(dailyReturns, alignedDates),
-        return3M: this.calculatePeriodReturn(dailyReturns, alignedDates, 90),
-        return6M: this.calculatePeriodReturn(dailyReturns, alignedDates, 180),
-        ytd: this.calculateYTD(dailyReturns, alignedDates),
-        bestDay: this.calculateBestDay(dailyReturns),
-        worstDay: this.calculateWorstDay(dailyReturns),
-        bestMonth: this.calculateBestMonth(dailyReturns, alignedDates),
-        worstMonth: this.calculateWorstMonth(dailyReturns, alignedDates),
-        bestYear: this.calculateBestYear(dailyReturns, alignedDates),
-        worstYear: this.calculateWorstYear(dailyReturns, alignedDates),
-        skew: this.calculateSkew(dailyReturns),
-        kurtosis: this.calculateKurtosis(dailyReturns),
-        totalDays: totalDays,
-        years: years,
-        dataPoints: dailyReturns.length
-      };
+      return calculateMetricsFromValue(parsedData, dateColumn);
     },
+    
+    // 以下所有指标计算方法已移至 utils/metricsCalculator.js
+    // 保留这些方法作为兼容性接口，实际调用工具函数
+    calculateCumulativeReturn: (dailyReturns) => metricsCalculator.calculateCumulativeReturn(dailyReturns),
+    calculateCAGR: (dailyReturns, years) => metricsCalculator.calculateCAGR(dailyReturns, years),
+    calculateVolatility: (dailyReturns) => metricsCalculator.calculateVolatility(dailyReturns),
+    calculateSharpeRatio: (dailyReturns) => metricsCalculator.calculateSharpeRatio(dailyReturns),
+    calculateSortinoRatio: (dailyReturns) => metricsCalculator.calculateSortinoRatio(dailyReturns),
+    calculateMaxDrawdown: (dailyReturns) => metricsCalculator.calculateMaxDrawdown(dailyReturns),
+    calculateCalmarRatio: (dailyReturns, years) => metricsCalculator.calculateCalmarRatio(dailyReturns, years),
+    calculateVaR: (dailyReturns, confidence) => metricsCalculator.calculateVaR(dailyReturns, confidence),
+    calculateCVaR: (dailyReturns, confidence) => metricsCalculator.calculateCVaR(dailyReturns, confidence),
+    calculateOmegaRatio: (dailyReturns, threshold) => metricsCalculator.calculateOmegaRatio(dailyReturns, threshold),
+    calculateTailRatio: (dailyReturns) => metricsCalculator.calculateTailRatio(dailyReturns),
+    calculateMaxDrawdownDuration: (dailyReturns, dates) => metricsCalculator.calculateMaxDrawdownDuration(dailyReturns, dates),
+    calculateBestDay: (dailyReturns) => metricsCalculator.calculateBestDay(dailyReturns),
+    calculateWorstDay: (dailyReturns) => metricsCalculator.calculateWorstDay(dailyReturns),
+    calculateBestMonth: (dailyReturns, dates) => metricsCalculator.calculateBestMonth(dailyReturns, dates),
+    calculateWorstMonth: (dailyReturns, dates) => metricsCalculator.calculateWorstMonth(dailyReturns, dates),
+    calculateMonthlyReturns: (dailyReturns, dates) => metricsCalculator.calculateMonthlyReturns(dailyReturns, dates),
+    calculateSkew: (dailyReturns) => metricsCalculator.calculateSkew(dailyReturns),
+    calculateKurtosis: (dailyReturns) => metricsCalculator.calculateKurtosis(dailyReturns),
+    calculateDurationOfMD: (dailyReturns, dates) => metricsCalculator.calculateDurationOfMD(dailyReturns, dates),
+    calculateDrawdownOfMDD: (dailyReturns, dates) => metricsCalculator.calculateDrawdownOfMDD(dailyReturns, dates),
+    calculateMonthlyVaR: (dailyReturns, dates, confidence) => metricsCalculator.calculateMonthlyVaR(dailyReturns, dates, confidence),
+    calculateGiniCoefficient: (dailyReturns) => metricsCalculator.calculateGiniCoefficient(dailyReturns),
+    calculateGainPainRatio: (dailyReturns, dates) => metricsCalculator.calculateGainPainRatio(dailyReturns, dates),
+    calculateOutlierWinRatio: (dailyReturns) => metricsCalculator.calculateOutlierWinRatio(dailyReturns),
+    calculateOutlierLossRatio: (dailyReturns) => metricsCalculator.calculateOutlierLossRatio(dailyReturns),
+    calculateRollingSharpeStats: (dailyReturns, windowSize) => metricsCalculator.calculateRollingSharpeStats(dailyReturns, windowSize),
+    calculateMTD: (dailyReturns, dates) => metricsCalculator.calculateMTD(dailyReturns, dates),
+    calculatePeriodReturn: (dailyReturns, dates, days) => metricsCalculator.calculatePeriodReturn(dailyReturns, dates, days),
+    calculateYTD: (dailyReturns, dates) => metricsCalculator.calculateYTD(dailyReturns, dates),
+    calculateBestYear: (dailyReturns, dates) => metricsCalculator.calculateBestYear(dailyReturns, dates),
+    calculateWorstYear: (dailyReturns, dates) => metricsCalculator.calculateWorstYear(dailyReturns, dates),
+    
 
     // 1. 累计收益
     calculateCumulativeReturn(dailyReturns) {
@@ -2720,46 +2287,8 @@ export default {
       return value.toFixed(decimals);
     },
 
-    // 将市场数据（OHLC）转换为日收益率
     convertMarketDataToDailyReturns(marketData) {
-      if (!marketData || !marketData.results || marketData.results.length < 2) {
-        return { dailyReturns: [], dates: [] };
-      }
-
-      // 按时间排序
-      const sortedResults = [...marketData.results]
-        .filter(item => item && item.t && item.c !== null && item.c !== undefined && !isNaN(item.c))
-        .sort((a, b) => a.t - b.t);
-
-      if (sortedResults.length < 2) {
-        return { dailyReturns: [], dates: [] };
-      }
-
-      const dailyReturns = [];
-      const dates = [];
-
-      for (let i = 1; i < sortedResults.length; i++) {
-        const prevClose = sortedResults[i - 1].c;
-        const currClose = sortedResults[i].c;
-
-        if (prevClose > 0 && currClose > 0) {
-          const dailyReturn = (currClose - prevClose) / prevClose;
-          dailyReturns.push(dailyReturn);
-          
-          // 格式化日期
-          try {
-            const date = new Date(sortedResults[i].t);
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const day = String(date.getDate()).padStart(2, '0');
-            dates.push(`${year}-${month}-${day}`);
-          } catch (e) {
-            dates.push(new Date(sortedResults[i].t).toISOString().split('T')[0]);
-          }
-        }
-      }
-
-      return { dailyReturns, dates };
+      return dataProcessor.convertMarketDataToDailyReturns(marketData);
     },
 
     // 计算市场数据的指标
