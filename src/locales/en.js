@@ -277,7 +277,7 @@ export default {
     },
     analysisChartsTitle: 'Analysis Charts',
     analysisCharts: {
-      cumulativeReturns: 'Cumulative Returns',
+      cumulativeReturns: 'Net Asset Value (NAV)',
       drawdown: 'Drawdown',
       rollingSharpe: 'Rolling Sharpe Ratio',
       monthlyReturns: 'Monthly Returns Heatmap',

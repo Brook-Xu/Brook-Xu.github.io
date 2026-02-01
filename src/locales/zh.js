@@ -277,7 +277,7 @@ export default {
     },
     analysisChartsTitle: '分析图表',
     analysisCharts: {
-      cumulativeReturns: '累计收益曲线',
+      cumulativeReturns: '净资产价值 (NAV)',
       drawdown: '回撤曲线',
       rollingSharpe: '滚动夏普比率',
       monthlyReturns: '月度收益热力图',

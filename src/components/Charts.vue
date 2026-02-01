@@ -16,20 +16,6 @@
       </button>
     </div>
     
-    <section class="charts" data-aos="fade-up">
-      <h2>{{ $t('charts.title') }}</h2>
-      <div v-if="!chartData || chartData.length === 0" class="no-data">
-        <p>{{ $t('charts.noDataMessage') }}</p>
-      </div>
-      <div v-else>
-        <div ref="chart" class="chart-container"></div>
-        <div class="chart-info">
-          <p>{{ $t('charts.totalDataPoints') }}: {{ chartData.length }}</p>
-          <p>{{ $t('home.dateRange') }}: {{ dateRange }}</p>
-        </div>
-      </div>
-    </section>
-
     <!-- Metrics Table Section -->
     <MetricsTable 
       v-if="metrics" 
@@ -119,7 +105,6 @@ export default {
   data() {
     return {
       chartData: null,
-      chart: null,
       marketData: null,
       apiError: null,
       parsedData: null,
@@ -231,26 +216,6 @@ export default {
                   datesLength: this.dates.length
                 });
               }
-            }
-            
-            // 渲染主图表 - 使用 setTimeout 确保 DOM 完全准备好
-            if (this.chartData && this.chartData.length > 0) {
-              setTimeout(() => {
-                if (this.$refs.chart) {
-                  this.initChart();
-                } else {
-                  console.warn('Chart ref not found after timeout, retrying...');
-                  setTimeout(() => {
-                    if (this.$refs.chart) {
-                      this.initChart();
-                    }
-                  }, 200);
-                }
-              }, 150);
-            } else {
-              console.warn('Cannot render main chart: chartData is empty', {
-                chartDataLength: this.chartData ? this.chartData.length : 0
-              });
             }
             
             // 渲染分析图表
@@ -522,7 +487,6 @@ export default {
 
         // 更新图表
         this.$nextTick(() => {
-          this.initChart();
           this.renderMarketCharts();
         });
 
@@ -530,10 +494,6 @@ export default {
         console.error('Error fetching market data:', error);
         this.apiError = error.message;
         
-        // 即使API失败，也要显示CSV数据图表
-        this.$nextTick(() => {
-          this.initChart();
-        });
       }
     },
 
@@ -545,168 +505,6 @@ export default {
     convertDateToStandardFormat: dataProcessor.convertDateToStandardFormat,
     isDateColumnName: dataProcessor.isDateColumnName,
     isValueColumnName: dataProcessor.isValueColumnName,
-
-    initChart() {
-      if (!this.$refs.chart) {
-        console.warn('initChart: chart ref not found');
-        return;
-      }
-      
-      if (!this.chartData || this.chartData.length === 0) {
-        console.warn('initChart: chartData is empty');
-        return;
-      }
-      
-      console.log('Initializing main chart with data:', {
-        chartDataLength: this.chartData.length
-      });
-      
-      // 如果图表已经初始化，先销毁
-      if (this.chart) {
-        this.chart.dispose();
-        this.chart = null;
-      }
-      
-      // 确保容器有尺寸
-      const chartElement = this.$refs.chart;
-      if (chartElement.offsetWidth === 0 || chartElement.offsetHeight === 0) {
-        console.warn('Chart container has no size, waiting...', {
-          width: chartElement.offsetWidth,
-          height: chartElement.offsetHeight,
-          clientWidth: chartElement.clientWidth,
-          clientHeight: chartElement.clientHeight
-        });
-        setTimeout(() => {
-          this.initChart();
-        }, 100);
-        return;
-      }
-      
-      console.log('Chart container size:', {
-        width: chartElement.offsetWidth,
-        height: chartElement.offsetHeight
-      });
-      
-      this.chart = echarts.init(this.$refs.chart);
-      
-      // 准备数据
-      const dates = this.chartData.map(item => item.date);
-      const values = this.chartData.map(item => item.value);
-      
-      console.log('Chart data prepared:', {
-        datesLength: dates.length,
-        valuesLength: values.length,
-        firstDate: dates[0],
-        lastDate: dates[dates.length - 1],
-        firstValue: values[0],
-        lastValue: values[values.length - 1]
-      });
-      
-      const option = {
-        title: {
-          text: this.$t('charts.dataTrendChart'),
-          left: 'center',
-          textStyle: {
-            color: '#FFC000',
-            fontSize: 20
-          }
-        },
-        tooltip: {
-          trigger: 'axis',
-          formatter: (params) => {
-            const data = params[0];
-            return `${this.$t('tooltips.date', { date: data.axisValue })}<br/>${this.$t('tooltips.value', { value: data.value })}`;
-          }
-        },
-        grid: {
-          left: '3%',
-          right: '4%',
-          bottom: '3%',
-          containLabel: true
-        },
-        xAxis: {
-          type: 'category',
-          data: dates,
-          axisLabel: {
-            rotate: 45,
-            color: '#ccc'
-          },
-          axisLine: {
-            lineStyle: {
-              color: '#666'
-            }
-          }
-        },
-        yAxis: {
-          type: 'value',
-          axisLabel: {
-            color: '#ccc'
-          },
-          axisLine: {
-            lineStyle: {
-              color: '#666'
-            }
-          },
-          splitLine: {
-            lineStyle: {
-              color: '#333'
-            }
-          }
-        },
-        series: [{
-          name: this.$t('charts.value'),
-          type: 'line',
-          data: values,
-          smooth: true,
-          lineStyle: {
-            color: '#FFC000',
-            width: 2
-          },
-          itemStyle: {
-            color: '#FFC000'
-          },
-          areaStyle: {
-            color: {
-              type: 'linear',
-              x: 0,
-              y: 0,
-              x2: 0,
-              y2: 1,
-              colorStops: [{
-                offset: 0, color: 'rgba(255, 192, 0, 0.3)'
-              }, {
-                offset: 1, color: 'rgba(255, 192, 0, 0.1)'
-              }]
-            }
-          }
-        }]
-      };
-      
-      try {
-        this.chart.setOption(option);
-        console.log('Main chart option set successfully');
-        
-        // 确保图表正确渲染
-        this.$nextTick(() => {
-          if (this.chart) {
-            this.chart.resize();
-          }
-        });
-      } catch (error) {
-        console.error('Error setting chart option:', error);
-      }
-      
-      // 响应式调整
-      const resizeHandler = () => {
-        if (this.chart) {
-          this.chart.resize();
-        }
-      };
-      
-      // 移除旧的监听器（如果存在）
-      window.removeEventListener('resize', resizeHandler);
-      window.addEventListener('resize', resizeHandler);
-    },
 
     // 渲染API市场数据图表
     renderMarketCharts() {
@@ -2501,32 +2299,7 @@ export default {
         pdf.text(this.$t('charts.title'), pdfWidth / 2, yPosition, { align: 'center' });
         yPosition += 15;
         
-        // 2. 添加主图表（Data Visualization Chart）
-        if (this.chart && this.$refs.chart) {
-          try {
-            const chartImg = this.chart.getDataURL({
-              type: 'png',
-              pixelRatio: 2,
-              backgroundColor: '#0d1b2a'
-            });
-            
-            const imgWidth = contentWidth;
-            const imgHeight = (this.$refs.chart.offsetHeight / this.$refs.chart.offsetWidth) * imgWidth;
-            
-            // 如果图片太高，需要分页
-            if (yPosition + imgHeight > pdfHeight - margin) {
-              pdf.addPage();
-              yPosition = margin;
-            }
-            
-            pdf.addImage(chartImg, 'PNG', margin, yPosition, imgWidth, imgHeight);
-            yPosition += imgHeight + 10;
-          } catch (error) {
-            console.error('Error capturing main chart:', error);
-          }
-        }
-        
-        // 3. 添加指标表格
+        // 2. 添加指标表格
         if (this.metrics && this.$refs.metricsSection) {
           try {
             // 检查是否需要新页面
@@ -2565,7 +2338,7 @@ export default {
           }
         }
         
-        // 4. 添加分析图表
+        // 3. 添加分析图表
         const chartRefs = [
           { ref: 'cumulativeReturnsChart', title: 'charts.analysisCharts.cumulativeReturns' },
           { ref: 'rollingSharpeChart', title: 'charts.analysisCharts.rollingSharpe' },
@@ -2619,7 +2392,7 @@ export default {
           }
         }
         
-        // 5. 保存 PDF
+        // 4. 保存 PDF
         const fileName = `数据分析报告_${new Date().toISOString().split('T')[0]}.pdf`;
         pdf.save(fileName);
         
@@ -2683,6 +2456,18 @@ export default {
         cumulativeValues.push(cumulative);
       }
       
+      // 计算数据范围，使1在中间位置
+      const minValue = Math.min(...cumulativeValues);
+      const maxValue = Math.max(...cumulativeValues);
+      // 计算距离1的最大偏差
+      const rangeAbove = maxValue - 1;
+      const rangeBelow = 1 - minValue;
+      const maxRange = Math.max(rangeAbove, rangeBelow);
+      // 设置y轴范围，使1在中间，并留15%边距
+      const padding = maxRange * 0.15;
+      const yAxisMin = Math.max(0, 1 - maxRange - padding);
+      const yAxisMax = 1 + maxRange + padding;
+      
       const option = {
         title: {
           text: this.$t('charts.analysisCharts.cumulativeReturns'),
@@ -2710,12 +2495,34 @@ export default {
         },
         yAxis: {
           type: 'value',
+          min: yAxisMin,
+          max: yAxisMax,
           axisLabel: { 
             color: '#ccc',
-            formatter: (value) => value.toFixed(2)
+            formatter: (value) => {
+              // 特别标注1这个值
+              if (Math.abs(value - 1) < 0.001) {
+                return '{b|1.00}';
+              }
+              return value.toFixed(2);
+            },
+            rich: {
+              b: {
+                color: '#FFC000',
+                fontWeight: 'bold',
+                fontSize: 12
+              }
+            }
           },
           axisLine: { lineStyle: { color: '#666' } },
-          splitLine: { lineStyle: { color: '#333' } }
+          splitLine: { 
+            lineStyle: { 
+              color: '#333',
+              type: 'dashed'
+            },
+            // 突出显示y=1的参考线
+            show: true
+          }
         },
         series: [{
           name: this.$t('charts.analysisCharts.netValue'),
@@ -2733,6 +2540,26 @@ export default {
                 { offset: 1, color: 'rgba(255, 192, 0, 0.1)' }
               ]
             }
+          },
+          // 添加y=1的参考线
+          markLine: {
+            silent: true,
+            animation: false,
+            lineStyle: {
+              color: '#FFC000',
+              type: 'solid',
+              width: 2.5,
+              opacity: 0.9
+            },
+            label: {
+              show: false
+            },
+            data: [
+              {
+                yAxis: 1,
+                name: '基准线'
+              }
+            ]
           }
         }]
       };
@@ -2990,15 +2817,29 @@ export default {
             show: true,
             formatter: (params) => {
               const value = params.data[2];
-              return (value * 100).toFixed(1) + '%';
+              const absValue = Math.abs(value);
+              
+              // 计算当前值的绝对值相对于最大绝对值的比例
+              const ratio = maxAbs > 0 ? absValue / maxAbs : 0;
+              
+              // 当比例较小（背景色较浅）时，使用黑色样式；否则使用白色样式
+              // 设置阈值为0.3，即当绝对值小于最大绝对值的30%时使用黑色
+              const styleName = ratio < 0.3 ? 'black' : 'white';
+              const text = (value * 100).toFixed(1) + '%';
+              return `{${styleName}|${text}}`;
             },
-            color: (params) => {
-              // 根据值的大小调整文字颜色，确保可读性
-              const value = params.data[2];
-              return Math.abs(value) < 0.01 ? '#000' : '#fff';
-            },
-            fontSize: 11,
-            fontWeight: 'bold'
+            rich: {
+              black: {
+                color: '#000',
+                fontSize: 11,
+                fontWeight: 'bold'
+              },
+              white: {
+                color: '#fff',
+                fontSize: 11,
+                fontWeight: 'bold'
+              }
+            }
           },
           itemStyle: {
             borderColor: '#333',
@@ -3584,20 +3425,10 @@ export default {
     }
   },
   beforeDestroy() {
-    if (this.chart) {
-      this.chart.dispose();
-    }
-    
     // 销毁所有分析图表
     Object.values(this.analysisCharts).forEach(chart => {
       if (chart) {
         chart.dispose();
-      }
-    });
-    
-    window.removeEventListener('resize', () => {
-      if (this.chart) {
-        this.chart.resize();
       }
     });
   }
