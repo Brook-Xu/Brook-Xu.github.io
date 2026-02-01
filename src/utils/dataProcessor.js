@@ -81,12 +81,79 @@ export function isDateColumnName(columnName) {
 
 /**
  * 判断列名是否为数值列
+ * 扩展了关键词列表，支持更多用户自定义的列名
  */
 export function isValueColumnName(columnName) {
   if (!columnName) return false;
-  const valueKeywords = ['value', 'price', 'amount', 'quantity', 'count', 'number', '数值', '价格'];
-  const lowerName = columnName.toLowerCase();
+  const lowerName = columnName.toLowerCase().trim();
+  
+  // 扩展的数值列关键词列表，按优先级分类
+  const valueKeywords = [
+    // 通用数值关键词
+    'value', '数值', '数据', 'data',
+    // 价格相关关键词
+    'price', '价格', 'close', '收盘', 'open', '开盘', 'high', '最高', 'low', '最低',
+    // 净值相关关键词
+    'nav', '净值', 'net', 'netvalue', 'net_value',
+    // 金额/数量相关关键词
+    'amount', '金额', 'quantity', '数量', 'count', '计数', 'number', '数字',
+    // 收益率相关关键词（这些会被特殊处理）
+    'return', '收益', '收益率', 'yield', '回报', '回报率',
+    'daily_return', '日收益', '日收益率',
+    'cumulative_return', '累计收益', '累计收益率',
+    'total_return', '总收益', '总收益率',
+    // 其他常见金融术语
+    'pnl', '盈亏', 'profit', '利润', 'loss', '亏损',
+    'balance', '余额', 'equity', '权益',
+    'volume', '成交量', 'vol', '量',
+    // 其他可能的数值列名
+    'val', 'val_', 'value_', 'price_', 'price_', 'amt', 'qty'
+  ];
+  
+  // 检查是否包含任何关键词
   return valueKeywords.some(keyword => lowerName.includes(keyword));
+}
+
+/**
+ * 根据列名判断数据类型，返回更详细的数据类型信息
+ * @param {string} columnName - 列名
+ * @returns {object} 包含数据类型和置信度的对象
+ */
+export function detectValueColumnType(columnName) {
+  if (!columnName) return { type: 'price', confidence: 'low' };
+  
+  const lowerName = columnName.toLowerCase().trim();
+  
+  // 收益率类型（高优先级）
+  if (lowerName.includes('daily_return') || lowerName.includes('日收益')) {
+    return { type: 'daily_return', confidence: 'high' };
+  }
+  if (lowerName.includes('cumulative_return') || lowerName.includes('累计收益')) {
+    return { type: 'cumulative_return', confidence: 'high' };
+  }
+  if (lowerName.includes('total_return') || lowerName.includes('总收益')) {
+    return { type: 'cumulative_return', confidence: 'medium' };
+  }
+  if (lowerName.includes('return') || lowerName.includes('收益') || lowerName.includes('收益率')) {
+    // 需要进一步判断是日收益还是累计收益，默认按累计收益处理
+    return { type: 'return', confidence: 'medium' };
+  }
+  
+  // 净值类型
+  if (lowerName.includes('nav') || lowerName.includes('净值') || 
+      lowerName.includes('netvalue') || lowerName.includes('net_value')) {
+    return { type: 'price', confidence: 'high' };
+  }
+  
+  // 价格类型
+  if (lowerName.includes('price') || lowerName.includes('价格') ||
+      lowerName.includes('close') || lowerName.includes('收盘') ||
+      lowerName.includes('open') || lowerName.includes('开盘')) {
+    return { type: 'price', confidence: 'high' };
+  }
+  
+  // 默认按价格处理
+  return { type: 'price', confidence: 'medium' };
 }
 
 /**

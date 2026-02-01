@@ -164,14 +164,13 @@ export default {
   charts: {
     title: 'Data Visualization Chart',
     uploadSection: 'Upload Data File',
-    uploadHint: 'Please select a CSV or Excel file to upload',
+    uploadHint: 'Please select a CSV file to upload',
     fileRequirements: 'File Requirements:',
     supportedFormats: 'Supported Date Formats:',
     supportedColumns: 'Supported Column Names:',
     supportedValueFormats: 'Supported Value Formats:',
     supportedDataTypes: 'Supported Data Types:',
-    excelRequirements: 'Excel File Requirements:',
-    csvOnly: 'Supported file types: CSV, XLS, XLSX',
+    csvOnly: 'Supported file types: CSV',
     firstColumnDate: 'First column: date (various formats supported)',
     secondColumnValue: 'Second column: numeric value',
     autoDetect: 'Column names are automatically detected',
@@ -187,8 +186,9 @@ export default {
     ],
     columnNames: {
       date: 'Date column: date, time, timestamp, day, month, year, candle_begin_time, etc.',
-      value: 'Value column: value, price, amount, quantity, count, number, etc.',
-      special: 'Special columns: daily_return (daily return), cumulative_return (cumulative return)'
+      value: 'Value column: value, price, close, open, high, low, nav, net value, amount, quantity, return, yield, etc.',
+      special: 'Special columns: daily_return (daily return), cumulative_return (cumulative return), total_return (total return)',
+      note: 'The system automatically recognizes column names, supporting mixed Chinese and English column names'
     },
     valueFormats: [
       'Regular numbers (e.g., 100, 100.5, -10.2)',
@@ -199,17 +199,12 @@ export default {
       'Daily return (daily_return): Daily return data, will be automatically converted to price series',
       'Cumulative return (cumulative_return): Cumulative return data, will be automatically converted to price series'
     ],
-    excelNotes: [
-      'Excel files will use the first worksheet (Sheet)',
-      'First row must be a header row (column names)',
-      'Supports both .xls and .xlsx formats'
-    ],
-    noDataMessage: 'No data available. Please upload a CSV or Excel file above.',
+    noDataMessage: 'No data available. Please upload a CSV file above.',
     totalDataPoints: 'Total data points',
     dataTrendChart: 'Data Trend Chart',
     value: 'Value',
     selectCsvFile: 'Please select a CSV file only.',
-    selectSupportedFile: 'Please select a supported file (CSV, XLS, or XLSX).',
+    selectSupportedFile: 'Please select a CSV file.',
     errorParsingCsv: 'Error parsing CSV file',
     errorReadingCsv: 'Error reading CSV file',
     errorParsingExcel: 'Error parsing Excel file',

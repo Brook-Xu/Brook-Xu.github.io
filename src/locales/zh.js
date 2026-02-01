@@ -164,14 +164,13 @@ export default {
   charts: {
     title: '数据可视化图表',
     uploadSection: '上传数据文件',
-    uploadHint: '请选择要上传的CSV或Excel文件',
+    uploadHint: '请选择要上传的CSV文件',
     fileRequirements: '文件要求：',
     supportedFormats: '支持的日期格式：',
     supportedColumns: '支持的列名：',
     supportedValueFormats: '支持的数值格式：',
     supportedDataTypes: '支持的数据类型：',
-    excelRequirements: 'Excel文件要求：',
-    csvOnly: '支持的文件类型：CSV、XLS、XLSX',
+    csvOnly: '支持的文件类型：CSV',
     firstColumnDate: '第一列：日期（支持多种格式）',
     secondColumnValue: '第二列：数值',
     autoDetect: '列名自动检测',
@@ -187,8 +186,9 @@ export default {
     ],
     columnNames: {
       date: '日期列：date、time、timestamp、day、month、year、日期、时间、candle_begin_time 等',
-      value: '数值列：value、price、amount、quantity、count、number、数值、价格 等',
-      special: '特殊列：daily_return（日收益率）、cumulative_return（累计收益率）'
+      value: '数值列：value、price、close、open、high、low、nav、净值、amount、数量、return、收益、数值、价格 等',
+      special: '特殊列：daily_return（日收益率）、cumulative_return（累计收益率）、total_return（总收益率）',
+      note: '系统会自动识别列名，支持中英文混合的列名'
     },
     valueFormats: [
       '普通数字（如：100、100.5、-10.2）',
@@ -199,17 +199,12 @@ export default {
       '日收益率（daily_return）：每日收益率数据，系统会自动转换为价格序列',
       '累计收益率（cumulative_return）：累计收益率数据，系统会自动转换为价格序列'
     ],
-    excelNotes: [
-      'Excel文件将使用第一个工作表（Sheet）',
-      '第一行必须是表头（列名）',
-      '支持.xls和.xlsx格式'
-    ],
-    noDataMessage: '暂无数据。请在上方上传CSV或Excel文件。',
+    noDataMessage: '暂无数据。请在上方上传CSV文件。',
     totalDataPoints: '总数据点',
     dataTrendChart: '数据趋势图表',
     value: '数值',
     selectCsvFile: '请仅选择CSV文件。',
-    selectSupportedFile: '请选择支持的文件（CSV、XLS或XLSX）。',
+    selectSupportedFile: '请选择CSV文件。',
     errorParsingCsv: '解析CSV文件时出错',
     errorReadingCsv: '读取CSV文件时出错',
     errorParsingExcel: '解析Excel文件时出错',
