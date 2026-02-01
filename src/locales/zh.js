@@ -290,7 +290,9 @@ export default {
       yearlyReturn: '年度收益',
       returnRange: '收益区间',
       frequency: '频次'
-    }
+    },
+    userUploadedData: '用户上传数据',
+    percentageChange: '涨跌百分比'
   },
 
   // 市场数据

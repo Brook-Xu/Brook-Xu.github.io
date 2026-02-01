@@ -290,7 +290,9 @@ export default {
       yearlyReturn: 'Yearly Return',
       returnRange: 'Return Range',
       frequency: 'Frequency'
-    }
+    },
+    userUploadedData: 'User Uploaded Data',
+    percentageChange: 'Percentage Change'
   },
 
   // 市场数据

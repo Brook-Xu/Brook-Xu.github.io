@@ -554,13 +554,10 @@ export default {
         return;
       }
 
-      // 验证数据格式
+      // 验证数据格式 - 只验证 close 价格（volume 是可选的）
       const validResults = data.results.filter(item => 
         item && 
         typeof item.t === 'number' && 
-        (typeof item.o === 'number' || item.o === null) &&
-        (typeof item.h === 'number' || item.h === null) &&
-        (typeof item.l === 'number' || item.l === null) &&
         (typeof item.c === 'number' || item.c === null)
       );
 
@@ -601,6 +598,9 @@ export default {
         return;
       }
 
+      // 保存 isPercentageMode 以便在 tooltip 中使用
+      const isPercentageMode = yAxisConfig.isPercentageMode || false;
+
       const option = {
         title: {
           text: this.getDataTitle(key),
@@ -618,9 +618,11 @@ export default {
                 return;
               }
               
-              if (param.seriesName === this.$t('home.volume')) {
-                result += `${param.seriesName}: ${param.value.toLocaleString()}<br/>`;
+              if (isPercentageMode) {
+                // 百分比模式
+                result += `${param.seriesName}: ${param.value.toFixed(2)}%<br/>`;
               } else {
+                // 价格模式
                 result += `${param.seriesName}: $${param.value.toFixed(2)}<br/>`;
               }
             });
@@ -655,7 +657,7 @@ export default {
           const axes = [
             {
               type: 'value',
-              name: this.$t('home.price'),
+              name: isPercentageMode ? (this.$t('charts.percentageChange') || 'Percentage Change (%)') : this.$t('home.price'),
               position: 'left',
               min: yAxisConfig.price.min,
               max: yAxisConfig.price.max,
@@ -664,6 +666,9 @@ export default {
                 formatter: function(value) {
                   if (value === null || value === undefined || isNaN(value)) {
                     return '';
+                  }
+                  if (isPercentageMode) {
+                    return value.toFixed(2) + '%';
                   }
                   return '$' + value.toFixed(2);
                 }
@@ -675,33 +680,6 @@ export default {
               }
             }
           ];
-          
-          // 只在有成交量数据时添加成交量 Y 轴（CoinGecko 数据不包含成交量）
-          if (yAxisConfig.hasVolume) {
-            axes.push({
-              type: 'value',
-              name: this.$t('home.volume'),
-              position: 'right',
-              min: yAxisConfig.volume.min,
-              max: yAxisConfig.volume.max,
-              axisLabel: { 
-                color: '#ccc',
-                formatter: function(value) {
-                  if (value === null || value === undefined || isNaN(value)) {
-                    return '';
-                  }
-                  if (value >= 1e6) {
-                    return (value / 1e6).toFixed(1) + 'M';
-                  } else if (value >= 1e3) {
-                    return (value / 1e3).toFixed(1) + 'K';
-                  }
-                  return value.toLocaleString();
-                }
-              },
-              axisLine: { lineStyle: { color: '#666' } },
-              splitLine: { show: false }
-            });
-          }
           
           return axes;
         })(),
@@ -736,16 +714,54 @@ export default {
       });
     },
 
+    // 将价格数据转换为百分比（相对于第一个价格）
+    convertPriceToPercentage(priceArray) {
+      if (!priceArray || priceArray.length === 0) return [];
+      const firstPrice = priceArray[0];
+      if (!firstPrice || firstPrice === 0) return priceArray;
+      return priceArray.map(price => {
+        if (price === null || price === undefined || isNaN(price)) return null;
+        return ((price - firstPrice) / firstPrice) * 100; // 转换为百分比
+      });
+    },
+
+    // 对齐用户数据和市场数据（按日期）
+    alignUserDataWithMarketData(userData, marketResults) {
+      if (!userData || userData.length === 0) return [];
+      
+      // 创建市场数据的日期映射（使用标准日期格式）
+      const marketDateMap = new Map();
+      marketResults.forEach(item => {
+        try {
+          const date = new Date(item.t);
+          const dateStr = date.toISOString().split('T')[0]; // YYYY-MM-DD 格式
+          marketDateMap.set(dateStr, item);
+        } catch (e) {
+          console.warn('Invalid date in market data:', item.t);
+        }
+      });
+
+      // 对齐用户数据
+      const alignedData = [];
+      userData.forEach(userItem => {
+        const dateStr = userItem.date; // 用户数据已经是标准格式 YYYY-MM-DD
+        const marketItem = marketDateMap.get(dateStr);
+        if (marketItem) {
+          alignedData.push({
+            date: dateStr,
+            userValue: userItem.value,
+            marketClose: marketItem.c
+          });
+        }
+      });
+
+      return alignedData;
+    },
+
     // 创建市场数据图表系列
     createMarketChartSeries(results) {
-      // 计算每个属性的数值范围
-      const volumeData = results.map(item => item.v).filter(v => v !== null && v !== undefined && !isNaN(v) && v > 0);
-      // 过滤掉 vw（VWAP），因为 CoinGecko 数据中没有这个字段
-      const priceData = results.map(item => [item.o, item.h, item.l, item.c]).flat().filter(v => v !== null && v !== undefined && !isNaN(v));
-      
-      // 检查是否有有效的成交量数据
-      // 至少需要 50% 的数据点有成交量才显示成交量图表
-      const hasVolume = volumeData.length > 0 && (volumeData.length / results.length) >= 0.5;
+      // 只使用 close 价格计算范围
+      const priceData = results.map(item => item.c).filter(v => v !== null && v !== undefined && !isNaN(v));
       
       const priceMin = priceData.length > 0 ? Math.min(...priceData) : 0;
       const priceMax = priceData.length > 0 ? Math.max(...priceData) : 0;
@@ -754,107 +770,143 @@ export default {
       const priceRange = priceMax - priceMin;
       // 如果价格范围太小或为0，使用价格本身的百分比作为边距
       const pricePadding = priceRange > 0 ? priceRange * 0.05 : Math.abs(priceMin || priceMax || 1) * 0.05;
-      const adjustedPriceMin = Math.max(0, priceMin - pricePadding);
-      const adjustedPriceMax = priceMax + pricePadding;
-      
-      // 为成交量数据添加边距（如果有成交量数据）
-      let adjustedVolumeMin = 0;
-      let adjustedVolumeMax = 0;
-      if (hasVolume) {
-        const volumeMin = Math.min(...volumeData);
-        const volumeMax = Math.max(...volumeData);
-        const volumeRange = volumeMax - volumeMin;
-        const volumePadding = volumeRange * 0.1; // 10%的边距
-        adjustedVolumeMin = Math.max(0, volumeMin - volumePadding);
-        adjustedVolumeMax = volumeMax + volumePadding;
-      }
+      let adjustedPriceMin = Math.max(0, priceMin - pricePadding);
+      let adjustedPriceMax = priceMax + pricePadding;
 
       const series = [];
       
-      // 只在有成交量数据时添加成交量系列
-      if (hasVolume) {
-        console.log(`Adding volume series for chart. Volume data points: ${volumeData.length}/${results.length}`);
-        series.push({
-          name: this.$t('home.volume'), 
-          data: results.map(item => item.v || 0), 
-          type: 'bar', 
-          yAxisIndex: 1, 
-          itemStyle: { 
-            color: (params) => {
-              // 根据涨跌显示不同颜色（如果有关闭价数据）
-              const currentItem = results[params.dataIndex];
-              const prevItem = params.dataIndex > 0 ? results[params.dataIndex - 1] : null;
-              if (prevItem && currentItem && currentItem.c && prevItem.c) {
-                return currentItem.c >= prevItem.c ? '#4caf50' : '#ef5350';
-              }
-              return '#ff6b6b';
+      // 检查是否有用户上传的数据
+      let userDataSeries = null;
+      let isPercentageMode = false;
+      let alignedUserData = [];
+      let marketPriceData = results.map(item => item.c);
+      let userPriceData = [];
+
+      if (this.parsedData && this.parsedData.length > 0) {
+        // 对齐用户数据和市场数据
+        alignedUserData = this.alignUserDataWithMarketData(this.parsedData, results);
+        
+        if (alignedUserData.length > 0) {
+          // 判断用户数据类型
+          const isUserDataPercentage = this.dataType === 'daily_return' || 
+                                       this.dataType === 'cumulative_return' || 
+                                       this.dataType === 'return';
+          
+          if (isUserDataPercentage) {
+            // 用户上传的是百分比数据，需要将市场数据也转换为百分比
+            isPercentageMode = true;
+            
+            // 将市场数据转换为百分比（相对于第一个价格）
+            const marketFirstPrice = marketPriceData.find(p => p !== null && p !== undefined && !isNaN(p));
+            if (marketFirstPrice) {
+              marketPriceData = this.convertPriceToPercentage(marketPriceData);
             }
-          },
-          barWidth: '60%',
-          barGap: '20%'
-        });
-      } else {
-        console.log(`No volume data available. Volume data points: ${volumeData.length}/${results.length}`);
+            
+            // 用户数据在 FileUpload 中已经被转换为价格序列
+            // 对于 daily_return: 价格序列从 1 开始，price[i] = price[i-1] * (1 + daily_return[i])
+            // 对于 cumulative_return: 价格序列是 1 + cumulative_return[i]
+            // 我们需要将这些价格序列转换为相对于第一个值的百分比
+            const userFirstValue = alignedUserData[0].userValue;
+            if (userFirstValue && userFirstValue !== 0) {
+              // 将价格序列转换为百分比（相对于第一个值）
+              userPriceData = alignedUserData.map(item => {
+                if (item.userValue === null || item.userValue === undefined || isNaN(item.userValue)) {
+                  return null;
+                }
+                return ((item.userValue - userFirstValue) / userFirstValue) * 100;
+              });
+            } else {
+              userPriceData = alignedUserData.map(() => 0);
+            }
+          } else {
+            // 用户上传的是价格数据，直接使用
+            userPriceData = alignedUserData.map(item => item.userValue);
+            
+            // 更新价格范围计算，包含用户数据
+            const allPriceData = [...priceData, ...userPriceData].filter(v => v !== null && v !== undefined && !isNaN(v));
+            if (allPriceData.length > 0) {
+              const allPriceMin = Math.min(...allPriceData);
+              const allPriceMax = Math.max(...allPriceData);
+              const allPriceRange = allPriceMax - allPriceMin;
+              const allPricePadding = allPriceRange > 0 ? allPriceRange * 0.05 : Math.abs(allPriceMin || allPriceMax || 1) * 0.05;
+              adjustedPriceMin = Math.max(0, allPriceMin - allPricePadding);
+              adjustedPriceMax = allPriceMax + allPricePadding;
+            }
+          }
+          
+          // 创建用户数据系列（需要与市场数据的日期对齐）
+          const userDataForChart = [];
+          const marketDates = results.map(item => {
+            try {
+              const date = new Date(item.t);
+              return date.toISOString().split('T')[0];
+            } catch (e) {
+              return null;
+            }
+          });
+          
+          // 创建对齐后的用户数据数组
+          const userDataMap = new Map();
+          alignedUserData.forEach((item, index) => {
+            userDataMap.set(item.date, userPriceData[index]);
+          });
+          
+          marketDates.forEach(dateStr => {
+            if (dateStr && userDataMap.has(dateStr)) {
+              userDataForChart.push(userDataMap.get(dateStr));
+            } else {
+              userDataForChart.push(null);
+            }
+          });
+          
+          userDataSeries = {
+            name: this.$t('charts.userUploadedData') || 'User Data',
+            data: userDataForChart,
+            type: 'line',
+            yAxisIndex: 0,
+            itemStyle: { color: '#FFC000' },
+            lineStyle: { width: 3 },
+            symbol: 'diamond',
+            symbolSize: 6
+          };
+        }
       }
-      
-      series.push(
-        { 
-          name: this.$t('home.open'), 
-          data: results.map(item => item.o), 
-          type: 'line', 
-          yAxisIndex: 0, 
-          itemStyle: { color: '#FFC000' },
-          lineStyle: { width: 2 },
-          symbol: 'circle',
-          symbolSize: 4
-        },
-        { 
-          name: this.$t('home.high'), 
-          data: results.map(item => item.h), 
-          type: 'line', 
-          yAxisIndex: 0, 
-          itemStyle: { color: '#ffa726' },
-          lineStyle: { width: 2 },
-          symbol: 'circle',
-          symbolSize: 4
-        },
-        { 
-          name: this.$t('home.low'), 
-          data: results.map(item => item.l), 
-          type: 'line', 
-          yAxisIndex: 0, 
-          itemStyle: { color: '#ef5350' },
-          lineStyle: { width: 2 },
-          symbol: 'circle',
-          symbolSize: 4
-        },
-        { 
-          name: this.$t('home.close'), 
-          data: results.map(item => item.c), 
-          type: 'line', 
-          yAxisIndex: 0, 
-          itemStyle: { color: '#42a5f5' },
-          lineStyle: { width: 3 },
-          symbol: 'circle',
-          symbolSize: 5
-        },
-        // VWAP 只在有数据时显示（CoinGecko 数据不包含 VWAP）
-        ...(results.some(item => item.vw !== null && item.vw !== undefined && !isNaN(item.vw)) ? [{
-          name: this.$t('home.vwap'), 
-          data: results.map(item => item.vw || null), 
-          type: 'line', 
-          yAxisIndex: 0, 
-          itemStyle: { color: '#ab47bc' },
-          lineStyle: { width: 2, type: 'dashed' },
-          symbol: 'diamond',
-          symbolSize: 4
-        }] : [])
-      );
+
+      // 添加市场数据的 close 价格系列
+      const marketSeriesData = isPercentageMode ? marketPriceData : results.map(item => item.c);
+      series.push({
+        name: this.$t('home.close'), 
+        data: marketSeriesData, 
+        type: 'line', 
+        yAxisIndex: 0, 
+        itemStyle: { color: '#42a5f5' },
+        lineStyle: { width: 3 },
+        symbol: 'circle',
+        symbolSize: 5
+      });
+
+      // 添加用户数据系列（如果有）
+      if (userDataSeries) {
+        series.push(userDataSeries);
+      }
+
+      // 更新价格范围（如果是百分比模式）
+      if (isPercentageMode) {
+        const allPercentageData = [...marketPriceData, ...userPriceData].filter(v => v !== null && v !== undefined && !isNaN(v));
+        if (allPercentageData.length > 0) {
+          const allPercentageMin = Math.min(...allPercentageData);
+          const allPercentageMax = Math.max(...allPercentageData);
+          const allPercentageRange = allPercentageMax - allPercentageMin;
+          const allPercentagePadding = allPercentageRange > 0 ? allPercentageRange * 0.05 : Math.abs(allPercentageMin || allPercentageMax || 1) * 0.05;
+          adjustedPriceMin = allPercentageMin - allPercentagePadding;
+          adjustedPriceMax = allPercentageMax + allPercentagePadding;
+        }
+      }
 
       // 确保价格范围有效
       const finalPriceMin = isNaN(adjustedPriceMin) || adjustedPriceMin === Infinity ? 0 : adjustedPriceMin;
       const finalPriceMax = isNaN(adjustedPriceMax) || adjustedPriceMax === Infinity || adjustedPriceMax === 0 
-        ? (priceMax || 100) 
+        ? (isPercentageMode ? 0 : (priceMax || 100)) 
         : adjustedPriceMax;
 
       return {
@@ -864,11 +916,7 @@ export default {
             min: finalPriceMin, 
             max: finalPriceMax 
           },
-          volume: { 
-            min: adjustedVolumeMin, 
-            max: adjustedVolumeMax 
-          },
-          hasVolume: hasVolume // 标记是否有成交量数据
+          isPercentageMode: isPercentageMode // 标记是否是百分比模式
         }
       };
     },
