@@ -221,6 +221,9 @@ export default {
     downloadPDF: 'Download PDF Report',
     generatingPDF: 'Generating PDF...',
     pdfGenerationError: 'Failed to generate PDF, please try again',
+    downloadHTML: 'Download HTML Report',
+    generatingHTML: 'Generating HTML...',
+    htmlGenerationError: 'Failed to generate HTML, please try again',
     metricsTitle: 'Performance Metrics',
     metrics: {
       metric: 'Metric',

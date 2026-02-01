@@ -221,6 +221,9 @@ export default {
     downloadPDF: '下载 PDF 报告',
     generatingPDF: '正在生成 PDF...',
     pdfGenerationError: 'PDF 生成失败，请重试',
+    downloadHTML: '下载 HTML 报告',
+    generatingHTML: '正在生成 HTML...',
+    htmlGenerationError: 'HTML 生成失败，请重试',
     metricsTitle: '业绩指标',
     metrics: {
       metric: '指标',

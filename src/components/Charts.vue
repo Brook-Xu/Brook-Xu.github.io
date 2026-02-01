@@ -86,11 +86,11 @@
 
     <!-- Analysis Results Section -->
     <div v-else>
-    <!-- Download PDF Button -->
+    <!-- Download HTML Button -->
     <div class="pdf-download-section">
-      <button @click="downloadPDF" class="download-pdf-btn" :disabled="isGeneratingPDF">
-        <span v-if="!isGeneratingPDF">{{ $t('charts.downloadPDF') }}</span>
-        <span v-else>{{ $t('charts.generatingPDF') }}</span>
+      <button @click="downloadHTML" class="download-pdf-btn" :disabled="isGeneratingHTML">
+        <span v-if="!isGeneratingHTML">{{ $t('charts.downloadHTML') }}</span>
+        <span v-else>{{ $t('charts.generatingHTML') }}</span>
       </button>
     </div>
     
@@ -168,8 +168,6 @@ import polygonApi from '../services/polygonApi';
 import { fetchAllCryptoData, getCryptoDataTitle } from '../services/cryptoApi';
 import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
 import MetricsTable from './charts/MetricsTable.vue';
 import * as metricsCalculator from '../utils/metricsCalculator';
 import * as dataProcessor from '../utils/dataProcessor';
@@ -199,7 +197,7 @@ export default {
       minLoadingDuration: 2500, // 最小 loading 显示时间（毫秒），2.5秒
       loadingPercentage: 0, // loading 百分比
       percentageInterval: null, // 百分比更新定时器
-      isGeneratingPDF: false, // PDF 生成状态
+      isGeneratingHTML: false, // HTML 生成状态
       analysisCharts: {
         cumulativeReturns: null,
         rollingSharpe: null,
@@ -2462,69 +2460,110 @@ export default {
       }
     },
 
-    // 下载 PDF
-    async downloadPDF() {
-      if (this.isGeneratingPDF) return;
+    // 下载 HTML 报告
+    async downloadHTML() {
+      if (this.isGeneratingHTML) return;
       
-      this.isGeneratingPDF = true;
+      this.isGeneratingHTML = true;
       
       try {
-        // 创建 PDF 实例 (A4 尺寸)
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = pdf.internal.pageSize.getHeight();
-        const margin = 10;
-        const contentWidth = pdfWidth - 2 * margin;
-        const contentHeight = pdfHeight - 2 * margin;
-        
-        let yPosition = margin;
-        
-        // 1. 添加标题
-        pdf.setFontSize(20);
-        pdf.setTextColor(255, 192, 0);
-        pdf.text(this.$t('charts.title'), pdfWidth / 2, yPosition, { align: 'center' });
-        yPosition += 15;
-        
-        // 2. 添加指标表格
-        if (this.metrics && this.$refs.metricsSection) {
-          try {
-            // 检查是否需要新页面
-            if (yPosition > pdfHeight - 50) {
-              pdf.addPage();
-              yPosition = margin;
-            }
+        // 1. 构建指标表格HTML
+        let metricsTableHTML = '';
+        if (this.metrics) {
+          const metricsConfig = [
+            { key: 'startDate', type: 'date' },
+            { key: 'endDate', type: 'date' },
+            { key: 'cumulativeReturn', type: 'percentage' },
+            { key: 'cagr', type: 'percentage' },
+            { key: 'volatility', type: 'percentage' },
+            { key: 'sharpeRatio', type: 'number', decimals: 3 },
+            { key: 'sortinoRatio', type: 'number', decimals: 3 },
+            { key: 'maxDrawdown', type: 'percentage' },
+            { key: 'durationOfMD', type: 'days' },
+            { key: 'maxDrawdownDuration', type: 'days' },
+            { key: 'drawdownOfMDD', type: 'percentage' },
+            { key: 'calmarRatio', type: 'number', decimals: 3 },
+            { key: 'var95', type: 'percentage' },
+            { key: 'var99Monthly', type: 'percentage' },
+            { key: 'cvar95', type: 'percentage' },
+            { key: 'cvar99', type: 'percentage' },
+            { key: 'giniCoefficient', type: 'number', decimals: 3 },
+            { key: 'omegaRatio', type: 'number', decimals: 3 },
+            { key: 'gainPainRatio', type: 'number', decimals: 3 },
+            { key: 'tailRatio', type: 'number', decimals: 3 },
+            { key: 'outlierWinRatio', type: 'percentage' },
+            { key: 'outlierLossRatio', type: 'percentage' },
+            { key: 'rollingSharpe90dMean', type: 'number', decimals: 3 },
+            { key: 'rollingSharpe90dMedian', type: 'number', decimals: 3 },
+            { key: 'rollingSharpe90dLast', type: 'number', decimals: 3 },
+            { key: 'rollingSharpe365dMean', type: 'number', decimals: 3 },
+            { key: 'rollingSharpe365dMedian', type: 'number', decimals: 3 },
+            { key: 'rollingSharpe365dLast', type: 'number', decimals: 3 },
+            { key: 'mtd', type: 'percentage' },
+            { key: 'return3M', type: 'percentage' },
+            { key: 'return6M', type: 'percentage' },
+            { key: 'ytd', type: 'percentage' },
+            { key: 'bestDay', type: 'percentage' },
+            { key: 'worstDay', type: 'percentage' },
+            { key: 'bestMonth', type: 'percentage' },
+            { key: 'worstMonth', type: 'percentage' },
+            { key: 'bestYear', type: 'percentage' },
+            { key: 'worstYear', type: 'percentage' },
+            { key: 'skew', type: 'number', decimals: 3 },
+            { key: 'kurtosis', type: 'number', decimals: 3 }
+          ];
+          
+          let tableRows = '';
+          metricsConfig.forEach(config => {
+            const metricName = this.$t(`charts.metrics.${config.key}`);
+            const uploadedValue = this.getMetricValue(this.metrics, config.key, config.type, config.decimals);
+            const sp500Value = this.getMetricValue(this.marketMetrics.sp500, config.key, config.type, config.decimals);
+            const nasdaqValue = this.getMetricValue(this.marketMetrics.nasdaq, config.key, config.type, config.decimals);
+            const btcValue = this.getMetricValue(this.marketMetrics.btc, config.key, config.type, config.decimals);
+            const ethValue = this.getMetricValue(this.marketMetrics.eth, config.key, config.type, config.decimals);
             
-            // 添加表格标题
-            pdf.setFontSize(16);
-            pdf.setTextColor(255, 192, 0);
-            pdf.text(this.$t('charts.metricsTitle'), pdfWidth / 2, yPosition, { align: 'center' });
-            yPosition += 10;
-            
-            // 使用 html2canvas 捕获表格
-            const canvas = await html2canvas(this.$refs.metricsSection, {
-              backgroundColor: '#0d1b2a',
-              scale: 2,
-              useCORS: true
-            });
-            
-            const tableImg = canvas.toDataURL('image/png');
-            const imgWidth = contentWidth;
-            const imgHeight = (canvas.height / canvas.width) * imgWidth;
-            
-            // 如果表格太高，需要分页
-            if (yPosition + imgHeight > pdfHeight - margin) {
-              pdf.addPage();
-              yPosition = margin;
-            }
-            
-            pdf.addImage(tableImg, 'PNG', margin, yPosition, imgWidth, imgHeight);
-            yPosition += imgHeight + 10;
-          } catch (error) {
-            console.error('Error capturing metrics table:', error);
-          }
+            tableRows += `
+              <tr>
+                <td>${metricName}</td>
+                <td>${uploadedValue || ''}</td>
+                <td>${sp500Value || ''}</td>
+                <td>${nasdaqValue || ''}</td>
+                <td>${btcValue || ''}</td>
+                <td>${ethValue || ''}</td>
+              </tr>
+            `;
+          });
+          
+          metricsTableHTML = `
+            <section class="metrics-section">
+              <h2>${this.$t('charts.metricsTitle')}</h2>
+              <div class="metrics-table-container">
+                <table class="metrics-table">
+                  <thead>
+                    <tr>
+                      <th>${this.$t('charts.metrics.metric')}</th>
+                      <th>${this.$t('charts.metrics.uploadedData')}</th>
+                      <th>${this.$t('charts.metrics.sp500')}</th>
+                      <th>${this.$t('charts.metrics.nasdaq')}</th>
+                      <th>${this.$t('charts.metrics.btc')}</th>
+                      <th>${this.$t('charts.metrics.eth')}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${tableRows}
+                  </tbody>
+                </table>
+                <div class="metrics-info">
+                  <p>${this.$t('charts.metrics.dataPoints')}: ${this.metrics.dataPoints}</p>
+                  <p>${this.$t('charts.metrics.totalDays')}: ${this.metrics.totalDays}</p>
+                  <p>${this.$t('charts.metrics.years')}: ${this.formatNumber(this.metrics.years, 2)}</p>
+                </div>
+              </div>
+            </section>
+          `;
         }
         
-        // 3. 添加分析图表
+        // 2. 获取所有图表的base64图片
         const chartRefs = [
           { ref: 'cumulativeReturnsChart', title: 'charts.analysisCharts.cumulativeReturns' },
           { ref: 'rollingSharpeChart', title: 'charts.analysisCharts.rollingSharpe' },
@@ -2534,6 +2573,7 @@ export default {
           { ref: 'rollingVolatilityChart', title: 'charts.analysisCharts.rollingVolatility' }
         ];
         
+        let chartsHTML = '';
         for (const chartInfo of chartRefs) {
           const chartRef = this.$refs[chartInfo.ref];
           if (!chartRef) continue;
@@ -2543,18 +2583,6 @@ export default {
             const chartInstance = echarts.getInstanceByDom(chartRef);
             if (!chartInstance) continue;
             
-            // 检查是否需要新页面
-            if (yPosition > pdfHeight - 100) {
-              pdf.addPage();
-              yPosition = margin;
-            }
-            
-            // 添加图表标题
-            pdf.setFontSize(14);
-            pdf.setTextColor(255, 192, 0);
-            pdf.text(this.$t(chartInfo.title), pdfWidth / 2, yPosition, { align: 'center' });
-            yPosition += 8;
-            
             // 获取图表图片
             const chartImg = chartInstance.getDataURL({
               type: 'png',
@@ -2562,32 +2590,286 @@ export default {
               backgroundColor: '#0d1b2a'
             });
             
-            const imgWidth = contentWidth;
-            const imgHeight = (chartRef.offsetHeight / chartRef.offsetWidth) * imgWidth;
-            
-            // 如果图片太高，需要分页
-            if (yPosition + imgHeight > pdfHeight - margin) {
-              pdf.addPage();
-              yPosition = margin;
-            }
-            
-            pdf.addImage(chartImg, 'PNG', margin, yPosition, imgWidth, imgHeight);
-            yPosition += imgHeight + 10;
+            chartsHTML += `
+              <div class="analysis-chart-item">
+                <h3>${this.$t(chartInfo.title)}</h3>
+                <div class="chart-image-container">
+                  <img src="${chartImg}" alt="${this.$t(chartInfo.title)}" style="max-width: 100%; height: auto;" />
+                </div>
+              </div>
+            `;
           } catch (error) {
             console.error(`Error capturing ${chartInfo.ref}:`, error);
           }
         }
         
-        // 4. 保存 PDF
-        const fileName = `数据分析报告_${new Date().toISOString().split('T')[0]}.pdf`;
-        pdf.save(fileName);
+        // 3. 获取market data图表
+        let marketChartsHTML = '';
+        if (this.marketData && Object.keys(this.marketData).length > 0) {
+          Object.keys(this.marketData).forEach(key => {
+            try {
+              const chartRef = this.$refs[`chart-${key}`];
+              if (!chartRef || !chartRef[0]) {
+                console.warn(`Chart ref not found for ${key}`);
+                return;
+              }
+              
+              // 获取 ECharts 实例
+              const chartInstance = echarts.getInstanceByDom(chartRef[0]);
+              if (!chartInstance) return;
+              
+              // 获取图表图片
+              const chartImg = chartInstance.getDataURL({
+                type: 'png',
+                pixelRatio: 2,
+                backgroundColor: '#0d1b2a'
+              });
+              
+              marketChartsHTML += `
+                <div class="analysis-chart-item">
+                  <h3>${this.getDataTitle(key)}</h3>
+                  <div class="chart-image-container">
+                    <img src="${chartImg}" alt="${this.getDataTitle(key)}" style="max-width: 100%; height: auto;" />
+                  </div>
+                </div>
+              `;
+            } catch (error) {
+              console.error(`Error capturing market chart ${key}:`, error);
+            }
+          });
+        }
         
-        console.log('PDF generated successfully');
+        // 4. 构建完整的HTML文档
+        const htmlContent = `<!DOCTYPE html>
+<html lang="${this.$i18n.locale}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${this.$t('charts.title')}</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #0d1b2a 0%, #1b263b 100%);
+      color: #ccc;
+      line-height: 1.6;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: rgba(13, 27, 42, 0.8);
+      border-radius: 10px;
+      padding: 40px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+    
+    h1 {
+      text-align: center;
+      color: #FFC000;
+      font-size: 2.5rem;
+      margin-bottom: 40px;
+      text-shadow: 0 2px 10px rgba(255, 192, 0, 0.3);
+    }
+    
+    .metrics-section {
+      background: linear-gradient(135deg, #0d1b2a 0%, #1b263b 100%);
+      padding: 40px;
+      border-radius: 10px;
+      margin: 40px 0;
+    }
+    
+    .metrics-section h2 {
+      text-align: center;
+      color: #FFC000;
+      margin-bottom: 30px;
+      font-size: 2rem;
+    }
+    
+    .metrics-table-container {
+      overflow-x: auto;
+    }
+    
+    .metrics-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: rgba(13, 27, 42, 0.5);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    
+    .metrics-table thead {
+      background: rgba(255, 192, 0, 0.2);
+    }
+    
+    .metrics-table th {
+      padding: 15px 20px;
+      text-align: left;
+      color: #FFC000;
+      font-weight: 600;
+      font-size: 16px;
+      border-bottom: 2px solid rgba(255, 192, 0, 0.3);
+    }
+    
+    .metrics-table td {
+      padding: 12px 20px;
+      color: #ccc;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      font-size: 14px;
+    }
+    
+    .metrics-table tbody tr:hover {
+      background: rgba(255, 192, 0, 0.05);
+      transition: background 0.3s;
+    }
+    
+    .metrics-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+    
+    .metrics-table td:first-child {
+      color: #FFC000;
+      font-weight: 500;
+    }
+    
+    .metrics-info {
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin-top: 20px;
+      padding: 15px;
+      background: rgba(13, 27, 42, 0.3);
+      border-radius: 5px;
+      border: 1px solid rgba(255, 192, 0, 0.2);
+    }
+    
+    .metrics-info p {
+      color: #999;
+      font-size: 14px;
+      margin: 0;
+    }
+    
+    .analysis-charts-section {
+      margin-top: 40px;
+    }
+    
+    .analysis-charts-section h2 {
+      text-align: center;
+      color: #FFC000;
+      font-size: 2rem;
+      margin-bottom: 30px;
+    }
+    
+    .analysis-chart-item {
+      background: rgba(13, 27, 42, 0.5);
+      padding: 30px;
+      border-radius: 10px;
+      margin-bottom: 30px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+    
+    .analysis-chart-item h3 {
+      color: #FFC000;
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    
+    .chart-image-container {
+      text-align: center;
+      background: #0d1b2a;
+      padding: 20px;
+      border-radius: 8px;
+    }
+    
+    .chart-image-container img {
+      display: block;
+      margin: 0 auto;
+      max-width: 100%;
+      height: auto;
+    }
+    
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      
+      .container {
+        box-shadow: none;
+        padding: 20px;
+      }
+      
+      .analysis-chart-item {
+        page-break-inside: avoid;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .metrics-table {
+        font-size: 12px;
+      }
+      
+      .metrics-table th,
+      .metrics-table td {
+        padding: 10px 12px;
+      }
+      
+      .metrics-info {
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      h1 {
+        font-size: 2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>${this.$t('charts.title')}</h1>
+    ${metricsTableHTML}
+    <section class="analysis-charts-section">
+      <h2>${this.$t('charts.analysisChartsTitle')}</h2>
+      ${chartsHTML}
+    </section>
+    ${marketChartsHTML ? `
+    <section class="analysis-charts-section">
+      <h2>${this.$t('home.marketDataCharts')}</h2>
+      ${marketChartsHTML}
+    </section>
+    ` : ''}
+  </div>
+</body>
+</html>`;
+        
+        // 5. 创建并下载HTML文件
+        const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        const fileName = `Data_Analysis_Report_${new Date().toISOString().split('T')[0]}.html`;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        
+        console.log('HTML report generated successfully');
       } catch (error) {
-        console.error('Error generating PDF:', error);
-        alert(this.$t('charts.pdfGenerationError') || 'PDF 生成失败，请重试');
+        console.error('Error generating HTML:', error);
+        alert(this.$t('charts.htmlGenerationError') || 'HTML 生成失败，请重试');
       } finally {
-        this.isGeneratingPDF = false;
+        this.isGeneratingHTML = false;
       }
     },
 
