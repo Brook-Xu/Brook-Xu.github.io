@@ -35,6 +35,7 @@ export default {
     productsTitle: 'Our Products',
     riskManagement: 'Risk Management',
     partners: 'Partners',
+    managementTeam: 'Management Team',
     contactUs: 'Contact us',
     login: 'Login',
     language: 'Language'
@@ -158,6 +159,14 @@ export default {
   about: {
     description: 'At Starnet Digital, we deliver cutting-edge digital asset management solutions to help investors navigate the dynamic world of blockchain, cryptocurrency, and decentralized finance. Our platform is built on secure, scalable, and tailored infrastructure – empowering clients to unlock the full value of their holdings.',
     details: 'With roots in proprietary trading, we have evolved into a full-spectrum digital asset manager, offering institutional-grade strategies backed by rigorous risk management. Our focus spans high-frequency trading (HFT), advanced DeFi strategies, and all-weather market-neutral approaches — designed to perform across market cycles and meet the evolving needs of institutional and professional investors.'
+  },
+
+  // Management Team
+  managementTeam: {
+    item1: 'Business Partner at 280m AUM crypto hedge fund',
+    item2: 'Top3 exchange.io Over 5 Years Capital Raising and Hedge Fund experience in Digital Asset Space hedge fund asset management.',
+    item3: 'Crypto OG Since 2017. Series Entrepreneuar,CFA',
+    item4: 'Base US and HK'
   },
 
   // 图表页面

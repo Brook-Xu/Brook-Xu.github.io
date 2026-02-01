@@ -27,6 +27,9 @@
         <li class="menu-item" :class="{ 'current-menu-item': activeSection === 'partners' }">
           <a href="#partners" @click.prevent="scrollToSection('partners')" class="nav-link" :class="{ 'active': activeSection === 'partners' }">{{ $t('navigation.partners') }}</a>
         </li>
+        <li class="menu-item" :class="{ 'current-menu-item': activeSection === 'management-team' }">
+          <a href="#management-team" @click.prevent="scrollToSection('management-team')" class="nav-link" :class="{ 'active': activeSection === 'management-team' }">{{ $t('navigation.managementTeam') }}</a>
+        </li>
         <li class="menu-item" :class="{ 'current-menu-item': activeSection === 'contact' }">
           <a href="#contact" @click.prevent="scrollToSection('contact')" class="nav-link" :class="{ 'active': activeSection === 'contact' }">{{ $t('navigation.contactUs') }}</a>
         </li>

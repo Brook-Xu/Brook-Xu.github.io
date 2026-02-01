@@ -19,6 +19,9 @@
     <div class="section" data-anchor="partners">
       <PartnersSection />
     </div>
+    <div class="section" data-anchor="management-team">
+      <ManagementTeamSection />
+    </div>
     <div class="section" data-anchor="contact">
       <ContactSection />
     </div>
@@ -34,6 +37,7 @@ import ValuesSection from './sections/ValuesSection.vue';
 import ProductsSection from './sections/ProductsSection.vue';
 import RiskSection from './sections/RiskSection.vue';
 import PartnersSection from './sections/PartnersSection.vue';
+import ManagementTeamSection from './sections/ManagementTeamSection.vue';
 import ContactSection from './sections/ContactSection.vue';
 
 export default {
@@ -45,6 +49,7 @@ export default {
     ProductsSection,
     RiskSection,
     PartnersSection,
+    ManagementTeamSection,
     ContactSection
   },
   data() {

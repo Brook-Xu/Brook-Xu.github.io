@@ -35,6 +35,7 @@ export default {
     productsTitle: '我们的产品',
     riskManagement: '风险管理',
     partners: '合作伙伴',
+    managementTeam: '管理团队',
     contactUs: '联系我们',
     login: '登录',
     language: '语言'
@@ -158,6 +159,14 @@ export default {
   about: {
     description: '在Starnet Digital，我们提供尖端的数字资产管理解决方案，帮助投资者驾驭区块链、加密货币和去中心化金融的动态世界。我们的平台建立在安全、可扩展和定制的基础设施之上——赋能客户释放其持有资产的全部价值。',
     details: '凭借自营交易的根基，我们已发展成为全方位的数字资产管理公司，提供由严格风险管理支持的机构级策略。我们的重点涵盖高频交易（HFT）、先进的DeFi策略和全天候市场中性方法——旨在跨市场周期表现优异，满足机构和专业投资者不断变化的需求。'
+  },
+
+  // Management Team
+  managementTeam: {
+    item1: 'Business Partner at 280m AUM crypto hedge fund',
+    item2: 'Top3 exchange.io Over 5 Years Capital Raising and Hedge Fund experience in Digital Asset Space hedge fund asset management.',
+    item3: 'Crypto OG Since 2017. Series Entrepreneuar,CFA',
+    item4: 'Base US and HK'
   },
 
   // 图表页面
